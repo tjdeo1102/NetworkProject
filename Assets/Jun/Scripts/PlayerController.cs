@@ -3,13 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Pun.Demo.Procedural;
+using System;
+using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviourPun
 {
+
+    [Header("Block")]
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private GameObject[] blockPrefabs;
     [SerializeField] private Block currentBlock;
 
+
+    [Header("PlayerStat")]
+    [SerializeField] private int curHp;
+    [SerializeField] private int maxHp;
+    public event Action OnChangeHp;
 
     private void Start()
     {
@@ -92,7 +101,29 @@ public class PlayerController : MonoBehaviourPun
         }
 
         int randomIndex = Random.Range(0, blockPrefabs.Length);
+        //SpawnPoint는 플레이어 위치 or 블럭의 쌓인 y값 최대치 or 타워의 높이 상대치를 통해 정해질 예정
         GameObject newBlock = PhotonNetwork.Instantiate(blockPrefabs[randomIndex].name, spawnPoint.position, Quaternion.identity);
         currentBlock = newBlock.GetComponent<Block>();
     }
+
+    public void TakeDamage(int damage)
+    {
+        curHp -= damage;
+        Debug.Log($"현재 체력 : {curHp}");
+
+        // 플레이어의 체력이 0 이하가 되면 그 이후의 상황을 처리
+        if (curHp <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        //플레이어 죽음 애니메이션 추가
+        //한명의 플레이어가 생존할 때 까지 대기
+        OnChangeHp?.Invoke();
+    }
+
+
 }
