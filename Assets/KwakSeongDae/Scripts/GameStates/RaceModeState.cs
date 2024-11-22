@@ -22,7 +22,7 @@ public class RaceModeState : GameState
         goalRoutineDic = new Dictionary<int, Coroutine>();
         isBlockCheckDic = new Dictionary<int, bool>();
         // 플레이어 수만큼 미리 요소 추가
-        foreach (var playerID in manager.PlayerDic.Keys)
+        foreach (var playerID in playerObjectDic.Keys)
         {
             goalRoutineDic.Add(playerID, null);
             isBlockCheckDic.Add(playerID, false);
@@ -64,9 +64,9 @@ public class RaceModeState : GameState
         {
             // 1. 현재 블럭 충돌 Check를 False로 초기화
             var isBlockCheckKeys = isBlockCheckDic.Keys.ToArray();
-            foreach (var key in isBlockCheckKeys)
+            foreach (var playerID in isBlockCheckKeys)
             {
-                isBlockCheckDic[key] = false;
+                isBlockCheckDic[playerID] = false;
             }
 
             // 2. Physics2D로 충돌체 검사
@@ -85,7 +85,7 @@ public class RaceModeState : GameState
                 {
                     // 테스트용 
                     //int playerID = block.Owner.ActorNumber;
-                    int playerID = 0;
+                    int playerID = collision.GetComponent<TestBlocks>().PlayerID;
 
                     if (isBlockCheckDic.ContainsKey(playerID))
                         isBlockCheckDic[playerID] = true;

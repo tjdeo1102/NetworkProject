@@ -43,13 +43,14 @@ public class GameState : MonoBehaviour
     {
         print($"{StateType}에서 탈출");
         // TODO: 게임 모드 끝났을 때, 어떻게 처리?
+
         // 기본적으로 해당 게임 모드가 끝나면 방이 해체된다고 가정하고, 초기화 진행
         var playerObjectKeys =playerObjectDic.Keys.ToArray();
         // 플레이어 오브젝트들 삭제
-        foreach (var key in playerObjectKeys)
+        foreach (var playerID in playerObjectKeys)
         {
-            if (playerObjectDic[key] != null)
-                Destroy(playerObjectDic[key]);
+            if (playerObjectDic[playerID] != null)
+                Destroy(playerObjectDic[playerID]);
         }
         playerObjectDic.Clear();
         manager?.ResetPlayer();
