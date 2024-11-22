@@ -16,6 +16,11 @@ public class LoginPanel : MonoBehaviour
     public void Login()
     {
         Debug.Log("로그인 요청");
+        if (idInputField.text == "")
+        {
+            Debug.LogWarning("아이디를 입력하셔야 접속이 가능합니다");
+        }
+        
         PhotonNetwork.LocalPlayer.NickName = idInputField.text;
         PhotonNetwork.ConnectUsingSettings();
     }
