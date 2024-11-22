@@ -18,6 +18,8 @@ public class Blocks : MonoBehaviour
     [SerializeField] private Transform tileParent;          // 타일들의 부모 트랜스폼
     [SerializeField] private Vector2[] tileRotPos;          // 회전시 적용할 위치값들
 
+    [SerializeField] LayerMask castLayer; 
+
     private int rotIndex = 0;               // tileRotPos 배열에서 사용할 index값
 
     private Rigidbody2D rigid;              // Rigidbody2D 컴포넌트 참조                                          
@@ -142,22 +144,68 @@ public class Blocks : MonoBehaviour
 
     // 이동 코루틴을 통해 이동 타이밍을 조절
     // Update에서 바로 이동해버리면 이동속도 제어가 안됀다
+    // 추가로 좌우 이동 시 충돌 감지 후 충돌을 처리한다.
     private IEnumerator MoveRoutine()
     {
         Vector2 movePos;
+        Vector2 lastDir;
+        float lastAmount;
+        Vector2 toHit;
+        RaycastHit2D[] result;
+        Vector2 startPos;
 
+        lastDir = currentDirection;
         // 제어가 가능할 동안 루프
         while (isControllable)
         {
-            movePos = rigid.position + currentDirection * currentAmount;
+            movePos = currentDirection * currentAmount;
+            lastDir = currentDirection;
+            lastAmount = currentAmount;
+
+            // 충돌 사전 감지
+            // position 이동 시에 도착위치에 감지되는 물체가 있으면 실제 이동하지 않고 별도 처리
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                // 각 타일의 위치로부터 이동할 방향으로 raycast
+                startPos = (Vector2)tiles[i].transform.position + lastDir * 0.25f;
+                result = Physics2D.RaycastAll(startPos, lastDir, lastAmount-0.05f, castLayer);
+                foreach(RaycastHit2D hit in result)
+                {
+                    // 부모 오브젝트가 hit된다면 해당 타일은 중간에 끼인 타일이므로 넘어간다.
+                    if (hit.transform == transform)
+                        break;
+
+                    // 제어권을 해제
+                    isControllable = false;
+
+                    // 충돌 검사를 시작한 위치로 부터 충돌한 지점까지의 거리를 확인
+                    toHit = hit.point - startPos;
+                    // 충돌은 감지했지만 위치가 딱 붙어있지 않는 경우
+                    // (밀치기의 경우 왼쪽 2칸까지 (1f) 범위이기 때문에 필요한 조건)
+                    if (toHit.magnitude > 0.01f)
+                    {
+                        Debug.Log("pos calibration");
+                        // 블록의 위치를 보정해준다.
+                        transform.position += new Vector3(toHit.x, 0, 0);
+                    }
+
+                    // for debug
+                    Debug.Log($"Horizontal Collision : {tiles[i].name} > {hit.collider.name}");
+                    Debug.Log($"origin : {(Vector2)tiles[i].transform.position}, direction : {lastDir}");
+                    SpriteRenderer sr = tiles[i].GetComponent<SpriteRenderer>();
+                    sr.color = Color.red;
+
+                    yield break;
+                }
+            }
+
+            Debug.Log("No Collision");
 
             // 순간적으로 이동해야 하므로 position값을 변경한다.
-            rigid.position = movePos;
+            rigid.position += movePos;
 
             // delay만큼 대기
             yield return wsMoveDelay;
-
-            rigid.velocity = new Vector2(0, rigid.velocity.y);
         }
 
         // 코루틴 변수 초기화
@@ -194,5 +242,18 @@ public class Blocks : MonoBehaviour
         // 이벤트 발생
         // 현재 블럭이 Enter 상태였었는지 확인할 수단이 필요? 
         OnBlockExited?.Invoke();
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        if (tiles.Length <= 0)
+            return;
+
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            Gizmos.DrawRay(tiles[i].transform.position+Vector3.left*0.25f, Vector3.left * 0.45f);
+            Gizmos.DrawRay(tiles[i].transform.position+Vector3.right*0.25f, Vector3.right * 0.45f);
+        }
     }
 }
