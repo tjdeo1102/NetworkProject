@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.6}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -291,7 +291,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.6}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -373,9 +373,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StateType: 1
-  playerPrefab: {fileID: 0}
-  bottomLeft: {x: 0, y: 0}
-  upRight: {x: 0, y: 0}
+  playerPrefab: {fileID: 139889674103374551, guid: e242a31ac6eb1a846a7aeb757ef0b44e, type: 3}
+  bottomLeft: {x: -9, y: -5}
+  upRight: {x: 9, y: -5}
   finishTimer: 3
   boxDetector: {fileID: 5381265777960585244}
 --- !u!1 &5381265778706291285
@@ -423,9 +423,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StateType: 3
-  playerPrefab: {fileID: 0}
-  bottomLeft: {x: 0, y: 0}
-  upRight: {x: 0, y: 0}
+  playerPrefab: {fileID: 139889674103374551, guid: e242a31ac6eb1a846a7aeb757ef0b44e, type: 3}
+  bottomLeft: {x: -9, y: -5}
+  upRight: {x: 9, y: -5}
+  winTimer: 0
+  winBlockCount: 0
 --- !u!1 &5381265778740060693
 GameObject:
   m_ObjectHideFlags: 0
