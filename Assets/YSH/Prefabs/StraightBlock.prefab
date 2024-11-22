@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5564063098573158909}
   - component: {fileID: 5564063098573158910}
   - component: {fileID: 5564063098573158911}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: StraightBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -64,6 +64,9 @@ MonoBehaviour:
   - {x: -1.75, y: 0.25}
   - {x: -0.5, y: 0.75}
   - {x: 0.25, y: -0.25}
+  castLayer:
+    serializedVersion: 2
+    m_Bits: 12288
 --- !u!50 &5564063098573158911
 Rigidbody2D:
   serializedVersion: 4
@@ -95,7 +98,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5564063098824068281}
   - component: {fileID: 5564063098824068282}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: tile3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -179,7 +182,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5564063099002927775}
   - component: {fileID: 5564063099002927768}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: tile4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -263,7 +266,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5564063099151194588}
   - component: {fileID: 5564063099151194589}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: TileParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -325,7 +328,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5564063099733971876}
   - component: {fileID: 5564063099733971877}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: tile2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -409,7 +412,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5564063100406893198}
   - component: {fileID: 5564063100406893199}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: tile1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

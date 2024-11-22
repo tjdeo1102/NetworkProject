@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4930956797943152146}
   - component: {fileID: 4930956797943152145}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: tile3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4930956799183455668}
   - component: {fileID: 4930956799183455667}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: tile4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -178,7 +178,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4930956799322085791}
   - component: {fileID: 4930956799322085790}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: tile2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -262,7 +262,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7382279233956361531}
   - component: {fileID: 7382279233956361530}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: tile1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -347,7 +347,7 @@ GameObject:
   - component: {fileID: 7382279234303379016}
   - component: {fileID: 7382279234303379019}
   - component: {fileID: 7382279234303379018}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: BoxBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -400,6 +400,9 @@ MonoBehaviour:
   - {x: -0.75, y: 0.75}
   - {x: 0.25, y: 0.75}
   - {x: 0.25, y: -0.25}
+  castLayer:
+    serializedVersion: 2
+    m_Bits: 12288
 --- !u!50 &7382279234303379018
 Rigidbody2D:
   serializedVersion: 4
@@ -431,7 +434,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7382279234949916265}
   - component: {fileID: 7382279234949916264}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: TileParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
