@@ -65,11 +65,14 @@ public class CoreManager : Singleton<CoreManager>
     }
 
     /// <summary>
-    /// 편집기에서 State를 임의로 바꿨을 때, 적용되도록 설정
+    /// 인스펙터에서 State를 임의로 바꿨을 때, 적용되도록 설정.
+    /// 추후,배포시 삭제 필요
     /// </summary>
     private void OnValidate()
     {
+#if UNITY_EDITOR
         ChangeState(currentState);
+#endif
     }
 
     /// <summary>
