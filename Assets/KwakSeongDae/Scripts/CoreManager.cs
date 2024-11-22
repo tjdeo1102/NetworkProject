@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,12 +30,12 @@ public class CoreManager : Singleton<CoreManager>
     private Dictionary<StateType, GameState> stateDic;
 
     [Header("참가 플레이어 관리")]
-    public Dictionary<int, GameObject> PlayerDic;
+    public Dictionary<int, Player> PlayerDic;
 
     protected override void Init()
     {
         stateDic = new Dictionary<StateType, GameState>();
-        PlayerDic = new Dictionary<int, GameObject>();
+        PlayerDic = new Dictionary<int, Player>();
         foreach (var s in states)
         {
             stateDic.Add(s.StateType, s);
@@ -72,23 +73,17 @@ public class CoreManager : Singleton<CoreManager>
     }
 
     /// <summary>
-    /// 포톤 뷰가 설정된 플레이어만 플레이어로 추가 가능
+    /// 포톤 플레이어만 플레이어로 추가 가능
     /// </summary>
-    public void SetPlayer(GameObject player)
+    public void SetPlayer(Player player)
     {
-        if (player.TryGetComponent<PhotonView>(out var view))
-        {
-            PlayerDic.Add(view.Owner.ActorNumber, player);
-        }
+        PlayerDic.Add(player.ActorNumber, player);
     }
-    public void SetPlayer(GameObject[] player)
+    public void SetPlayer(Player[] players)
     {
-        foreach (var p in player)
+        foreach (var player in players)
         {
-            if (p.TryGetComponent<PhotonView>(out var view))
-            {
-                PlayerDic.Add(view.Owner.ActorNumber, p);
-            }
+            PlayerDic.Add(player.ActorNumber, player);
         }
     }
 
@@ -98,5 +93,10 @@ public class CoreManager : Singleton<CoreManager>
     public void ResetPlayer()
     {
         PlayerDic.Clear();
+        PlayerDic = new Dictionary<int, Player>();
+        // 테스트 코드
+        PlayerDic.Add(0, null);
+        PlayerDic.Add(1, null);
+        PlayerDic.Add(2, null);
     }
 }
