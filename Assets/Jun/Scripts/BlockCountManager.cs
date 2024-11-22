@@ -13,18 +13,18 @@ public class BlockCountManager : MonoBehaviour
     private void OnEnable()
     {
         // 이벤트 구독
-        //blocks.OnBlockEntered += BlockPlaced;
-        //blocks.OnBlockExited += BlockRemoved;
+        blocks.OnBlockEntered += BlockPlaced;
+        blocks.OnBlockExited += BlockRemoved;
     }
 
     private void OnDisable()
     {
         // 이벤트 구독 해제
-        //blocks.OnBlockEntered -= BlockPlaced;
-        //blocks.OnBlockExited -= BlockRemoved;
+        blocks.OnBlockEntered -= BlockPlaced;
+        blocks.OnBlockExited -= BlockRemoved;
     }
 
-    private void BlockPlaced(Block block)
+    private void BlockPlaced()
     {
         BlockCount++;
         Debug.Log($"블럭 개수: {BlockCount}");
@@ -32,7 +32,7 @@ public class BlockCountManager : MonoBehaviour
         OnChangeBlockCount?.Invoke(BlockCount);
     }
 
-    private void BlockRemoved(Block block)
+    private void BlockRemoved()
     {
         BlockCount--;
         Debug.Log($"블럭 개수: {BlockCount}");
