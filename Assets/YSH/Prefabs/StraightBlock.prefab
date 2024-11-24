@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5564063098573158909
 Transform:
   m_ObjectHideFlags: 0
@@ -316,7 +316,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.9738907, y: 0.47678435}
+  m_Size: {x: 1.9865887, y: 0.48677358}
   m_EdgeRadius: 0
 --- !u!1 &5564063099733971883
 GameObject:
