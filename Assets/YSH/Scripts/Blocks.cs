@@ -14,13 +14,9 @@ public class Blocks : MonoBehaviour
     [SerializeField] private float rotateAmount;            // 회전량
     [SerializeField] private float moveDelay;               // 이동 시 부여할 딜레이
     [SerializeField] private GameObject[] tiles;            // 블럭 타일들
-    [SerializeField] private Transform tileParent;          // 타일들의 부모 트랜스폼
-    [SerializeField] private Vector2[] tileRotPos;          // 회전시 적용할 위치값들
     [SerializeField] private LayerMask castLayer;           // 레이캐스트용 layermask
 
-    private int rotIndex = 0;               // tileRotPos 배열에서 사용할 index값
     private Rigidbody2D rigid;              // Rigidbody2D 컴포넌트 참조                                          
-
     private Vector2 currentVelocity;        // 현재 하강 속도
     private Vector2 currentDirection;       // 현재 이동 방향
     private float currentAmount;            // 현재 이동량
@@ -104,17 +100,6 @@ public class Blocks : MonoBehaviour
 
         // z축으로 rotateAmount 만큼 회전
         transform.Rotate(Vector3.forward, rotateAmount);
-
-        // 회전시 적용할 위치값을 설정하지 않았으면 여기서 return
-        if (tileRotPos.Length == 0)
-            return;
-
-        // tile Parent의 위치를 적용
-        tileParent.localPosition = tileRotPos[rotIndex++];
-
-        // 360도 회전을 모두 진행했다면 다시 처음으로 
-        if (rotIndex >= tileRotPos.Length)
-            rotIndex = 0;
     }
 
     // 실제 이동, 밀치기를 진행
@@ -281,10 +266,10 @@ public class Blocks : MonoBehaviour
 
         for (int i = 0; i < tiles.Length; i++)
         {
-            Gizmos.DrawRay((tiles[i].transform.position+Vector3.left*0.25f) + (Vector3.up * 0.22f), Vector3.left * 0.45f);
-            Gizmos.DrawRay((tiles[i].transform.position+Vector3.left*0.25f) + (Vector3.down * 0.22f), Vector3.left * 0.45f);
-            Gizmos.DrawRay((tiles[i].transform.position+Vector3.right*0.25f) + (Vector3.up * 0.22f), Vector3.right * 0.45f);
-            Gizmos.DrawRay((tiles[i].transform.position+Vector3.right*0.25f) + (Vector3.down * 0.22f), Vector3.right * 0.45f);
+            Gizmos.DrawRay((tiles[i].transform.position+Vector3.left*0.25f) + (Vector3.up * 0.22f), Vector3.left * 0.2f);
+            Gizmos.DrawRay((tiles[i].transform.position+Vector3.left*0.25f) + (Vector3.down * 0.22f), Vector3.left * 0.2f);
+            Gizmos.DrawRay((tiles[i].transform.position+Vector3.right*0.25f) + (Vector3.up * 0.22f), Vector3.right * 0.2f);
+            Gizmos.DrawRay((tiles[i].transform.position+Vector3.right*0.25f) + (Vector3.down * 0.22f), Vector3.right * 0.2f);
         }
     }
 }

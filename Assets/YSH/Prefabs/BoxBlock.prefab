@@ -353,7 +353,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7382279234303379016
 Transform:
   m_ObjectHideFlags: 0
@@ -385,8 +385,8 @@ MonoBehaviour:
   basicFallSpeed: -1
   fastFallSpeed: -3
   spotlightPrefab: {fileID: 0}
-  moveAmount: 0.5
-  pushAmount: 1
+  moveAmount: 0.25
+  pushAmount: 0.5
   rotateAmount: 90
   moveDelay: 0.08
   tiles:
@@ -394,12 +394,6 @@ MonoBehaviour:
   - {fileID: 4930956799322085760}
   - {fileID: 4930956797943152147}
   - {fileID: 4930956799183455669}
-  tileParent: {fileID: 7382279234949916265}
-  tileRotPos:
-  - {x: -0.75, y: -0.25}
-  - {x: -0.75, y: 0.75}
-  - {x: 0.25, y: 0.75}
-  - {x: 0.25, y: -0.25}
   castLayer:
     serializedVersion: 2
     m_Bits: 12288
@@ -449,7 +443,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7382279234949916278}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.25, y: -0.25, z: 0}
+  m_LocalPosition: {x: -0.25, y: 0.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
