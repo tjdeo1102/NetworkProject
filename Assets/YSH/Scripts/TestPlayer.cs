@@ -6,8 +6,40 @@ public class TestPlayer : MonoBehaviour
 {
     [SerializeField] private Blocks currentBlock;
 
+    [SerializeField] private Blocks[] testBlocks;
+
+    private int blockIndex = -1;
+
+    private void Start()
+    {
+        ChangeBlock();
+    }
+
+    // for test
+    private void ChangeBlock()
+    {
+        if (testBlocks.Length <= 0)
+            return;
+
+        blockIndex++;
+
+        if (blockIndex >= testBlocks.Length)
+            blockIndex = 0;
+
+        currentBlock = testBlocks[blockIndex];
+
+        if (!currentBlock.gameObject.activeSelf)
+            currentBlock.gameObject.SetActive(true);
+    }
+
     void Update()
     {
+        // for test
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            ChangeBlock();
+        }
+
         if (Input.GetKey(KeyCode.DownArrow))
             currentBlock.Down();
 
