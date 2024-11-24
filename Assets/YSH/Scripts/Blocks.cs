@@ -15,15 +15,18 @@ public class Blocks : MonoBehaviour
     [SerializeField] private float moveDelay;               // 이동 시 부여할 딜레이
     [SerializeField] private GameObject[] tiles;            // 블럭 타일들
     [SerializeField] private LayerMask castLayer;           // 레이캐스트용 layermask
+    [SerializeField] private float rotateSpeed;             // 회전 속도
 
     private Rigidbody2D rigid;              // Rigidbody2D 컴포넌트 참조                                          
     private Vector2 currentVelocity;        // 현재 하강 속도
     private Vector2 currentDirection;       // 현재 이동 방향
     private float currentAmount;            // 현재 이동량
+    private float targetAngle;              // 목표 회전각
 
     private bool isControllable;            // 제어 가능 여부
     private bool isFastDown;                // 빠른 하강 여부
     private bool isPushing;                 // 밀치기 여부
+    private bool isRotate;                  // 회전 여부
 
     private Coroutine moveRoutine;          // 이동 시 사용할 코루틴
     private WaitForSeconds wsMoveDelay;     // 이동 코루틴에서 활용할 WaitForSeconds 객체
@@ -67,6 +70,22 @@ public class Blocks : MonoBehaviour
         // 하강
         rigid.velocity = currentVelocity;
 
+        // 회전 flag가 set된 경우
+        if (isRotate)
+        {
+            // targetAngle 까지 회전 시도
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(0, 0, targetAngle), rotateSpeed * Time.deltaTime);
+            // targetAngle까지 회전했으면 보정 및 회전 종료처리
+            // 360도를 target으로 하는 회전의 경우 회전이 끝나면 eulerAngle.z값이 0이 아닌 1.0017... 과 같이 나와 2f보다 작은것을 확인하는 것으로 예외처리
+            if (transform.eulerAngles.z >= targetAngle || targetAngle == 360 && transform.eulerAngles.z < 2f)
+            {
+                // 회전각을 정확히 targetAngle로 보정
+                transform.rotation = Quaternion.Euler(0, 0, targetAngle);
+                // 다시 회전이 가능하도록 회전 완료 처리
+                isRotate = false;
+            }
+        }
+
         // flag 초기화
         // 플레이어가 지속적으로 key를 누르고 있는다면 다시 true가 될 것이고
         // 플레이어가 key를 더이상 누르지 않는다면 false인 상태로 지속될 것이다.
@@ -98,8 +117,19 @@ public class Blocks : MonoBehaviour
         if (!isControllable)
             return;
 
-        // z축으로 rotateAmount 만큼 회전
-        transform.Rotate(Vector3.forward, rotateAmount);
+        // 회전 중이면 return
+        if (isRotate)
+            return;
+
+        // 한바퀴 회전했으면 초기화
+        if (targetAngle == 360)
+            targetAngle = 0;
+        
+        // 현재 회전각 저장
+        targetAngle += 90;
+
+        // flag set
+        isRotate = true;
     }
 
     // 실제 이동, 밀치기를 진행
