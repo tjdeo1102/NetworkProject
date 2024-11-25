@@ -254,6 +254,9 @@ public class Blocks : MonoBehaviour
                 // 제어권을 해제
                 isControllable = false;
 
+                // spotlight 비활성화
+                spotlightObject.SetActive(false);
+
                 // 충돌 검사를 시작한 위치로 부터 충돌한 지점까지의 거리를 확인
                 toHit = resultHit.point - resultStartPos;
                 // 충돌은 감지했지만 위치가 딱 붙어있지 않는 경우
@@ -289,6 +292,15 @@ public class Blocks : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
+        if (isControllable)
+        {
+            rigid.velocity = Vector2.zero;
+            spotlightObject.SetActive(false);
+
+            // 충돌 시 flag 변경 
+            isControllable = false;
+        }
+
         // 충돌한 면이 other의 윗면인지 확인
         if (other.contacts[0].normal.y >= 0.9f)
         {
@@ -304,16 +316,7 @@ public class Blocks : MonoBehaviour
         else
         {
             Debug.Log("not entered");
-        }
-
-        if (isControllable)
-        {
-            rigid.velocity = Vector2.zero;
-            spotlightObject.SetActive(false);
-
-            // 충돌 시 flag 변경 
-            isControllable = false;
-        }   
+        }  
     }
 
     private void OnCollisionExit2D(Collision2D other)
