@@ -1,22 +1,24 @@
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PuzzleModeState : GameState
 {
     [Header("퍼즐 모드 설정")]
-    [SerializeField] private float finishTimer;
     [SerializeField] private BoxCollider2D boxDetector;
+
     private Dictionary<int, Coroutine> finishRoutineDic;
     private Dictionary<int, bool> isBlockCheckDic;
-    private WaitForSeconds timer;
 
     private Coroutine mainCollisionRoutine;
 
     public override void Enter()
     {
+        SceneLoad(SceneIndex.Game);
         base.Enter();
         // Dictionary 초기 세팅
         finishRoutineDic = new Dictionary<int, Coroutine>();
@@ -27,9 +29,6 @@ public class PuzzleModeState : GameState
             finishRoutineDic.Add(playerID, null);
             isBlockCheckDic.Add(playerID, false);
         }
-
-        // Timer 초기 세팅
-        timer = new WaitForSeconds(finishTimer);
 
         // 충돌 감지 루틴 실행
         mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
@@ -43,7 +42,7 @@ public class PuzzleModeState : GameState
         {
             if (finishRoutineDic[i] != null)
             {
-                StopCoroutine(finishRoutineDic[i]);
+                StopFinishRoutine(finishRoutineDic[i]);
             }
         }
         finishRoutineDic.Clear();
@@ -71,16 +70,13 @@ public class PuzzleModeState : GameState
 
             // 2. Physics2D로 충돌체 검사
             // isEntered가 된 블럭만 감지해서 현재 FInish 지점 상태 업데이트
-            Collider2D[] cols = Physics2D.OverlapBoxAll(detectorPos, detectorScale, 0);
+            Collider2D[] cols = Physics2D.OverlapBoxAll(detectorPos, detectorScale, 0, LayerMask.GetMask("Blocks"));
             print("충돌 감지 중");
             foreach (var collision in cols)
             {
-                // TODO: 블럭에 해당하는 태그로 바꿔주기
-
                 // 블럭이 존재하는 경우, 해당 소유자의 블럭이 있음을 체크
                 // 충돌된 블럭이 있을때, 플레이어의 코루틴의 유무 판단 후, 코루틴 실행
-                if (collision.CompareTag("Player")
-                    && collision.GetComponent<Blocks>().IsEntered == false
+                if (collision.GetComponent<Blocks>().IsEntered == false
                     && collision.TryGetComponent<PhotonView>(out var block))
                 {
                     // 테스트 용
@@ -111,7 +107,7 @@ public class PuzzleModeState : GameState
                         print($"{playerID} 블럭 없음");
                         if (finishRoutineDic[playerID] != null)
                         {
-                            StopCoroutine(finishRoutineDic[playerID]);
+                            StopFinishRoutine(finishRoutineDic[playerID]);
                             finishRoutineDic[playerID] = null;
                         }
                     }
@@ -125,28 +121,55 @@ public class PuzzleModeState : GameState
         }
     }
 
-    private IEnumerator FinishRoutine(int playerID)
+    protected override IEnumerator FinishRoutine(int playerID)
     {
+        yield return StartCoroutine(base.FinishRoutine(playerID));
         // 제한 시간이 지나면
-        yield return timer;
+        // 해당 플레이어는 더 이상 조작 불가
+        PlayerStateChange(playerID);
 
-        // 더 이상 플레이어가 조작할 수 없는 상태로 진입
+        // 모든 플레이어 상태 체크 후, 집계 시작
+        AllPlayerResult();
+    }
+
+    private void PlayerStateChange(int playerID)
+    {
+        if (playerObjectDic.ContainsKey(playerID)
+            && playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
+        {
+            controller.IsGoal = true;
+        }
 
         // 기존에 finishRoutineDic의 목록에서 해당 플레이어 삭제
         finishRoutineDic.Remove(playerID);
         isBlockCheckDic.Remove(playerID);
-        print($"{playerID}는 이제 조작할 수 없습니다.");
 
-        // 모든 플레이어가 종료되었는지 체크
-        AllPlayerStateCheck();
+        print($"{playerID}는 이제 조작할 수 없습니다.");
     }
 
-    private void AllPlayerStateCheck()
+    private void AllPlayerResult()
     {
         if (finishRoutineDic.Count < 1)
         {
             //TODO: 각 플레이어가 쌓은 블럭의 개수를 집계하는 코드 필요
+            List<Tuple<int,int>> result = new List<Tuple<int,int>>();
+            foreach (var playerID in playerObjectDic.Keys)
+            {
+                //if (playerObjectDic[playerID].TryGetComponent<BlockCountManager>(out var manager))
+                //{
+                //    result.Add(new Tuple<int, int>(playerID, manager.BlockCount));
+                //}
+
+                //테스트 코드
+                result.Add(new Tuple<int, int>(playerID, playerID));
+            }
+            //내림차순으로 블럭 개수 정렬
+            result.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+            result.ForEach(x => print($"{x.Item1}의 블럭개수: {x.Item2}"));
+
             print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
+            print($"{result[0].Item1}이 퍼즐 모드의 우승자입니다!!!");
+
             manager.CurrentState = StateType.Stop;
         }
     }
