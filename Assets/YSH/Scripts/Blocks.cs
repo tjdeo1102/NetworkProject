@@ -8,7 +8,7 @@ public class Blocks : MonoBehaviour
 {
     [SerializeField] private float basicFallSpeed;          // 하강 속도
     [SerializeField] private float fastFallSpeed;           // 빠른 하강 속도
-    [SerializeField] private GameObject spotlightPrefab;    // spotlight UI 오브젝트
+    [SerializeField] private GameObject spotlightObject;    // spotlight 오브젝트
     [SerializeField] private float moveAmount;              // 일반 이동량
     [SerializeField] private float pushAmount;              // 밀치기 이동량
     [SerializeField] private float rotateAmount;            // 회전량
@@ -16,12 +16,13 @@ public class Blocks : MonoBehaviour
     [SerializeField] private GameObject[] tiles;            // 블럭 타일들
     [SerializeField] private LayerMask castLayer;           // 레이캐스트용 layermask
     [SerializeField] private float rotateSpeed;             // 회전 속도
+    [SerializeField] private Vector2 blockSize;             // 블럭 사이즈 (타일 하나당 0.5로 계산)
 
     private Rigidbody2D rigid;              // Rigidbody2D 컴포넌트 참조                                          
     private Vector2 currentVelocity;        // 현재 하강 속도
     private Vector2 currentDirection;       // 현재 이동 방향
     private float currentAmount;            // 현재 이동량
-    private float targetAngle;              // 목표 회전각
+    private float targetAngle;              // 목표 회전각              
 
     private bool isControllable;            // 제어 가능 여부
     private bool isFastDown;                // 빠른 하강 여부
@@ -47,6 +48,9 @@ public class Blocks : MonoBehaviour
     {
         isControllable = true;
         wsMoveDelay = new WaitForSeconds(moveDelay);
+
+        // spotlight 초기화
+        SetSpotlight(0);
 
         // 기본 하강 속도 설정
         currentVelocity = new Vector2(rigid.velocity.x, basicFallSpeed);
@@ -81,6 +85,13 @@ public class Blocks : MonoBehaviour
             {
                 // 회전각을 정확히 targetAngle로 보정
                 transform.rotation = Quaternion.Euler(0, 0, targetAngle);
+
+                // spotlight의 크기 설정
+                SetSpotlight(targetAngle);
+
+                // spotlight 활성화
+                spotlightObject.SetActive(true);
+
                 // 다시 회전이 가능하도록 회전 완료 처리
                 isRotate = false;
             }
@@ -128,8 +139,31 @@ public class Blocks : MonoBehaviour
         // 현재 회전각 저장
         targetAngle += 90;
 
+        // 회전중 spotlight 비활성화
+        spotlightObject.SetActive(false);
+
         // flag set
         isRotate = true;
+    }
+
+    private void SetSpotlight(float angle)
+    {
+        // 90, 270도인 경우 vertical
+        if (targetAngle == 90 || targetAngle == 270)
+        {
+            spotlightObject.transform.localScale = new Vector3(blockSize.y, spotlightObject.transform.localScale.y, spotlightObject.transform.localScale.z);
+
+            // 블럭이 회전될 때 같이 회전되어 방향이 틀어지므로 보정을 위해 재회전 해준다.
+            spotlightObject.transform.localRotation = Quaternion.Euler(0, 0, 90);
+        }
+        // 나머지 경우는 horizontal 
+        else
+        {
+            spotlightObject.transform.localScale = new Vector3(blockSize.x, spotlightObject.transform.localScale.y, spotlightObject.transform.localScale.z);
+
+            // 블럭이 회전될 때 같이 회전되어 방향이 틀어지므로 보정을 위해 재회전 해준다.
+            spotlightObject.transform.localRotation = Quaternion.Euler(0, 0, 0);
+        }
     }
 
     // 실제 이동, 밀치기를 진행
@@ -275,6 +309,7 @@ public class Blocks : MonoBehaviour
         if (isControllable)
         {
             rigid.velocity = Vector2.zero;
+            spotlightObject.SetActive(false);
 
             // 충돌 시 flag 변경 
             isControllable = false;
