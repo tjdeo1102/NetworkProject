@@ -223,11 +223,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1909153616546704872, guid: 6c78be99e9da0724a9d5db6bff051e06, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.49
       objectReference: {fileID: 0}
     - target: {fileID: 1909153616546704872, guid: 6c78be99e9da0724a9d5db6bff051e06, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 11.15
+      value: 1.07
       objectReference: {fileID: 0}
     - target: {fileID: 1909153616546704872, guid: 6c78be99e9da0724a9d5db6bff051e06, type: 3}
       propertyPath: m_LocalPosition.z
@@ -418,11 +418,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5d034c912a6c0249a6000cefd66f72e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boxCastHeight: 10
+  boxCastHeight: 30
   blockLayer:
     serializedVersion: 2
     m_Bits: 262144
-  BoxSize: {x: 5, y: 10}
+  BoxSize: {x: 5, y: 1}
 --- !u!61 &1786305745
 BoxCollider2D:
   m_ObjectHideFlags: 0
