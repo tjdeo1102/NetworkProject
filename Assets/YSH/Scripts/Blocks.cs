@@ -8,7 +8,7 @@ public class Blocks : MonoBehaviour
 {
     [SerializeField] private float basicFallSpeed;          // 하강 속도
     [SerializeField] private float fastFallSpeed;           // 빠른 하강 속도
-    [SerializeField] private GameObject spotlightPrefab;    // spotlight UI 오브젝트
+    [SerializeField] private GameObject spotlightObject;    // spotlight 오브젝트
     [SerializeField] private float moveAmount;              // 일반 이동량
     [SerializeField] private float pushAmount;              // 밀치기 이동량
     [SerializeField] private float rotateAmount;            // 회전량
@@ -16,17 +16,21 @@ public class Blocks : MonoBehaviour
     [SerializeField] private GameObject[] tiles;            // 블럭 타일들
     [SerializeField] private LayerMask castLayer;           // 레이캐스트용 layermask
     [SerializeField] private float rotateSpeed;             // 회전 속도
+    [SerializeField] private Vector2 blockSize;             // 블럭 사이즈 (타일 하나당 0.5로 계산)
 
     private Rigidbody2D rigid;              // Rigidbody2D 컴포넌트 참조                                          
     private Vector2 currentVelocity;        // 현재 하강 속도
     private Vector2 currentDirection;       // 현재 이동 방향
     private float currentAmount;            // 현재 이동량
-    private float targetAngle;              // 목표 회전각
+    private float targetAngle;              // 목표 회전각              
 
     private bool isControllable;            // 제어 가능 여부
     private bool isFastDown;                // 빠른 하강 여부
     private bool isPushing;                 // 밀치기 여부
     private bool isRotate;                  // 회전 여부
+    private bool isEntered;                 // 블럭 안착 여부
+
+    private int collisionCount = 0;         // 현재 블럭과 충돌해있는 충돌체의 수 (exit 판정에 사용)
 
     private Coroutine moveRoutine;          // 이동 시 사용할 코루틴
     private WaitForSeconds wsMoveDelay;     // 이동 코루틴에서 활용할 WaitForSeconds 객체
@@ -35,7 +39,7 @@ public class Blocks : MonoBehaviour
     public UnityAction OnBlockEntered;      // 블럭이 안착했을 때 Invoke (블럭 카운팅에 활용)
     public UnityAction OnBlockExited;       // 블럭이 안착했다가 벗어날 때 (블럭 카운팅에 활용)
 
-    public bool IsEntered { get { return isControllable; } }     // 외부에서 안착여부를 확인하기 위한 프로퍼티
+    public bool IsEntered { get { return isEntered; } }     // 외부에서 안착여부를 확인하기 위한 프로퍼티
 
     private void Awake()
     {
@@ -47,6 +51,9 @@ public class Blocks : MonoBehaviour
     {
         isControllable = true;
         wsMoveDelay = new WaitForSeconds(moveDelay);
+
+        // spotlight 초기화
+        SetSpotlight(0);
 
         // 기본 하강 속도 설정
         currentVelocity = new Vector2(rigid.velocity.x, basicFallSpeed);
@@ -81,6 +88,13 @@ public class Blocks : MonoBehaviour
             {
                 // 회전각을 정확히 targetAngle로 보정
                 transform.rotation = Quaternion.Euler(0, 0, targetAngle);
+
+                // spotlight의 크기 설정
+                SetSpotlight(targetAngle);
+
+                // spotlight 활성화
+                spotlightObject.SetActive(true);
+
                 // 다시 회전이 가능하도록 회전 완료 처리
                 isRotate = false;
             }
@@ -128,8 +142,31 @@ public class Blocks : MonoBehaviour
         // 현재 회전각 저장
         targetAngle += 90;
 
+        // 회전중 spotlight 비활성화
+        spotlightObject.SetActive(false);
+
         // flag set
         isRotate = true;
+    }
+
+    private void SetSpotlight(float angle)
+    {
+        // 90, 270도인 경우 vertical
+        if (targetAngle == 90 || targetAngle == 270)
+        {
+            spotlightObject.transform.localScale = new Vector3(blockSize.y, spotlightObject.transform.localScale.y, spotlightObject.transform.localScale.z);
+
+            // 블럭이 회전될 때 같이 회전되어 방향이 틀어지므로 보정을 위해 재회전 해준다.
+            spotlightObject.transform.localRotation = Quaternion.Euler(0, 0, 90);
+        }
+        // 나머지 경우는 horizontal 
+        else
+        {
+            spotlightObject.transform.localScale = new Vector3(blockSize.x, spotlightObject.transform.localScale.y, spotlightObject.transform.localScale.z);
+
+            // 블럭이 회전될 때 같이 회전되어 방향이 틀어지므로 보정을 위해 재회전 해준다.
+            spotlightObject.transform.localRotation = Quaternion.Euler(0, 0, 0);
+        }
     }
 
     // 실제 이동, 밀치기를 진행
@@ -220,6 +257,9 @@ public class Blocks : MonoBehaviour
                 // 제어권을 해제
                 isControllable = false;
 
+                // spotlight 비활성화
+                spotlightObject.SetActive(false);
+
                 // 충돌 검사를 시작한 위치로 부터 충돌한 지점까지의 거리를 확인
                 toHit = resultHit.point - resultStartPos;
                 // 충돌은 감지했지만 위치가 딱 붙어있지 않는 경우
@@ -240,8 +280,6 @@ public class Blocks : MonoBehaviour
                 yield break;
             }
 
-            Debug.Log("No Collision");
-
             // 순간적으로 이동해야 하므로 position값을 변경한다.
             rigid.position += moveDist;
 
@@ -255,37 +293,68 @@ public class Blocks : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
+        if (isControllable)
+        {
+            rigid.velocity = Vector2.zero;
+            spotlightObject.SetActive(false);
+
+            // 충돌 시 flag 변경 
+            isControllable = false;
+        }
+
+        // 충돌체 카운트 증가
+        collisionCount++;
+
+        // 이미 enter된 상태면 return
+        if (isEntered)
+            return;
+
         // 충돌한 면이 other의 윗면인지 확인
         if (other.contacts[0].normal.y >= 0.9f)
         {
-            Debug.Log("entered");
+            Debug.Log($"{gameObject.name} entered");
 
-            //// 충돌 시 flag 변경 (레이어로 특정 물체 구분 필요?)
-            //isControllable = false;
+            // enter flag set
+            isEntered = true;
 
             // 이벤트 발생
-            // (타워의 경우 옆면충돌을 별도로 판정해야 하는가?)
             OnBlockEntered?.Invoke();
         }
         else
         {
-            Debug.Log("not entered");
-        }
-
-        if (isControllable)
-        {
-            rigid.velocity = Vector2.zero;
-
-            // 충돌 시 flag 변경 
-            isControllable = false;
-        }   
+            Debug.Log($"{gameObject.name} not entered");
+        }  
     }
 
     private void OnCollisionExit2D(Collision2D other)
     {
+        // 충돌체 카운트 감소
+        collisionCount--;
+
+        // 아직 enter된 상태가 아니면 return
+        if (!isEntered)
+            return;
+
+        // 충돌중인 물체가 있다면 exit가 아닌것으로 간주
+        if (collisionCount > 0)
+            return;
+
+        Debug.Log($"{gameObject.name} exited");
+
+        // enter flag set
+        isEntered = false;
+
         // 이벤트 발생
-        // 현재 블럭이 Enter 상태였었는지 확인할 수단이 필요? 
         OnBlockExited?.Invoke();
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        // 블럭 추락 여부 확인
+        if (other.CompareTag("FallTrigger"))
+        {
+            OnBlockFallen?.Invoke();
+        }
     }
 
     private void OnDrawGizmos()
