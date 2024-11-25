@@ -7,16 +7,16 @@ using UnityEngine;
 public class RaceModeState : GameState
 {
     [Header("레이스 모드 설정")]
-    [SerializeField] private float goalTimer;
     [SerializeField] private BoxCollider2D boxDetector;
+    
     private Dictionary<int, Coroutine> goalRoutineDic;
     private Dictionary<int, bool> isBlockCheckDic;
-    private WaitForSeconds timer;
 
     private Coroutine mainCollisionRoutine;
 
     public override void Enter()
     {
+        SceneLoad(SceneIndex.Game);
         base.Enter();
         // Dictionary 초기 세팅
         goalRoutineDic = new Dictionary<int, Coroutine>();
@@ -27,9 +27,6 @@ public class RaceModeState : GameState
             goalRoutineDic.Add(playerID, null);
             isBlockCheckDic.Add(playerID, false);
         }
-
-        // Timer 초기 세팅
-        timer = new WaitForSeconds(goalTimer);
 
         // 충돌 감지 루틴 실행
         mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
@@ -43,7 +40,7 @@ public class RaceModeState : GameState
         {
             if (goalRoutineDic[i] != null)
             {
-                StopCoroutine(goalRoutineDic[i]);
+                StopFinishRoutine(goalRoutineDic[i]);
             }
         }
         goalRoutineDic.Clear();
@@ -71,16 +68,13 @@ public class RaceModeState : GameState
 
             // 2. Physics2D로 충돌체 검사
             // isEntered가 된 블럭만 감지해서 현재 FInish 지점 상태 업데이트
-            Collider2D[] cols = Physics2D.OverlapBoxAll(detectorPos, detectorScale, 0);
+            Collider2D[] cols = Physics2D.OverlapBoxAll(detectorPos, detectorScale, 0, LayerMask.GetMask("Blocks"));
             print("충돌 감지 중");
             foreach (var collision in cols)
             {
-                // TODO: 블럭에 해당하는 태그로 바꿔주기
-
                 // 블럭이 존재하는 경우, 해당 소유자의 블럭이 있음을 체크
                 // 충돌된 블럭이 있을때, 플레이어의 코루틴의 유무 판단 후, 코루틴 실행
-                if (collision.CompareTag("Player")
-                    && collision.GetComponent<Blocks>().IsEntered == false
+                if (collision.GetComponent<Blocks>().IsEntered == false
                     && collision.TryGetComponent<PhotonView>(out var block))
                 {
                     // 테스트용 
@@ -104,14 +98,14 @@ public class RaceModeState : GameState
                     {
                         print($"{playerID} 블럭 감지");
                         if (goalRoutineDic[playerID] == null)
-                            goalRoutineDic[playerID] = StartCoroutine(GoalRoutine(playerID));
+                            goalRoutineDic[playerID] = StartCoroutine(FinishRoutine(playerID));
                     }
                     else
                     {
                         print($"{playerID} 블럭 없음");
                         if (goalRoutineDic[playerID] != null)
                         {
-                            StopCoroutine(goalRoutineDic[playerID]);
+                            StopFinishRoutine(goalRoutineDic[playerID]);
                             goalRoutineDic[playerID] = null;
                         }
                     }
@@ -125,21 +119,20 @@ public class RaceModeState : GameState
         }
     }
 
-    private IEnumerator GoalRoutine(int playerID)
+    protected override IEnumerator FinishRoutine(int playerID)
     {
+        yield return StartCoroutine(base.FinishRoutine(playerID));
         // 제한 시간이 지나면
-        yield return timer;
-
-        AllPlayerStop();
-
-        print($"{playerID}는 우승자입니다.");
-        
+        // 모든 플레이어 작동 멈추고 집계
+        AllPlayerResult();
         manager.CurrentState = StateType.Stop;
     }
 
-    private void AllPlayerStop()
+    private void AllPlayerResult()
     {
         // TODO: 모든 플레이어가 조작할 수 없는 상태로 진입
         print("모든 플레이어의 행동이 중지되었습니다.");
+
+        print($"는 우승자입니다.");
     }
 }

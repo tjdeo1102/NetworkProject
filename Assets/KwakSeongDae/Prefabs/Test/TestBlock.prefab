@@ -15,9 +15,9 @@ GameObject:
   - component: {fileID: 9102812947795399750}
   - component: {fileID: 9102812947795399751}
   - component: {fileID: -2843328165137001073}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: TestBlock
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -156,6 +156,11 @@ MonoBehaviour:
   pushAmount: 0
   rotateAmount: 0
   moveDelay: 0
+  tiles: []
+  castLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  rotateSpeed: 0
 --- !u!50 &9102812947795399751
 Rigidbody2D:
   serializedVersion: 4
