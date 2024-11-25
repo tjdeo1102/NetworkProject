@@ -15,7 +15,32 @@ public class LobbyScene : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        SetActivePanel(Panel.Login);
+        // 방장이 가는 씬은 자동으로 파티원들이 따라간다
+        PhotonNetwork.AutomaticallySyncScene = true;
+
+        // 만일 내가 방 안에 있었다면
+        if(PhotonNetwork.InRoom == true)
+        {
+            // 룸패널을 활성화(룸패널로 가고)
+            SetActivePanel(Panel.Room);
+        }
+        // 그게 아니라 로비에 있다면
+        else if (PhotonNetwork.InLobby)
+        {
+            // 로비를 활성화
+            SetActivePanel(Panel.Lobby);
+        }
+        // 만일 접속 중이 맞다면
+        else if(PhotonNetwork.IsConnected)
+        {
+            // 메뉴패널로 가고
+            SetActivePanel(Panel.Menu);
+        }
+        else
+        {
+            // 접속도 끊어져 있는 상태면 로그인패널로 간다
+            SetActivePanel(Panel.Login);
+        }
     }
     /// <summary>
     /// 마스터 서버에 접속을 허락해달라는 요청을 받은 후의 반응
@@ -91,6 +116,11 @@ public class LobbyScene : MonoBehaviourPunCallbacks
         roomPanel.PlayerPropertiesUpdate(targetPlayer, changedProps);
     }
 
+    // public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    // {
+    //    
+    // }
+
     /// <summary>
     /// 방을 입장하는데 실패했을때 보내는 반응
     /// </summary>
@@ -159,6 +189,8 @@ public class LobbyScene : MonoBehaviourPunCallbacks
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
         Debug.Log($"{newMasterClient.NickName} 플레이어가 방장이 되었습니다.");
+
+         // PhotonNetwork.SetMasterClient(newMasterClient); 저 사람한테 방장 주기, 마스터 클라이언트만 된다
     }
 
     /// <summary>
