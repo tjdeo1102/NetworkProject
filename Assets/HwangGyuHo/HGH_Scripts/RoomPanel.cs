@@ -17,6 +17,7 @@ public class RoomPanel : MonoBehaviour
     {
         // PlayerNumbering 에 플레이어 추가
         PlayerNumbering.OnPlayerNumberingChanged += UpdatePlayer;
+        PhotonNetwork.LocalPlayer.SetReady(false);
     }
 
     private void OnDisable()
@@ -27,7 +28,7 @@ public class RoomPanel : MonoBehaviour
 
     public void UpdatePlayer()
     {
-        // 
+       
         foreach (PlayerEntry entry in playerEntries)
         {
             entry.SetEmpty();
@@ -43,26 +44,22 @@ public class RoomPanel : MonoBehaviour
         }
     }
 
-    public void PlayerEnterRoom(Player newPlayer)
+    public void EnterPlayer(Player newPlayer)
     {
         Debug.Log($"{newPlayer.NickName} 입장!");
         UpdatePlayer();
     }
 
-    public void PlayerLeftRoom(Player otherPlayer)
+    public void ExitPlayer(Player otherPlayer)
     {
         Debug.Log($"{otherPlayer.NickName} 퇴장!");
         UpdatePlayer();
     }
 
-    public void PlayerPropertiesUpdate(Player targetPlayer)
+    public void PlayerPropertiesUpdate(Player targetPlayer, Hashtable properties)
     {
         // TODO : 플레이어 속성이 바뀌면 그것을 업데이트
-    }
-
-    public void MasterClientSwitched(Player newMasterClient)
-    {
-        Debug.Log($"{newMasterClient.NickName}이 방장이 됐습니다.");
+        Debug.Log($"{targetPlayer.NickName} 정보변경!!");
     }
 
     public void StartGame()
@@ -73,6 +70,7 @@ public class RoomPanel : MonoBehaviour
     public void LeaveRoom()
     {
         Debug.Log("방을 떠났습니다");
+        PhotonNetwork.LeaveRoom();
     }
 
     public void AllPlayerReadyCheck()
