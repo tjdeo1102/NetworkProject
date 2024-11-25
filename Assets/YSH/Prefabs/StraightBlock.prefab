@@ -49,8 +49,8 @@ MonoBehaviour:
   basicFallSpeed: -1
   fastFallSpeed: -3
   spotlightPrefab: {fileID: 0}
-  moveAmount: 0.5
-  pushAmount: 1
+  moveAmount: 0.25
+  pushAmount: 0.5
   rotateAmount: 90
   moveDelay: 0.08
   tiles:
@@ -58,15 +58,10 @@ MonoBehaviour:
   - {fileID: 5564063099733971883}
   - {fileID: 5564063098824068280}
   - {fileID: 5564063099002927774}
-  tileParent: {fileID: 5564063099151194588}
-  tileRotPos:
-  - {x: -1, y: -0.75}
-  - {x: -1.75, y: 0.25}
-  - {x: -0.5, y: 0.75}
-  - {x: 0.25, y: -0.25}
   castLayer:
     serializedVersion: 2
     m_Bits: 12288
+  rotateSpeed: 990
 --- !u!50 &5564063098573158911
 Rigidbody2D:
   serializedVersion: 4
@@ -281,7 +276,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5564063099151194563}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.25, y: -0.25, z: 0}
+  m_LocalPosition: {x: -0.75, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -316,7 +311,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.9738907, y: 0.47678435}
+  m_Size: {x: 1.9865887, y: 0.48677358}
   m_EdgeRadius: 0
 --- !u!1 &5564063099733971883
 GameObject:
