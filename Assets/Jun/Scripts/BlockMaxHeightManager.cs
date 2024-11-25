@@ -17,11 +17,12 @@ public class BlockMaxHeightManager : MonoBehaviour
         if (hit.collider != null)
         {
             // 부모 오브젝트에서 y값을 가져옴 (자식에 Collider가 있는 경우)
-            Transform parentTransform = hit.collider.transform.parent;
+            /*Transform parentTransform = hit.collider.transform.parent;
             if (parentTransform != null)
             {
                 return parentTransform.position.y;
-            }
+            }*/
+            return hit.point.y;
         }
 
         return 0;  // 닿은 블럭이 없으면 매우 낮은 값을 반환(타워의 포지션 값을 받아올 예정)
