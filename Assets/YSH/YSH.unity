@@ -376,6 +376,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5564063098573158910, guid: 51731620cfa4b9f4b8d527ab7c9aa595, type: 3}
+      propertyPath: colliders.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5564063098573158910, guid: 51731620cfa4b9f4b8d527ab7c9aa595, type: 3}
+      propertyPath: colliders.Array.data[0]
+      value: 
+      objectReference: {fileID: 532303638}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 51731620cfa4b9f4b8d527ab7c9aa595, type: 3}
 --- !u!114 &362736062 stripped
@@ -389,6 +397,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c205cc8e0b9a8648a8893148577abba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!61 &532303638 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 5564063099151194589, guid: 51731620cfa4b9f4b8d527ab7c9aa595, type: 3}
+  m_PrefabInstance: {fileID: 362736061}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &571758767
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -716,6 +729,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &1405839065 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 7382279234949916264, guid: a8effdcfe4ee0634193f70c27cca267a, type: 3}
+  m_PrefabInstance: {fileID: 1449901110}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1418442124
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -801,7 +819,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7382279234303379016, guid: a8effdcfe4ee0634193f70c27cca267a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7382279234303379016, guid: a8effdcfe4ee0634193f70c27cca267a, type: 3}
       propertyPath: m_LocalPosition.y
@@ -839,6 +857,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7382279234303379019, guid: a8effdcfe4ee0634193f70c27cca267a, type: 3}
+      propertyPath: colliders.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7382279234303379019, guid: a8effdcfe4ee0634193f70c27cca267a, type: 3}
+      propertyPath: colliders.Array.data[0]
+      value: 
+      objectReference: {fileID: 1405839065}
     - target: {fileID: 7382279234303379030, guid: a8effdcfe4ee0634193f70c27cca267a, type: 3}
       propertyPath: m_Name
       value: Block2
@@ -1089,10 +1115,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentBlock: {fileID: 0}
   testBlocks:
-  - {fileID: 2050430988}
-  - {fileID: 809367177}
   - {fileID: 362736062}
   - {fileID: 1449901111}
-  - {fileID: 1418442125}
   - {fileID: 571758768}
+  - {fileID: 2050430988}
+  - {fileID: 809367177}
+  - {fileID: 1418442125}
   - {fileID: 763224945}
