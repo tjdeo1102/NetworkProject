@@ -6,19 +6,20 @@ using UnityEngine;
 public class SurvivalModeState : GameState
 {
     [Header("서바이벌 모드 설정")]
-    [SerializeField] float winTimer;
     [SerializeField] int winBlockCount;
 
-    private Action<int> hpMiddleware;
-    private Action<int> bulletCountMiddleware;
+    private Dictionary<int,Action<int>> hpMiddleware;
+    private Dictionary<int,Action<int>> blockCountMiddleware;
     private Dictionary<int,Coroutine> winRoutineDic;
-    private WaitForSeconds timer;
 
     public override void Enter()
     {
+        SceneLoad(SceneIndex.Game);
         base.Enter();
 
         // Dictionary 초기 세팅
+        hpMiddleware = new Dictionary<int,Action<int>>();
+        blockCountMiddleware = new Dictionary<int,Action<int>>();
         winRoutineDic = new Dictionary<int, Coroutine>();
         var playerKeys = playerObjectDic.Keys;
 
@@ -27,33 +28,48 @@ public class SurvivalModeState : GameState
         {
             winRoutineDic.Add(playerID, null);
 
+            // 각 플레이어 HP 및 BlockCount이벤트 구독 설정
             if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
             {
-                // TODO: 컨트롤러 측, 관련 이벤트 구현시 참조 설정
-                hpMiddleware = (newHP) => PlayerHPHandle(newHP,playerID);
-                bulletCountMiddleware = (newBlockCount) => PlayerBlockCountHandle(newBlockCount, playerID);
-                // controller.OnChangeHp += hpMiddleware;
-                // controller.OnChangeBlockCount += bulletCountMiddleware;
-                print($"{playerID}에 대한 HP 및 BlockCount이벤트 구독 설정");
+                hpMiddleware.Add(playerID, (newHP) => PlayerHPHandle(newHP, playerID));
+                controller.OnChangeHp += hpMiddleware[playerID];
+            }
+            if (playerObjectDic[playerID].TryGetComponent<BlockCountManager>(out var manager))
+            {
+                blockCountMiddleware.Add(playerID, (newBlockCount) => PlayerBlockCountHandle(newBlockCount, playerID));
+                manager.OnChangeBlockCount += blockCountMiddleware[playerID];
             }
         }
-
-        // Timer 초기 세팅
-        timer = new WaitForSeconds(winTimer);
     }
 
     public override void Exit()
     {
-        // 이벤트 구독 해제
-        // controller.OnChangeHp -= hpMiddleware;
-        // controller.OnChangeBlockCount -= bulletCountMiddleware;
+        var playerKeys = playerObjectDic.Keys;
+
+        // 플레이어 수만큼 미리 요소 추가
+        foreach (var playerID in playerKeys)
+        {
+            if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller)
+                && hpMiddleware.ContainsKey(playerID))
+            {
+                controller.OnChangeHp -= hpMiddleware[playerID];
+            }
+            if (playerObjectDic[playerID].TryGetComponent<BlockCountManager>(out var manager)
+                && blockCountMiddleware.ContainsKey(playerID))
+            {
+                manager.OnChangeBlockCount -= blockCountMiddleware[playerID];
+            }
+        }
+
+        hpMiddleware.Clear();
+        blockCountMiddleware.Clear();
 
         // winRoutineDic이 실행되고 있는 경우에는 해당 코루틴은 중지
         foreach (int i in winRoutineDic.Keys)
         {
             if (winRoutineDic[i] != null)
             {
-                StopCoroutine(winRoutineDic[i]);
+                StopFinishRoutine(winRoutineDic[i]);
             }
         }
         winRoutineDic.Clear();
@@ -68,7 +84,7 @@ public class SurvivalModeState : GameState
             if (playerObjectDic.ContainsKey(playerID)
                 && playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
             {
-                // TODO: 플레이어가 죽은 상황일 때, 해당 플레이어는 조작 못하도록 설정
+                controller.IsGoal = true;
                 // 플레이어 컨트롤러 측, 관련 변수 업데이트 시 코드 추가
                 print($"{playerID}님의 남은 목숨이 모두 소진되어 게임오버되었습니다.");
             }
@@ -84,7 +100,7 @@ public class SurvivalModeState : GameState
             if (winRoutineDic.ContainsKey(playerID))
             {
                 if (winRoutineDic[playerID] == null)
-                    winRoutineDic[playerID] = StartCoroutine(WinRoutine(playerID));
+                    winRoutineDic[playerID] = StartCoroutine(FinishRoutine(playerID));
             }
             else
             {
@@ -96,26 +112,45 @@ public class SurvivalModeState : GameState
             //실행되고 있는 승리 루틴이 존재하면, 해당 루틴 중지
             if (winRoutineDic[playerID] != null)
             {
-                StopCoroutine(winRoutineDic[playerID]);
+                StopFinishRoutine(winRoutineDic[playerID]);
                 winRoutineDic[(playerID)] = null;
             }
         }
 
     }
 
-    private IEnumerator WinRoutine(int playerID)
+    protected override IEnumerator FinishRoutine(int playerID)
     {
-        // 제한 시간이 지나면
-        yield return timer;
+        yield return StartCoroutine(base.FinishRoutine(playerID));
 
-        AllPlayerStop();
+        // 제한 시간이 지나면
+        // 해당 플레이어는 더 이상 조작 불가
+        PlayerStateChange(playerID);
+
+        // 모든 플레이어 상태 체크 후, 집계 시작
+        AllPlayerResult();
 
         print($"{playerID}는 우승자입니다.");
 
         manager.CurrentState = StateType.Stop;
     }
 
-    private void AllPlayerStop()
+    private void PlayerStateChange(int playerID)
+    {
+        if (playerObjectDic.ContainsKey(playerID)
+            && playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
+        {
+            controller.IsGoal = true;
+        }
+
+        // 기존에 winRoutineDic의 목록에서 해당 플레이어 삭제
+        winRoutineDic.Remove(playerID);
+        winRoutineDic.Remove(playerID);
+
+        print($"{playerID}는 이제 조작할 수 없습니다.");
+    }
+
+    private void AllPlayerResult()
     {
         // TODO: 모든 플레이어가 조작할 수 없는 상태로 진입
         print("모든 플레이어의 행동이 중지되었습니다.");
