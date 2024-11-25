@@ -15,33 +15,7 @@ public class LobbyScene : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        // 플레이어끼리 씬 동기화
-        PhotonNetwork.AutomaticallySyncScene = true;
-
-        // 방으로 들어왔을때
-        if (PhotonNetwork.InRoom)
-        {
-            // RoomPanel을 활성화
-            SetActivePanel(Panel.Room);
-        }
-        // 로비로 입장했다면
-        else if (PhotonNetwork.InLobby)
-        {
-            // LobbyPanel 활성화
-            SetActivePanel(Panel.Lobby);
-        }
-        // 접속이 됐다면
-        else if (PhotonNetwork.IsConnected)
-        {
-            // MenuPanel 활성화
-            SetActivePanel(Panel.Menu);
-        }
-        // 다 아니라면
-        else
-        {
-            // LohinPanel 활성화
-            SetActivePanel(Panel.Login);
-        }
+        SetActivePanel(Panel.Login);
     }
     /// <summary>
     /// 마스터 서버에 접속을 허락해달라는 요청을 받은 후의 반응
@@ -95,7 +69,7 @@ public class LobbyScene : MonoBehaviourPunCallbacks
     /// <param name="newPlayer"></param>
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        // roomPanel.EnterPlayer(newPlayer);
+        roomPanel.EnterPlayer(newPlayer);
     }
 
     /// <summary>
@@ -104,7 +78,7 @@ public class LobbyScene : MonoBehaviourPunCallbacks
     /// <param name="otherPlayer"></param>
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        //roomPanel.ExitPlayer(otherPlayer);
+        roomPanel.ExitPlayer(otherPlayer);
     }
 
     /// <summary>
@@ -114,7 +88,7 @@ public class LobbyScene : MonoBehaviourPunCallbacks
     /// <param name="changedProps"></param>
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
-        //roomPanel.UpdatePlayerProperty(targetPlayer, changedProps);
+        roomPanel.PlayerPropertiesUpdate(targetPlayer, changedProps);
     }
 
     /// <summary>
@@ -161,7 +135,7 @@ public class LobbyScene : MonoBehaviourPunCallbacks
     public override void OnLeftLobby()
     {
         Debug.Log("로비 퇴장 성공");
-        //lobbyPanel.ClearRoomEntries();
+        lobbyPanel.ClearRoomEntries();
         SetActivePanel(Panel.Menu);
     }
 
@@ -175,7 +149,7 @@ public class LobbyScene : MonoBehaviourPunCallbacks
         // 주의사항
         // 1. 처음 로비 입장 시 : 모든 방 목록을 전달
         // 2. 입장 중 방 목록이 변경되는 경우 : 변경된 방 목록만 전달
-        //lobbyPanel.UpdateRoomList(roomList);
+        lobbyPanel.UpdateRoomList(roomList);
     }
 
     /// <summary>

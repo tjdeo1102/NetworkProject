@@ -48,21 +48,32 @@ public class MainPanel : MonoBehaviour
 
     public void CreateRoomCancel()
     {
-
+        Debug.Log("방 만들기를 취소했습니다");
+        createRoomPanel.SetActive(false);
     }
 
     public void RandomMatching()
     {
+        Debug.Log("랜덤매칭 요청");
+        // 비어있는 방이 없으면 들어가지 않는 방식
+        // PhotonNetwork.JoinRandomRoom();
 
+        // 비어있는 방이 없으면 새로 방을 만들어서 들어가는 방식
+        // 그래서 얘는 방을 만들기 위한 내용도 써줘야 한다
+        string Name = $"Room {Random.Range(1000, 10000)}";
+        RoomOptions options = new RoomOptions() { MaxPlayers = 4 };
+        PhotonNetwork.JoinRandomOrCreateRoom(roomName: name, roomOptions: options);
     }
 
     public void JoinLobby()
     {
-
+        Debug.Log("로비 입장 요청");
+        PhotonNetwork.JoinLobby();
     }
 
     public void Logout()
     {
-
+        Debug.Log("로그아웃 요청");
+        PhotonNetwork.Disconnect();
     }
 }

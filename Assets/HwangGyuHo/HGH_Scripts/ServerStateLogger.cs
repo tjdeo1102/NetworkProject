@@ -12,10 +12,7 @@ public class ServerStateLogger : MonoBehaviourPunCallbacks
     // 서버 상황을 알려주는 코드
     private void Update()
     {
-        // 상태가 바뀐 상황에서만 확인하는 코드
-        // 상태가 안바뀌었다면 확인안한다
-        // Update 프레임마다 확인할 수는 없으니까
-        // 로그를 찍어주는 코드
+        // 상태가 바뀌는 것이 확인되면 로그를 찍어준다
         if (state == PhotonNetwork.NetworkClientState)
             return;
 

@@ -17,11 +17,20 @@ public class PlayerEntry : MonoBehaviour
     {
         // 방에 들어갔을때
         // 닉네임은 nameText.text로
-        player.NickName = nameText.text;
+        nameText.text= player.NickName;
         // 레디버튼은 활성화 시키고
-        readyText.gameObject.SetActive(true);
+        readyButton.gameObject.SetActive(true);
         // 상호작용은 주체가 자기자신, LocalPlayer일때 가능
         readyButton.interactable = player == PhotonNetwork.LocalPlayer;
+
+        if (player.GetReady())
+        {
+            readyText.text = "Ready";
+        }
+        else
+        {
+            readyText.text = "";
+        }
     }
 
     public void SetEmpty()

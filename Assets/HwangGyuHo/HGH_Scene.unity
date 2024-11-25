@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 787612}
   - component: {fileID: 787611}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: PlayerNameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -719,7 +719,7 @@ GameObject:
   - component: {fileID: 119731311}
   - component: {fileID: 119731310}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: PlayerNameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1235,7 +1235,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 188350652}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1059671194}
+        m_TargetAssemblyTypeName: RoomPanel, Assembly-CSharp
+        m_MethodName: LeaveRoom
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &188350652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1357,7 +1369,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 223255625}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1962026359}
+        m_TargetAssemblyTypeName: PlayerEntry, Assembly-CSharp
+        m_MethodName: Ready
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &223255625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2045,7 +2069,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 477198885}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 699846602}
+        m_TargetAssemblyTypeName: PlayerEntry, Assembly-CSharp
+        m_MethodName: Ready
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &477198885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2167,7 +2203,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 498478926}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 713800681}
+        m_TargetAssemblyTypeName: PlayerEntry, Assembly-CSharp
+        m_MethodName: Ready
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &498478926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2866,6 +2914,7 @@ GameObject:
   - component: {fileID: 699846599}
   - component: {fileID: 699846601}
   - component: {fileID: 699846600}
+  - component: {fileID: 699846602}
   m_Layer: 5
   m_Name: Player_1
   m_TagString: Untagged
@@ -2916,7 +2965,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2934,6 +2983,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 699846598}
   m_CullTransparentMesh: 1
+--- !u!114 &699846602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 699846598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a08202ef5891e84495af9a44fbe578c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nameText: {fileID: 787611}
+  readyText: {fileID: 2008007664}
+  readyButton: {fileID: 477198884}
 --- !u!1 &705575079
 GameObject:
   m_ObjectHideFlags: 0
@@ -3017,7 +3081,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 705575082}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1409967245}
+        m_TargetAssemblyTypeName: MainPanel, Assembly-CSharp
+        m_MethodName: RandomMatching
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &705575082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3067,6 +3143,7 @@ GameObject:
   - component: {fileID: 713800678}
   - component: {fileID: 713800680}
   - component: {fileID: 713800679}
+  - component: {fileID: 713800681}
   m_Layer: 5
   m_Name: Player_2
   m_TagString: Untagged
@@ -3110,14 +3187,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19188325, g: 0.7422674, b: 0.8301887, a: 1}
+  m_Color: {r: 0.19215688, g: 0.7411765, b: 0.8313726, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3135,6 +3212,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 713800677}
   m_CullTransparentMesh: 1
+--- !u!114 &713800681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 713800677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a08202ef5891e84495af9a44fbe578c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nameText: {fileID: 2080124826}
+  readyText: {fileID: 515920939}
+  readyButton: {fileID: 498478925}
 --- !u!1 &824549919
 GameObject:
   m_ObjectHideFlags: 0
@@ -3315,7 +3407,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: Leave
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3610,7 +3702,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 900228578}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1059671194}
+        m_TargetAssemblyTypeName: RoomPanel, Assembly-CSharp
+        m_MethodName: StartGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &900228578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4167,7 +4271,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66707ee8ed604824f8390efc2f07e745, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerEntries: []
+  playerEntries:
+  - {fileID: 2115312406}
+  - {fileID: 699846602}
+  - {fileID: 713800681}
+  - {fileID: 1962026359}
   startButton: {fileID: 900228577}
 --- !u!1 &1071056263
 GameObject:
@@ -4680,7 +4788,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1288228312}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1409967245}
+        m_TargetAssemblyTypeName: MainPanel, Assembly-CSharp
+        m_MethodName: CreateRoomCancel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1288228312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6094,7 +6214,7 @@ GameObject:
   - component: {fileID: 1475410876}
   - component: {fileID: 1475410875}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: PlayerNameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7240,7 +7360,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1590293312}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2115312406}
+        m_TargetAssemblyTypeName: PlayerEntry, Assembly-CSharp
+        m_MethodName: Ready
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1590293312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8165,6 +8297,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d8a623f49a58df43b0376c0f8e3cb7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  roomContent: {fileID: 1311838658}
+  roomEntryPrefab: {fileID: 0}
 --- !u!1 &1962026355
 GameObject:
   m_ObjectHideFlags: 0
@@ -8176,6 +8310,7 @@ GameObject:
   - component: {fileID: 1962026356}
   - component: {fileID: 1962026358}
   - component: {fileID: 1962026357}
+  - component: {fileID: 1962026359}
   m_Layer: 5
   m_Name: Player_3
   m_TagString: Untagged
@@ -8219,15 +8354,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19188325, g: 0.7422674, b: 0.8301887, a: 1}
+  m_Color: {r: 0.19215688, g: 0.7411765, b: 0.8313726, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 0}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -8244,6 +8379,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1962026355}
   m_CullTransparentMesh: 1
+--- !u!114 &1962026359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1962026355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a08202ef5891e84495af9a44fbe578c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nameText: {fileID: 119731310}
+  readyText: {fileID: 1901264844}
+  readyButton: {fileID: 223255624}
 --- !u!1 &1968806913
 GameObject:
   m_ObjectHideFlags: 0
@@ -8482,7 +8632,7 @@ GameObject:
   - component: {fileID: 2080124827}
   - component: {fileID: 2080124826}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: PlayerNameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8698,6 +8848,7 @@ GameObject:
   - component: {fileID: 2115312403}
   - component: {fileID: 2115312405}
   - component: {fileID: 2115312404}
+  - component: {fileID: 2115312406}
   m_Layer: 5
   m_Name: Player_0
   m_TagString: Untagged
@@ -8748,7 +8899,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8766,3 +8917,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2115312402}
   m_CullTransparentMesh: 1
+--- !u!114 &2115312406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2115312402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a08202ef5891e84495af9a44fbe578c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nameText: {fileID: 1475410875}
+  readyText: {fileID: 1210570368}
+  readyButton: {fileID: 1590293311}
