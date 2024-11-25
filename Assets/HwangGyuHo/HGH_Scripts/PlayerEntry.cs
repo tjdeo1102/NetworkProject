@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using PhotonHashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerEntry : MonoBehaviour
 {
@@ -15,9 +16,18 @@ public class PlayerEntry : MonoBehaviour
 
     public void SetPlayer(Player player)
     {
-        // 방에 들어갔을때
-        // 닉네임은 nameText.text로
-        nameText.text= player.NickName;
+        if (player.IsMasterClient)
+        {
+            // 방장이면 이렇게 표시되게
+            nameText.text = $"zZ{player.NickName}Zz";
+        }
+        else
+        {
+            // 방에 들어갔을때
+            // 닉네임은 nameText.text로
+            nameText.text = player.NickName;
+        }
+        
         // 레디버튼은 활성화 시키고
         readyButton.gameObject.SetActive(true);
         // 상호작용은 주체가 자기자신, LocalPlayer일때 가능
@@ -43,6 +53,7 @@ public class PlayerEntry : MonoBehaviour
     public void Ready()
     {
         bool ready = PhotonNetwork.LocalPlayer.GetReady();
+
         if (ready)
         {
             PhotonNetwork.LocalPlayer.SetReady(false);

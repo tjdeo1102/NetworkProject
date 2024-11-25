@@ -18,9 +18,11 @@ public static class CustomPropert
         player.SetCustomProperties(customProperty);
     }
 
+    // 가져오는 방법
     public static bool GetReady(this Player player)
     {
         PhotonHashtable customProperty = player.CustomProperties;
+        
         if (customProperty.ContainsKey(READY))
         {
             return (bool)customProperty[READY];

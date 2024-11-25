@@ -2,6 +2,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Pun.UtilityScripts;
 using Photon.Realtime;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Android;
 using UnityEngine.UI;
@@ -42,6 +43,15 @@ public class RoomPanel : MonoBehaviour
             int number = player.GetPlayerNumber();
             playerEntries[number].SetPlayer(player);
         }
+
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {
+            startButton.interactable = AllPlayerReadyCheck();
+        }
+        else
+        {
+            startButton.interactable = false;
+        }
     }
 
     public void EnterPlayer(Player newPlayer)
@@ -58,8 +68,13 @@ public class RoomPanel : MonoBehaviour
 
     public void PlayerPropertiesUpdate(Player targetPlayer, Hashtable properties)
     {
+        // 레디 커스텀 프로퍼티를 변경한 경우면 RREADY 키가 있음
         // TODO : 플레이어 속성이 바뀌면 그것을 업데이트
         Debug.Log($"{targetPlayer.NickName} 정보변경!!");
+        if (properties.ContainsKey(CustomPropert.READY))
+        {
+            UpdatePlayer();
+        }
     }
 
     public void StartGame()
@@ -73,8 +88,14 @@ public class RoomPanel : MonoBehaviour
         PhotonNetwork.LeaveRoom();
     }
 
-    public void AllPlayerReadyCheck()
+    public bool AllPlayerReadyCheck()
     {
         // TODO : 모든 플레이어의 레디 체크
+        foreach(Player player in PhotonNetwork.PlayerList)
+        {
+            if (player.GetReady() == false)
+                return false;
+        }
+        return true;
     }
 }

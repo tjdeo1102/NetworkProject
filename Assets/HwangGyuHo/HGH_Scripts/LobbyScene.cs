@@ -91,6 +91,11 @@ public class LobbyScene : MonoBehaviourPunCallbacks
         roomPanel.PlayerPropertiesUpdate(targetPlayer, changedProps);
     }
 
+    // public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    // {
+    //    
+    // }
+
     /// <summary>
     /// 방을 입장하는데 실패했을때 보내는 반응
     /// </summary>
@@ -159,6 +164,8 @@ public class LobbyScene : MonoBehaviourPunCallbacks
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
         Debug.Log($"{newMasterClient.NickName} 플레이어가 방장이 되었습니다.");
+
+         // PhotonNetwork.SetMasterClient(newMasterClient); 저 사람한테 방장 주기, 마스터 클라이언트만 된다
     }
 
     /// <summary>
