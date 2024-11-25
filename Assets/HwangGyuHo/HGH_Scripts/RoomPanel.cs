@@ -16,8 +16,11 @@ public class RoomPanel : MonoBehaviour
 
     private void OnEnable()
     {
+        UpdatePlayer();
+
         // PlayerNumbering 에 플레이어 추가
         PlayerNumbering.OnPlayerNumberingChanged += UpdatePlayer;
+
         PhotonNetwork.LocalPlayer.SetReady(false);
     }
 
@@ -79,7 +82,11 @@ public class RoomPanel : MonoBehaviour
 
     public void StartGame()
     {
-        // TODO : 플레이어들 READY가 모두 되면 게임시작 버튼으로 게임시작
+        // 플레이어들 READY가 모두 되면 게임시작 버튼으로 게임시작
+        // 씬 이름이 일치해야 함
+        PhotonNetwork.LoadLevel("HGH_TestScene");
+        // 게임 플레이 중에는 방에 들어올 수 없게
+        PhotonNetwork.CurrentRoom.IsOpen = false;
     }
 
     public void LeaveRoom()
@@ -90,7 +97,7 @@ public class RoomPanel : MonoBehaviour
 
     public bool AllPlayerReadyCheck()
     {
-        // TODO : 모든 플레이어의 레디 체크
+        // 모든 플레이어의 레디 체크
         foreach(Player player in PhotonNetwork.PlayerList)
         {
             if (player.GetReady() == false)
