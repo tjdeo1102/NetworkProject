@@ -1,8 +1,9 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Singleton<T> : MonoBehaviour
+public class Singleton<T> : MonoBehaviourPunCallbacks
 {
     public static T Instance { get; protected set; }
 
@@ -13,7 +14,8 @@ public class Singleton<T> : MonoBehaviour
             Instance = gameObject.GetComponent<T>();
             DontDestroyOnLoad(gameObject);
 
-            Init();
+            photonView.RPC("Init", RpcTarget.All);
+            //Init();
         }
         else
         {
@@ -21,5 +23,6 @@ public class Singleton<T> : MonoBehaviour
         }
     }
 
+    [PunRPC]
     protected virtual void Init() { }
 }
