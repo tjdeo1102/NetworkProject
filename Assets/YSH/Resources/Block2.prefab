@@ -483,7 +483,7 @@ MonoBehaviour:
   - {fileID: 4930956799183455669}
   castLayer:
     serializedVersion: 2
-    m_Bits: 12288
+    m_Bits: 12352
   rotateSpeed: 990
   blockSize: {x: 1, y: 1}
 --- !u!50 &7382279234303379018
