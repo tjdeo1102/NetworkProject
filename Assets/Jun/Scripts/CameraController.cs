@@ -14,8 +14,8 @@ public class CameraController : MonoBehaviour
     [SerializeField] private List<Player> players;
     [SerializeField] public float cameraSize;
 
-    [SerializeField] private float highestPlayerHeight = float.MinValue;
-    [SerializeField] private float lowestPlayerHeight = float.MaxValue;
+    [SerializeField] private float highestPlayerHeight = 5f;
+    [SerializeField] private float lowestPlayerHeight = 5f;
 
     private void Update()
     {
