@@ -5,9 +5,32 @@ using UnityEngine;
 
 public class BlockMaxHeightManager : MonoBehaviour
 {
-    public float boxCastHeight = 20f;                      
-    public LayerMask blockLayer;                     // 블럭이 포함된 레이어
-    public Vector2 BoxSize = new Vector2(5f, 1f);
+    [SerializeField] private float boxCastHeight = 20f;
+    [SerializeField] private LayerMask blockLayer;      // 블럭이 포함된 레이어
+    [SerializeField] private Vector2 BoxSize = new Vector2(5f, 1f);
+    [SerializeField] public float highestPoint = 0f;
+
+    private void Start()
+    {
+        // 모든 블럭 오브젝트를 찾아서 이벤트 구독
+        foreach (Blocks blocks in FindObjectsOfType<Blocks>())
+        {
+            blocks.OnBlockEntered += HandleBlockEntered;
+            blocks.OnBlockExited += HandleBlockExited;
+        }
+    }
+
+    private void HandleBlockEntered()
+    {
+        highestPoint = GetHighestBlockPosition();
+        Debug.Log("가장 높은 블럭의 y값: " + highestPoint);
+    }
+
+    private void HandleBlockExited()
+    {
+        highestPoint = GetHighestBlockPosition();
+        Debug.Log("가장 높은 블럭의 y값: " + highestPoint);
+    }
 
     // 타워에서 가장 높은 블럭을 찾는 함수
     public float GetHighestBlockPosition()
@@ -50,9 +73,9 @@ public class BlockMaxHeightManager : MonoBehaviour
         Gizmos.color = Color.red;
 
         // 충돌 결과를 검사
-        RaycastHit2D hit = Physics2D.BoxCast(rayOrigin, BoxSize, 0f, Vector2.down, distance, blockLayer);
+        RaycastHit2D hit = BoxCastToFindHighestBlock();
 
-        if (hit.collider != null) // 충돌 발생 시
+        if (hit.collider != null ) // 충돌 발생 시
         {
             // 충돌 지점까지 레이저 표시
             Gizmos.DrawRay(rayOrigin, direction * hit.distance);
@@ -65,20 +88,5 @@ public class BlockMaxHeightManager : MonoBehaviour
             // 최대 거리까지 레이저 표시
             Gizmos.DrawRay(rayOrigin, direction * distance);
         }
-        /*// BoxCast의 시작 위치 계산 (위쪽에서 시작)
-        Vector2 rayOrigin = (Vector2)transform.position + Vector2.up * boxCastHeight;
-
-        // Gizmos로 BoxCast의 경로를 시각화하여 디버깅
-        Gizmos.color = Color.red;
-
-        // BoxCast의 크기에 맞춰서 박스를 그려줌
-        // "rayOrigin"은 BoxCast가 시작하는 위치, Size는 박스의 크기
-        Gizmos.DrawWireCube(rayOrigin + Vector2.down * boxCastHeight / 2, BoxSize);*/
-    }
-
-    private void Update()
-    {
-        float highestBlockY = GetHighestBlockPosition();
-        Debug.Log("가장 높은 블럭의 y값: " + highestBlockY);
     }
 }
