@@ -29,7 +29,7 @@ public class BlockCountManager : MonoBehaviour
         BlockCount++;
         Debug.Log($"블럭 개수: {BlockCount}");
 
-        OnChangeBlockCount?.Invoke(BlockCount);
+        //OnChangeBlockCount?.Invoke(BlockCount);
     }
 
     private void BlockRemoved()
@@ -37,6 +37,6 @@ public class BlockCountManager : MonoBehaviour
         BlockCount--;
         Debug.Log($"블럭 개수: {BlockCount}");
 
-        OnChangeBlockCount?.Invoke(BlockCount);
+        //OnChangeBlockCount?.Invoke(BlockCount);
     }
 }

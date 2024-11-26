@@ -12,21 +12,23 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float maxZoomOut = 10f;
     [SerializeField] private float minZoomIn = 5f;
     [SerializeField] private List<Player> players;
-    [SerializeField] public float cameraSize;
+    public float cameraSize;
 
-    [SerializeField] private float highestPlayerHeight = 5f;
-    [SerializeField] private float lowestPlayerHeight = 5f;
+    [SerializeField] private float highestPlayerHeight = 0f;
+    [SerializeField] private float lowestPlayerHeight = 0f;
 
     private void Update()
     {
         ModulateCameraZoom();
     }
 
-    /*public void GetHighestTowerHeight()
+    public void GetHighestTowerHeight()
     {
-        // 초기화
+        /*// 초기화
         highestPlayerHeight = float.MinValue;
         lowestPlayerHeight = float.MaxValue;
+
+        //플레이어 GetCommponent
 
         foreach (var player in PlayerDic.Values)
         {
@@ -43,8 +45,8 @@ public class CameraController : MonoBehaviour
                     lowestPlayerHeight = height;
                 }
             }
-        }
-    }*/
+        }*/
+    }
 
     private void ModulateCameraZoom()
     {

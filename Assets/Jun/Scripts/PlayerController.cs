@@ -6,13 +6,14 @@ using Photon.Pun.Demo.Procedural;
 using System;
 using Random = UnityEngine.Random;
 
-public class PlayerController : MonoBehaviourPun
+public class PlayerController : MonoBehaviourPun, IPunObservable
 {
 
     [Header("Block")]
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private GameObject[] blockPrefabs;
     [SerializeField] private Blocks currentBlock;
+    public int BlockCount = 0;
 
 
     [Header("PlayerStat")]
@@ -22,6 +23,8 @@ public class PlayerController : MonoBehaviourPun
 
     [Header("PlayerCheck")]
     public bool IsGoal = false;
+
+    public event System.Action<int> OnChangeBlockCount;
 
     private void Start()
     {
@@ -92,7 +95,7 @@ public class PlayerController : MonoBehaviourPun
             currentBlock.Rotate();
         }
     }
-    private void BlockEntered()
+    private void BlockDisabled()
     {
         // 기존 블럭의 제어 해제
         if (currentBlock != null)
@@ -117,7 +120,9 @@ public class PlayerController : MonoBehaviourPun
         GameObject newBlock = Instantiate(blockPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
         //GameObject newBlock = PhotonNetwork.Instantiate(blockPrefabs[randomIndex].name, spawnPoint.position, Quaternion.identity);
         currentBlock = newBlock.GetComponent<Blocks>();
-        //currentBlock.OnDisableControl += BlockEntered;
+        currentBlock.OnDisableControl += BlockDisabled;
+        currentBlock.OnBlockEntered += BlockEnter;
+        currentBlock.OnBlockExited += BlockExit;
     }
 
     public void TakeDamage(int damage)
@@ -145,5 +150,29 @@ public class PlayerController : MonoBehaviourPun
         IsGoal = true;
         //골인 했을 때 추가적인 구현
         //ex) 원작 게임처럼 큰 나무집이 떨어져 1등이 엔딩을 장식할 수 있도록
+    }
+
+    public void BlockEnter()
+    {
+        BlockCount++;
+        OnChangeBlockCount?.Invoke(BlockCount);
+    }
+
+    public void BlockExit()
+    {
+        BlockCount--;
+        OnChangeBlockCount?.Invoke(BlockCount);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(BlockCount);
+        }
+        else
+        {
+            BlockCount = (int)stream.ReceiveNext();
+        }
     }
 }

@@ -565,6 +565,7 @@ GameObject:
   - component: {fileID: 1986640919}
   - component: {fileID: 1986640918}
   - component: {fileID: 1986640920}
+  - component: {fileID: 1986640921}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -654,14 +655,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnPoint: {fileID: 1973145644}
   blockPrefabs:
-  - {fileID: 5564063098573158883, guid: 7c6c6619785cb29489b0859c648f09c2, type: 3}
-  - {fileID: 7382279234303379030, guid: 5b932ca92d60e2844af97270a4aa24ea, type: 3}
-  - {fileID: 5564063098573158883, guid: 6b03a54848d53f04395dd486f3d03c1e, type: 3}
-  - {fileID: 5564063098573158883, guid: f49ea1aa4b117454699fa6676bac40de, type: 3}
-  - {fileID: 5564063098573158883, guid: f74702eb9cadd074ca12670e8b68bfb9, type: 3}
-  - {fileID: 5564063098573158883, guid: f58415f90133215409f82367c137da61, type: 3}
-  - {fileID: 5564063098573158883, guid: 35f2891158f08434991115e1db7917eb, type: 3}
+  - {fileID: 5564063098573158883, guid: ef1d90e5e2f83804fb0b5ff7cc0bc98a, type: 3}
+  - {fileID: 7382279234303379030, guid: 11be13f62eb50564993ecc6e2ebe176a, type: 3}
+  - {fileID: 5564063098573158883, guid: 156535795f0638f4ea5e202b97ec6566, type: 3}
+  - {fileID: 5564063098573158883, guid: 695e3a5e9b3017546b116437580e5b2d, type: 3}
+  - {fileID: 5564063098573158883, guid: 9d39bd63e19e78845b171a9dc5b7f7b8, type: 3}
+  - {fileID: 5564063098573158883, guid: cb9693d1d619ba0478b1b060d9ec7132, type: 3}
+  - {fileID: 5564063098573158883, guid: 02769209f19393d4ebeb1d3efbe00606, type: 3}
   currentBlock: {fileID: 0}
+  BlockCount: 0
   curHp: 0
   maxHp: 0
   IsGoal: 0
+--- !u!114 &1986640921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1986640917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e60a6fe29c3159a46bf4759d3774fccb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1986640917}
+  blockMaxHeightManager: {fileID: 1786305744}

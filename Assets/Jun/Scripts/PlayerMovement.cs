@@ -14,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
         if (player != null)
         {
             // 가장 높은 블럭의 y값을 BlockMaxHeightManager에서 가져오기
+            // enter / exit 이벤트가 있을 때만 수행하도록 수정해야 한다
             float currentHighestBlockY = blockMaxHeightManager.GetHighestBlockPosition();
 
             // 최대 높이가 변경되었을 때만 위치 업데이트

@@ -10,7 +10,7 @@ public class BlockMaxHeightManager : MonoBehaviour
     [SerializeField] private Vector2 BoxSize = new Vector2(5f, 1f);
     [SerializeField] public float highestPoint = 0f;
 
-    private void Start()
+    /*private void Start()
     {
         // 모든 블럭 오브젝트를 찾아서 이벤트 구독
         foreach (Blocks blocks in FindObjectsOfType<Blocks>())
@@ -30,7 +30,7 @@ public class BlockMaxHeightManager : MonoBehaviour
     {
         highestPoint = GetHighestBlockPosition();
         Debug.Log("가장 높은 블럭의 y값: " + highestPoint);
-    }
+    }*/
 
     // 타워에서 가장 높은 블럭을 찾는 함수
     public float GetHighestBlockPosition()
