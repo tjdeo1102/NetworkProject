@@ -26,10 +26,10 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // 플레이어 위치를 블록의 최대 높이에 맞게 조정하는 함수
-    public void SetPlayerPosition(float highestBlockY)
+    public void SetPlayerPosition(float highestPoint)
     {
-        // 플레이어의 위치를 가장 높은 블록 위치에서 왼쪽으로 오프셋을 적용하여 조정
-        Vector2 playerNewPosition = new Vector2(player.transform.position.x, highestBlockY);
+        // 플레이어의 위치를 가장 높은 블록 위치로 조정
+        Vector2 playerNewPosition = new Vector2(player.transform.position.x, highestPoint);
 
         // 플레이어의 위치 업데이트
         player.transform.position = playerNewPosition;

@@ -1,3 +1,4 @@
+using Photon.Pun.Demo.PunBasics;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,16 +14,40 @@ public class CameraController : MonoBehaviour
     [SerializeField] private List<Player> players;
     [SerializeField] public float cameraSize;
 
+    [SerializeField] private float highestPlayerHeight = float.MinValue;
+    [SerializeField] private float lowestPlayerHeight = float.MaxValue;
+
     private void Update()
     {
         ModulateCameraZoom();
     }
 
+    /*public void GetHighestTowerHeight()
+    {
+        // ÃÊ±âÈ­
+        highestPlayerHeight = float.MinValue;
+        lowestPlayerHeight = float.MaxValue;
+
+        foreach (var player in PlayerDic.Values)
+        {
+            if (player.BlockMaxHeightManager != null)
+            {
+                float height = player.BlockMaxHeightManager.highestPoint;
+
+                if (height > highestPlayerHeight)
+                {
+                    highestPlayerHeight = height;
+                }
+                if ( height < lowestPlayerHeight)
+                {
+                    lowestPlayerHeight = height;
+                }
+            }
+        }
+    }*/
+
     private void ModulateCameraZoom()
     {
-        float highestPlayerHeight = 10f;
-        float lowestPlayerHeight = 1f;
-
         // ³ôÀÌ Â÷ÀÌ°¡ ÀÛÀ¸¸é ÁÜÀÎ, Å©¸é ÁÜ¾Æ¿ô
         float heightDifference = highestPlayerHeight - lowestPlayerHeight;
         float targetZoom = Mathf.Lerp(minZoomIn, maxZoomOut, heightDifference / 10f); // ³ôÀÌ¿¡ ºñ·ÊÇÏ¿© ÁÜ
