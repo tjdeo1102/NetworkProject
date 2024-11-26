@@ -270,7 +270,7 @@ public class Blocks : MonoBehaviourPun
 
                 if (resultHit.collider.gameObject.layer == LayerMask.NameToLayer("Wall"))
                 {
-                    Debug.Log("Hit Wall");
+                    Debug.Log("Hit Wall (MoveRoutine)");
                     hitWall = true;
                     break;
                 }
@@ -322,7 +322,7 @@ public class Blocks : MonoBehaviourPun
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
         {
-            Debug.Log("hit wall");
+            Debug.Log("Hit Wall (OnCollision)");
             return;
         }
 
