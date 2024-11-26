@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using PhotonHashtable = ExitGames.Client.Photon.Hashtable;
 
-public class ScoreEntry : MonoBehaviour
+public class PlayerEntry : MonoBehaviour
 {
     [SerializeField] TMP_Text nameText;
     [SerializeField] TMP_Text readyText;

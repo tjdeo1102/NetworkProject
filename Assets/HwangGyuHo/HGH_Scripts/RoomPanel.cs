@@ -10,7 +10,7 @@ using PhotonHashtable = ExitGames.Client.Photon.Hashtable;
 
 public class RoomPanel : MonoBehaviour
 {
-    [SerializeField] ScoreEntry[] playerEntries;
+    [SerializeField] PlayerEntry[] playerEntries;
     [SerializeField] Button startButton;
 
 
@@ -33,7 +33,7 @@ public class RoomPanel : MonoBehaviour
     public void UpdatePlayer()
     {
        
-        foreach (ScoreEntry entry in playerEntries)
+        foreach (PlayerEntry entry in playerEntries)
         {
             entry.SetEmpty();
         }
