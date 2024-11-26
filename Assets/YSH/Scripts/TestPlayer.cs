@@ -1,8 +1,10 @@
+using Photon.Pun;
+using Photon.Pun.Demo.Procedural;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestPlayer : MonoBehaviour
+public class TestPlayer : MonoBehaviourPun
 {
     [SerializeField] private Blocks currentBlock;
 
@@ -39,6 +41,9 @@ public class TestPlayer : MonoBehaviour
         {
             ChangeBlock();
         }
+
+        if (currentBlock == null)
+            return;
 
         if (Input.GetKey(KeyCode.DownArrow))
             currentBlock.Down();

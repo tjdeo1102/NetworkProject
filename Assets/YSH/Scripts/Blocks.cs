@@ -1,10 +1,11 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Blocks : MonoBehaviour
+public class Blocks : MonoBehaviourPun
 {
     [SerializeField] private float basicFallSpeed;          // 하강 속도
     [SerializeField] private float fastFallSpeed;           // 빠른 하강 속도
@@ -29,6 +30,7 @@ public class Blocks : MonoBehaviour
     private bool isPushing;                 // 밀치기 여부
     private bool isRotate;                  // 회전 여부
     private bool isEntered;                 // 블럭 안착 여부
+    private bool isVertical = false;        // 회전 상태를 확인하기 위한 flag
 
     private int collisionCount = 0;         // 현재 블럭과 충돌해있는 충돌체의 수 (exit 판정에 사용)
 
@@ -52,8 +54,19 @@ public class Blocks : MonoBehaviour
         isControllable = true;
         wsMoveDelay = new WaitForSeconds(moveDelay);
 
-        // spotlight 초기화
-        SetSpotlight(0);
+        // 네트워크 or local 처리
+        if (PhotonNetwork.IsConnected)
+        {
+            // 자신의 블럭이 아니면 spotlight를 보이지 않도록 한다.
+            if (photonView.IsMine)
+                SetSpotlight();
+            else
+                spotlightObject.SetActive(false);
+        }
+        else
+        {
+            SetSpotlight();
+        }
 
         // 기본 하강 속도 설정
         currentVelocity = new Vector2(rigid.velocity.x, basicFallSpeed);
@@ -77,20 +90,27 @@ public class Blocks : MonoBehaviour
         // 하강
         rigid.velocity = currentVelocity;
 
-        // 회전 flag가 set된 경우
+        // flag 초기화
+        // 플레이어가 지속적으로 key를 누르고 있는다면 다시 true가 될 것이고
+        // 플레이어가 key를 더이상 누르지 않는다면 false인 상태로 지속될 것이다.
+        isPushing = false;
+        isFastDown = false;
+    }
+
+    private void FixedUpdate()
+    {
+        if (!isControllable)
+            return;
+
         if (isRotate)
         {
-            // targetAngle 까지 회전 시도
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(0, 0, targetAngle), rotateSpeed * Time.deltaTime);
-            // targetAngle까지 회전했으면 보정 및 회전 종료처리
-            // 360도를 target으로 하는 회전의 경우 회전이 끝나면 eulerAngle.z값이 0이 아닌 1.0017... 과 같이 나와 2f보다 작은것을 확인하는 것으로 예외처리
-            if (transform.eulerAngles.z >= targetAngle || targetAngle == 360 && transform.eulerAngles.z < 2f)
+            rigid.rotation += rotateSpeed * Time.deltaTime;
+            if (rigid.rotation >= targetAngle || targetAngle == 360 && rigid.rotation < 2f)
             {
-                // 회전각을 정확히 targetAngle로 보정
-                transform.rotation = Quaternion.Euler(0, 0, targetAngle);
+                rigid.rotation = targetAngle;
 
                 // spotlight의 크기 설정
-                SetSpotlight(targetAngle);
+                SetSpotlight();
 
                 // spotlight 활성화
                 spotlightObject.SetActive(true);
@@ -99,12 +119,6 @@ public class Blocks : MonoBehaviour
                 isRotate = false;
             }
         }
-
-        // flag 초기화
-        // 플레이어가 지속적으로 key를 누르고 있는다면 다시 true가 될 것이고
-        // 플레이어가 key를 더이상 누르지 않는다면 false인 상태로 지속될 것이다.
-        isPushing = false;
-        isFastDown = false;
     }
 
     // Player의 빠른 하강 조작을 위한 Interface
@@ -135,10 +149,6 @@ public class Blocks : MonoBehaviour
         if (isRotate)
             return;
 
-        // 한바퀴 회전했으면 초기화
-        if (targetAngle == 360)
-            targetAngle = 0;
-        
         // 현재 회전각 저장
         targetAngle += 90;
 
@@ -149,17 +159,15 @@ public class Blocks : MonoBehaviour
         isRotate = true;
     }
 
-    private void SetSpotlight(float angle)
+    private void SetSpotlight()
     {
-        // 90, 270도인 경우 vertical
-        if (targetAngle == 90 || targetAngle == 270)
+        if (isVertical)
         {
             spotlightObject.transform.localScale = new Vector3(blockSize.y, spotlightObject.transform.localScale.y, spotlightObject.transform.localScale.z);
 
             // 블럭이 회전될 때 같이 회전되어 방향이 틀어지므로 보정을 위해 재회전 해준다.
             spotlightObject.transform.localRotation = Quaternion.Euler(0, 0, 90);
         }
-        // 나머지 경우는 horizontal 
         else
         {
             spotlightObject.transform.localScale = new Vector3(blockSize.x, spotlightObject.transform.localScale.y, spotlightObject.transform.localScale.z);
@@ -167,6 +175,9 @@ public class Blocks : MonoBehaviour
             // 블럭이 회전될 때 같이 회전되어 방향이 틀어지므로 보정을 위해 재회전 해준다.
             spotlightObject.transform.localRotation = Quaternion.Euler(0, 0, 0);
         }
+
+        // 회전 현황 업데이트
+        isVertical = !isVertical;
     }
 
     // 실제 이동, 밀치기를 진행
@@ -209,6 +220,8 @@ public class Blocks : MonoBehaviour
         Vector2 resultStartPos; // 최종적으로 선정된 시작 위치 (동일)
 
         Vector2 toHit; // 감지 시작 위치 -> 감지된 위치로 향하는 벡터
+
+        bool hitWall = false;
 
         // 제어가 가능할 동안 루프
         while (isControllable)
@@ -254,6 +267,13 @@ public class Blocks : MonoBehaviour
                 if (resultHit.transform == transform)
                     continue;
 
+                if (resultHit.collider.gameObject.layer == LayerMask.NameToLayer("Wall"))
+                {
+                    Debug.Log("Hit Wall");
+                    hitWall = true;
+                    break;
+                }
+
                 // 제어권을 해제
                 isControllable = false;
 
@@ -280,8 +300,11 @@ public class Blocks : MonoBehaviour
                 yield break;
             }
 
-            // 순간적으로 이동해야 하므로 position값을 변경한다.
-            rigid.position += moveDist;
+            if (!hitWall)
+            {
+                // 순간적으로 이동해야 하므로 position값을 변경한다.
+                rigid.position += moveDist;
+            }
 
             // delay만큼 대기
             yield return wsMoveDelay;
@@ -293,9 +316,16 @@ public class Blocks : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
+        {
+            Debug.Log("hit wall");
+            return;
+        }
+
         if (isControllable)
         {
             rigid.velocity = Vector2.zero;
+
             spotlightObject.SetActive(false);
 
             // 충돌 시 flag 변경 
