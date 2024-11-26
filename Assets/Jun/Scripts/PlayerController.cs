@@ -25,8 +25,16 @@ public class PlayerController : MonoBehaviourPun
 
     private void Start()
     {
-        PhotonNetwork.ConnectUsingSettings();
-        if (photonView.IsMine)
+        //PhotonNetwork.ConnectUsingSettings();
+        if (spawnPoint == null || blockPrefabs == null || blockPrefabs.Length == 0)
+        {
+            Debug.LogError("스폰지점, 블럭프리팹이 잘못 설정 되었습니다.");
+            return;
+        }
+
+        //Start가 아닌 방에 참가 했을 때 스폰하는 것으로 수정 예정
+        SpawnBlock();
+        /*if (photonView.IsMine)
         {
 
             if (spawnPoint == null || blockPrefabs == null || blockPrefabs.Length == 0)
@@ -38,8 +46,8 @@ public class PlayerController : MonoBehaviourPun
             //Start가 아닌 방에 참가 했을 때 스폰하는 것으로 수정 예정
             SpawnBlock();
 
-            //Block.OnBlockEntered += BlockEntered;
-        }
+            currentBlock.OnBlockEntered += BlockEntered;
+        }*/
     }
 
     private void OnDestroy()
@@ -52,7 +60,7 @@ public class PlayerController : MonoBehaviourPun
 
     private void Update()
     {
-        if (photonView.IsMine && currentBlock != null )
+        if (/*photonView.IsMine && */currentBlock != null )
         {
             PlayerInput();
         }
@@ -60,7 +68,7 @@ public class PlayerController : MonoBehaviourPun
 
     private void PlayerInput()
     {
-        if (!IsGoal)
+        if (IsGoal)
             return;
 
         if (Input.GetKey(KeyCode.DownArrow))
@@ -98,16 +106,18 @@ public class PlayerController : MonoBehaviourPun
 
     public void SpawnBlock()
     {
-        if (!PhotonNetwork.IsConnected) 
+        /*if (!PhotonNetwork.IsConnected) 
         {
             Debug.LogError("Photon Network에 연결되어 있지 않습니다. 블럭을 생성할 수 없습니다.");
             return;
-        }
+        }*/
 
         int randomIndex = Random.Range(0, blockPrefabs.Length);
         //SpawnPoint는 플레이어 위치 or 블럭의 쌓인 y값 최대치 or 타워의 높이 상대치를 통해 정해질 예정
-        GameObject newBlock = PhotonNetwork.Instantiate(blockPrefabs[randomIndex].name, spawnPoint.position, Quaternion.identity);
+        GameObject newBlock = Instantiate(blockPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
+        //GameObject newBlock = PhotonNetwork.Instantiate(blockPrefabs[randomIndex].name, spawnPoint.position, Quaternion.identity);
         currentBlock = newBlock.GetComponent<Blocks>();
+        //currentBlock.OnDisableControl += BlockEntered;
     }
 
     public void TakeDamage(int damage)
