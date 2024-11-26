@@ -177,6 +177,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: CoreManager
       objectReference: {fileID: 0}
+    - target: {fileID: 5381265777643828288, guid: 9dae05879c1eb734cb2a27b6a939ec21, type: 3}
+      propertyPath: uiPrefab
+      value: 
+      objectReference: {fileID: 7881674830855549598, guid: e8dcd9e14d6dd0148a0a9e9350a86a0d, type: 3}
+    - target: {fileID: 5381265777975951900, guid: 9dae05879c1eb734cb2a27b6a939ec21, type: 3}
+      propertyPath: uiPrefab
+      value: 
+      objectReference: {fileID: 7881674830855549598, guid: e8dcd9e14d6dd0148a0a9e9350a86a0d, type: 3}
+    - target: {fileID: 5381265778706291287, guid: 9dae05879c1eb734cb2a27b6a939ec21, type: 3}
+      propertyPath: uiPrefab
+      value: 
+      objectReference: {fileID: 7881674830855549598, guid: e8dcd9e14d6dd0148a0a9e9350a86a0d, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9dae05879c1eb734cb2a27b6a939ec21, type: 3}
 --- !u!1 &1547860661

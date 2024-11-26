@@ -12,70 +12,70 @@ public class SurvivalModeState : GameState
     private Dictionary<int,Action<int>> blockCountMiddleware;
     private Dictionary<int,Coroutine> winRoutineDic;
 
-    public override void Enter()
-    {
-        SceneLoad(SceneIndex.Game);
-        base.Enter();
+    //public override void Enter()
+    //{
+    //    SceneLoad(SceneIndex.Game);
+    //    base.Enter();
 
-        // Dictionary 초기 세팅
-        hpMiddleware = new Dictionary<int,Action<int>>();
-        blockCountMiddleware = new Dictionary<int,Action<int>>();
-        winRoutineDic = new Dictionary<int, Coroutine>();
-        var playerKeys = playerObjectDic.Keys;
+    //    // Dictionary 초기 세팅
+    //    hpMiddleware = new Dictionary<int,Action<int>>();
+    //    blockCountMiddleware = new Dictionary<int,Action<int>>();
+    //    winRoutineDic = new Dictionary<int, Coroutine>();
+    //    var playerKeys = playerObjectDic.Keys;
 
-        // 플레이어 수만큼 미리 요소 추가
-        foreach (var playerID in playerKeys)
-        {
-            winRoutineDic.Add(playerID, null);
+    //    // 플레이어 수만큼 미리 요소 추가
+    //    foreach (var playerID in playerKeys)
+    //    {
+    //        winRoutineDic.Add(playerID, null);
 
-            // 각 플레이어 HP 및 BlockCount이벤트 구독 설정
-            if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
-            {
-                hpMiddleware.Add(playerID, (newHP) => PlayerHPHandle(newHP, playerID));
-                controller.OnChangeHp += hpMiddleware[playerID];
-            }
-            if (playerObjectDic[playerID].TryGetComponent<BlockCountManager>(out var manager))
-            {
-                blockCountMiddleware.Add(playerID, (newBlockCount) => PlayerBlockCountHandle(newBlockCount, playerID));
-                manager.OnChangeBlockCount += blockCountMiddleware[playerID];
-            }
-        }
-    }
+    //        // 각 플레이어 HP 및 BlockCount이벤트 구독 설정
+    //        if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
+    //        {
+    //            hpMiddleware.Add(playerID, (newHP) => PlayerHPHandle(newHP, playerID));
+    //            controller.OnChangeHp += hpMiddleware[playerID];
+    //        }
+    //        if (playerObjectDic[playerID].TryGetComponent<BlockCountManager>(out var manager))
+    //        {
+    //            blockCountMiddleware.Add(playerID, (newBlockCount) => PlayerBlockCountHandle(newBlockCount, playerID));
+    //            manager.OnChangeBlockCount += blockCountMiddleware[playerID];
+    //        }
+    //    }
+    //}
 
-    public override void Exit()
-    {
-        var playerKeys = playerObjectDic.Keys;
+    //public override void Exit()
+    //{
+    //    var playerKeys = playerObjectDic.Keys;
 
-        // 플레이어 수만큼 미리 요소 추가
-        foreach (var playerID in playerKeys)
-        {
-            if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller)
-                && hpMiddleware.ContainsKey(playerID))
-            {
-                controller.OnChangeHp -= hpMiddleware[playerID];
-            }
-            if (playerObjectDic[playerID].TryGetComponent<BlockCountManager>(out var manager)
-                && blockCountMiddleware.ContainsKey(playerID))
-            {
-                manager.OnChangeBlockCount -= blockCountMiddleware[playerID];
-            }
-        }
+    //    // 플레이어 수만큼 미리 요소 추가
+    //    foreach (var playerID in playerKeys)
+    //    {
+    //        if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller)
+    //            && hpMiddleware.ContainsKey(playerID))
+    //        {
+    //            controller.OnChangeHp -= hpMiddleware[playerID];
+    //        }
+    //        if (playerObjectDic[playerID].TryGetComponent<BlockCountManager>(out var manager)
+    //            && blockCountMiddleware.ContainsKey(playerID))
+    //        {
+    //            manager.OnChangeBlockCount -= blockCountMiddleware[playerID];
+    //        }
+    //    }
 
-        hpMiddleware.Clear();
-        blockCountMiddleware.Clear();
+    //    hpMiddleware.Clear();
+    //    blockCountMiddleware.Clear();
 
-        // winRoutineDic이 실행되고 있는 경우에는 해당 코루틴은 중지
-        foreach (int i in winRoutineDic.Keys)
-        {
-            if (winRoutineDic[i] != null)
-            {
-                StopFinishRoutine(winRoutineDic[i]);
-            }
-        }
-        winRoutineDic.Clear();
+    //    // winRoutineDic이 실행되고 있는 경우에는 해당 코루틴은 중지
+    //    foreach (int i in winRoutineDic.Keys)
+    //    {
+    //        if (winRoutineDic[i] != null)
+    //        {
+    //            StopFinishRoutine(winRoutineDic[i]);
+    //        }
+    //    }
+    //    winRoutineDic.Clear();
 
-        base.Exit();
-    }
+    //    base.Exit();
+    //}
 
     public void PlayerHPHandle(int newHP, int playerID)
     {
@@ -129,10 +129,6 @@ public class SurvivalModeState : GameState
 
         // 모든 플레이어 상태 체크 후, 집계 시작
         AllPlayerResult();
-
-        print($"{playerID}는 우승자입니다.");
-
-        manager.CurrentState = StateType.Stop;
     }
 
     private void PlayerStateChange(int playerID)
@@ -152,7 +148,29 @@ public class SurvivalModeState : GameState
 
     private void AllPlayerResult()
     {
-        // TODO: 모든 플레이어가 조작할 수 없는 상태로 진입
-        print("모든 플레이어의 행동이 중지되었습니다.");
+        if (winRoutineDic.Count < 1)
+        {
+             List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+            foreach (var playerID in playerObjectDic.Keys)
+            {
+                //if (playerObjectDic[playerID].TryGetComponent<BlockCountManager>(out var manager))
+                //{
+                //    result.Add(new Tuple<int, int>(playerID, manager.BlockCount));
+                //}
+
+                //테스트 코드
+                result.Add(new Tuple<int, int>(playerID, playerID));
+            }
+            //내림차순으로 블럭 개수 정렬
+            result.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+            result.ForEach((x) => {
+                playerUI?.SetResultEntry(x.Item1.ToString(), x.Item2);
+                playerUI?.SetResult();
+            });
+            print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
+            print($"{result[0].Item1}이 퍼즐 모드의 우승자입니다!!!");
+
+            Time.timeScale = 0f;
+        }
     }
 }

@@ -1,5 +1,6 @@
 using Photon.Pun;
 using Photon.Pun.Demo.PunBasics;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +12,11 @@ public enum SceneIndex
     Room, Game
 }
 
-public class GameState : MonoBehaviour
+/* 딕셔너리 관리: 방장만
+ * 충돌 관리 및 그 외 로직: 방장만 
+ * UI 관리: 각 플레이어
+ */
+public class GameState : MonoBehaviourPunCallbacks
 {
     [Header("기본 설정")]
     public StateType StateType;
@@ -19,74 +24,80 @@ public class GameState : MonoBehaviour
     [Header("게임 시작 & 종료 설정")]
     [SerializeField] protected float startDelayTime;
     [SerializeField] protected float finishDelayTime;
-    [SerializeField] private GameTimer timerUI;
+    [SerializeField] private PlayerGameCanvasUI uiPrefab;
 
     [Header("플레이어 스폰 설정")]
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Vector2 bottomLeft;            // 스폰 가능 지역의 좌하단 좌표
     [SerializeField] private Vector2 upRight;               // 스폰 가능 지역의 우상단 좌표
 
-    protected CoreManager manager;
-    protected Dictionary<int, GameObject> playerObjectDic;
+    [HideInInspector] public Dictionary<int, GameObject> playerObjectDic;
+    protected PlayerGameCanvasUI playerUI;
     private WaitForSecondsRealtime startDelay;
     private WaitForSeconds finishDelay;
 
-    private void OnEnable()
+    // 활성화 시점에 모두 초기화
+    protected virtual void OnEnable()
     {
+        print($"{StateType}에 진입");
+
         // 시작 딜레이는 게임이 멈춰야되는 기능도 포함하므로 Realtime으로 계산
         startDelay = new WaitForSecondsRealtime(startDelayTime);
         finishDelay = new WaitForSeconds(finishDelayTime);
-    }
-
-    public virtual void Enter()
-    {
-        print($"{StateType}에 진입");
-        manager = CoreManager.Instance;
         playerObjectDic = new Dictionary<int, GameObject>();
-        if (playerPrefab != null)
+
+        if (playerPrefab != null
+            && uiPrefab != null)
         {
-            var playerKeys = manager.PlayerDic.Keys.ToArray();
-            print($"플레이어 수: {playerKeys.Length}");
-            var playerSpawnPos = PlayerSpawnStartPositions(bottomLeft, upRight, playerKeys.Length);
-            for (int i = 0; i < playerKeys.Length; i++)
+            var players = PhotonNetwork.PlayerList;
+            var playerSpawnPos = PlayerSpawnStartPositions(bottomLeft, upRight, players.Length);
+            print($"플레이어 수: {players.Length}");
+
+            for (int i = 0; i < players.Length; i++)
             {
-                playerObjectDic.Add(playerKeys[i], Instantiate(playerPrefab, playerSpawnPos[i], Quaternion.identity, null));
+                var playerObj = Instantiate(playerPrefab, playerSpawnPos[i], Quaternion.identity, null);
+                // 본인 오브젝트가 생성되는 경우에는 본인 UI도 같이 생성
+                if (players[i] == PhotonNetwork.LocalPlayer)
+                    playerUI = Instantiate(uiPrefab, playerObj.transform);
+
+                playerObjectDic.Add(players[i].ActorNumber, playerObj);
             }
         }
-        StartCoroutine(StartRoutine());
+
+        // RPC이용해서 시작 시간 동기화, 방장이 RPC날리기
+        if (PhotonNetwork.IsMasterClient)
+            photonView.RPC("StartRoutineMiddleware", RpcTarget.AllViaServer);
     }
-    public virtual void OnUpdate()
-    {
-        //print($"{StateType}에서 업데이트 중");
-    }
+
     public virtual void Exit()
     {
         print($"{StateType}에서 탈출");
 
-        // 기본적으로 해당 게임 모드가 끝나면 방이 해체된다고 가정하고, 초기화 진행
-        var playerObjectKeys = playerObjectDic.Keys.ToArray();
-        // 플레이어 오브젝트들 삭제
-        foreach (var playerID in playerObjectKeys)
-        {
-            if (playerObjectDic[playerID] != null)
-                Destroy(playerObjectDic[playerID]);
-        }
-        playerObjectDic.Clear();
-        manager?.ResetPlayer();
+        // 모든 딕셔너리 초기화 과정 불필요
+        Time.timeScale = 1f;
 
         SceneLoad(SceneIndex.Room);
+    }
+
+    [PunRPC]
+    private void StartRoutineMiddleware()
+    {
+        // 각자 자신의 State에서만 처리
+        if(photonView.IsMine)
+            StartCoroutine(StartRoutine(PhotonNetwork.Time));
     }
 
     /// <summary>
     /// 모드 시작 시, 작동할 타이머 루틴
     /// </summary>
-    private IEnumerator StartRoutine()
+    private IEnumerator StartRoutine(double startTime)
     {
-        timerUI.Timer = startDelayTime;
-        timerUI.transform.gameObject.SetActive(true);
+        var delay = PhotonNetwork.Time - startTime;
+        // 지연보상 적용
+        playerUI?.SetTimer(startDelayTime - (float)delay);
         Time.timeScale = 0f;
         yield return startDelay;
-        timerUI.transform.gameObject.SetActive(false);
+        playerUI?.SetTimer(0);
         Time.timeScale = 1f;
     }
 
@@ -95,10 +106,9 @@ public class GameState : MonoBehaviour
     /// </summary>
     protected virtual IEnumerator FinishRoutine(int playerID)
     {
-        timerUI.Timer = finishDelayTime;
-        timerUI.transform.gameObject.SetActive(true);
+        playerUI?.SetTimer(finishDelayTime);
         yield return finishDelay;
-        timerUI.transform.gameObject.SetActive(false);
+        playerUI?.SetTimer(0);
     }
 
     /// <summary>
@@ -107,7 +117,8 @@ public class GameState : MonoBehaviour
     protected void StopFinishRoutine(Coroutine routine)
     {
         // 종료 시, 공통적인 기능들 일괄 처리
-        timerUI.transform.gameObject.SetActive(false);
+        playerUI?.SetTimer(0);
+
         StopCoroutine(routine);
     }
 

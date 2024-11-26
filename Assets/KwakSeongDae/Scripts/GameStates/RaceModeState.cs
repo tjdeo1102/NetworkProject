@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,41 +15,41 @@ public class RaceModeState : GameState
 
     private Coroutine mainCollisionRoutine;
 
-    public override void Enter()
-    {
-        SceneLoad(SceneIndex.Game);
-        base.Enter();
-        // Dictionary 초기 세팅
-        goalRoutineDic = new Dictionary<int, Coroutine>();
-        isBlockCheckDic = new Dictionary<int, bool>();
-        // 플레이어 수만큼 미리 요소 추가
-        foreach (var playerID in playerObjectDic.Keys)
-        {
-            goalRoutineDic.Add(playerID, null);
-            isBlockCheckDic.Add(playerID, false);
-        }
+    //public override void Enter()
+    //{
+    //    SceneLoad(SceneIndex.Game);
+    //    base.Enter();
+    //    // Dictionary 초기 세팅
+    //    goalRoutineDic = new Dictionary<int, Coroutine>();
+    //    isBlockCheckDic = new Dictionary<int, bool>();
+    //    // 플레이어 수만큼 미리 요소 추가
+    //    foreach (var playerID in playerObjectDic.Keys)
+    //    {
+    //        goalRoutineDic.Add(playerID, null);
+    //        isBlockCheckDic.Add(playerID, false);
+    //    }
 
-        // 충돌 감지 루틴 실행
-        mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
-    }
+    //    // 충돌 감지 루틴 실행
+    //    mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
+    //}
 
-    public override void Exit()
-    {
-        StopCoroutine(mainCollisionRoutine);
-        // finishRoutine이 실행되고 있는 경우에는 해당 코루틴은 중지
-        foreach (int i in goalRoutineDic.Keys)
-        {
-            if (goalRoutineDic[i] != null)
-            {
-                StopFinishRoutine(goalRoutineDic[i]);
-            }
-        }
-        goalRoutineDic.Clear();
-        isBlockCheckDic.Clear();
+    //public override void Exit()
+    //{
+    //    StopCoroutine(mainCollisionRoutine);
+    //    // finishRoutine이 실행되고 있는 경우에는 해당 코루틴은 중지
+    //    foreach (int i in goalRoutineDic.Keys)
+    //    {
+    //        if (goalRoutineDic[i] != null)
+    //        {
+    //            StopFinishRoutine(goalRoutineDic[i]);
+    //        }
+    //    }
+    //    goalRoutineDic.Clear();
+    //    isBlockCheckDic.Clear();
 
-        // Exit호출은 Enter의 역순
-        base.Exit();
-    }
+    //    // Exit호출은 Enter의 역순
+    //    base.Exit();
+    //}
     private IEnumerator CollisionCheckRoutine()
     {
         var detectorPos = (Vector2)boxDetector.transform.position + boxDetector.offset;
@@ -124,15 +125,49 @@ public class RaceModeState : GameState
         yield return StartCoroutine(base.FinishRoutine(playerID));
         // 제한 시간이 지나면
         // 모든 플레이어 작동 멈추고 집계
+        AllPlayerStateChange();
         AllPlayerResult();
-        manager.CurrentState = StateType.Stop;
+    }
+
+    private void AllPlayerStateChange()
+    {
+        foreach (var playerID in playerObjectDic.Keys)
+        {
+            if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controlller))
+            {
+                controlller.IsGoal = true;
+            }
+            // 기존에 finishRoutineDic의 목록에서 해당 플레이어 삭제
+            goalRoutineDic.Remove(playerID);
+            isBlockCheckDic.Remove(playerID);
+            print($"{playerID}는 이제 조작할 수 없습니다.");
+        }
+        print("모든 플레이어의 행동이 중지되었습니다.");
     }
 
     private void AllPlayerResult()
     {
-        // TODO: 모든 플레이어가 조작할 수 없는 상태로 진입
-        print("모든 플레이어의 행동이 중지되었습니다.");
+        if (goalRoutineDic.Count < 1)
+        {
+            List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+            foreach (var playerID in playerObjectDic.Keys)
+            {
+                //TODO: 각 플레이어의 가장 높은 블럭을 집계하는 코드 필요
 
-        print($"는 우승자입니다.");
+                //테스트 코드
+                result.Add(new Tuple<int, int>(playerID, playerID));
+            }
+            //내림차순으로 블럭 개수 정렬
+            result.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+            result.ForEach((x) => {
+                playerUI?.SetResultEntry(x.Item1.ToString(), x.Item2);
+                playerUI?.SetResult();
+            });
+
+            print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
+            print($"{result[0].Item1}이 퍼즐 모드의 우승자입니다!!!");
+
+            Time.timeScale = 0f;
+        }
     }
 }
