@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     [SerializeField] private GameObject[] blockPrefabs;
     [SerializeField] private Blocks currentBlock;
     public int BlockCount = 0;
-
+    [SerializeField] private BlockMaxHeightManager blockMaxHeightManager;
 
     [Header("PlayerStat")]
     [SerializeField] private int curHp;
@@ -123,6 +123,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         currentBlock.OnDisableControl += BlockDisabled;
         currentBlock.OnBlockEntered += BlockEnter;
         currentBlock.OnBlockExited += BlockExit;
+        //이벤트 해제 어디서?
     }
 
     public void TakeDamage(int damage)
@@ -156,12 +157,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     {
         BlockCount++;
         OnChangeBlockCount?.Invoke(BlockCount);
+        blockMaxHeightManager.UpdateHighestPoint();
     }
 
     public void BlockExit()
     {
         BlockCount--;
         OnChangeBlockCount?.Invoke(BlockCount);
+        blockMaxHeightManager.UpdateHighestPoint();
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

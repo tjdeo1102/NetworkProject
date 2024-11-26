@@ -9,20 +9,19 @@ public class PlayerMovement : MonoBehaviour
 
     private float previousHighestBlockY = 0f;  // 이전 최대 높이(처음 시작할 위치로 지정할 예정)
 
-    private void Update()
+    private void Start()
     {
-        if (player != null)
+        if (blockMaxHeightManager != null)
         {
-            // 가장 높은 블럭의 y값을 BlockMaxHeightManager에서 가져오기
-            // enter / exit 이벤트가 있을 때만 수행하도록 수정해야 한다
-            float currentHighestBlockY = blockMaxHeightManager.GetHighestBlockPosition();
+            blockMaxHeightManager.OnHeightChanged += SetPlayerPosition; // 이벤트 구독
+        }
+    }
 
-            // 최대 높이가 변경되었을 때만 위치 업데이트
-            if (currentHighestBlockY != previousHighestBlockY)
-            {
-                SetPlayerPosition(currentHighestBlockY);  // 위치 업데이트
-                previousHighestBlockY = currentHighestBlockY; // 이전 높이 갱신
-            }
+    private void OnDestroy()
+    {
+        if (blockMaxHeightManager != null)
+        {
+            blockMaxHeightManager.OnHeightChanged -= SetPlayerPosition; // 이벤트 구독 해제
         }
     }
 
