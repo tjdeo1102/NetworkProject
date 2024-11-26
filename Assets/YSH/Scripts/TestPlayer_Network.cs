@@ -4,31 +4,42 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestPlayer : MonoBehaviourPun
+public class TestPlayer_Network : MonoBehaviourPun
 {
     [SerializeField] private Blocks currentBlock;
 
-    [SerializeField] private Blocks[] testBlocks;
+    [SerializeField] Blocks[] testBlockPrefabs;
+
+    private Blocks[] testBlockInstances;
 
     private int blockIndex = -1;
 
     private void Start()
     {
-        ChangeBlock();
+        object[] data = photonView.InstantiationData;
+        gameObject.name = $"{data[0]}";
+
+        testBlockInstances = new Blocks[testBlockPrefabs.Length];
     }
 
-    // for test
     private void ChangeBlock()
     {
-        if (testBlocks.Length <= 0)
-            return;
-
         blockIndex++;
 
-        if (blockIndex >= testBlocks.Length)
+        if (blockIndex >= testBlockPrefabs.Length)
             blockIndex = 0;
 
-        currentBlock = testBlocks[blockIndex];
+        if (testBlockInstances[blockIndex] != null)
+        {
+            currentBlock = testBlockInstances[blockIndex];
+        }
+        else
+        {
+            GameObject blockObj = PhotonNetwork.Instantiate(testBlockPrefabs[blockIndex].name, new Vector3(Random.Range(-3, 3), 3.75f, 0), Quaternion.identity);
+            testBlockInstances[blockIndex] = blockObj.GetComponent<Blocks>();
+            currentBlock = testBlockInstances[blockIndex];
+            Debug.Log($"<color=yellow>${photonView.Owner.NickName} Instantiated Block</color>");
+        }    
 
         if (!currentBlock.gameObject.activeSelf)
             currentBlock.gameObject.SetActive(true);
@@ -36,7 +47,9 @@ public class TestPlayer : MonoBehaviourPun
 
     void Update()
     {
-        // for test
+        if (!photonView.IsMine)
+            return;
+
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             ChangeBlock();
