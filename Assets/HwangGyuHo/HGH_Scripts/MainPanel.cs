@@ -2,6 +2,9 @@ using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine;
+using Firebase;
+using Firebase.Extensions;
+using Firebase.Auth;
 
 public class MainPanel : MonoBehaviour
 {
@@ -75,5 +78,26 @@ public class MainPanel : MonoBehaviour
     {
         Debug.Log("로그아웃 요청");
         PhotonNetwork.Disconnect();
+    }
+
+    public void DeleteUser()
+    {
+        FirebaseUser user = BackendManager.Auth.CurrentUser;
+        user.DeleteAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("DeleteAsync was canceled.");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("DeleteAsync encountered an error: " + task.Exception);
+                return;
+            }
+
+            Debug.Log("User deleted successfully.");
+            PhotonNetwork.Disconnect();
+        });
     }
 }
