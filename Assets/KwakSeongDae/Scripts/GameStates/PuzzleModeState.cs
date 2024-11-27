@@ -13,7 +13,6 @@ public class PuzzleModeState : GameState
 
     private Coroutine finishRoutine;
     private Dictionary<int, bool> isBlockCheckDic;
-
     private Coroutine mainCollisionRoutine;
 
     protected override void OnEnable()
@@ -21,6 +20,7 @@ public class PuzzleModeState : GameState
         base.OnEnable();
         // Dictionary 초기 세팅
         isBlockCheckDic = new Dictionary<int, bool>();
+        
         // 플레이어 수만큼 미리 요소 추가
         foreach (var player in PhotonNetwork.PlayerList)
         {
@@ -70,10 +70,7 @@ public class PuzzleModeState : GameState
                 var block = blockTrans.GetComponent<Blocks>();
                 // 블럭이 존재하는 경우, 해당 소유자의 블럭이 있음을 체크
                 // 충돌된 블럭이 있을때, 플레이어의 코루틴의 유무 판단 후, 코루틴 실행
-
-                // TODO: 블럭이 닿은경우를 체크하는 것이 아닌, 컨트롤 여부를 체크해야함
-                if (block.IsEntered == false 
-                    //&& block.IsControllable
+                if (block.IsControllable == false
                     && blockTrans.TryGetComponent<PhotonView>(out var view))
                 {
                     int playerID = view.Owner.ActorNumber;
@@ -139,8 +136,7 @@ public class PuzzleModeState : GameState
 
     private void PlayerStateChange(int playerID)
     {
-        if (playerObjectDic.ContainsKey(playerID)
-            && playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
+        if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
         {
             controller.IsGoal = true;
         }
@@ -164,13 +160,11 @@ public class PuzzleModeState : GameState
             List<Tuple<int,int>> result = new List<Tuple<int,int>>();
             foreach (var playerKey in playerObjectDic.Keys)
             {
-                //if (playerObjectDic[playerKey].TryGetComponent<PlayerController>(out var controller))
-                //{
-                //    result.Add(new Tuple<int, int>(playerKey, controller.BlockCount));
-                //}
-
-                //테스트 코드
-                result.Add(new Tuple<int, int>(playerKey, playerKey));
+                if (playerObjectDic[playerKey].TryGetComponent<PlayerController>(out var controller))
+                {
+                    print(controller.BlockCount);
+                    result.Add(new Tuple<int, int>(playerKey, controller.BlockCount));
+                }
             }
 
             //내림차순으로 블럭 개수 정렬
