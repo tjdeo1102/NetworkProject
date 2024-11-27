@@ -1,5 +1,6 @@
 using Photon.Pun;
 using Photon.Pun.Demo.PunBasics;
+using Photon.Pun.UtilityScripts;
 using Photon.Realtime;
 using System;
 using System.Collections;
@@ -26,6 +27,7 @@ public class GameState : MonoBehaviourPun
 
     [Header("플레이어 스폰 설정")]
     [SerializeField] private string playerPrefabPath;
+    [SerializeField] private string towerPrefabPath;
     [SerializeField] private string wallPrefabPath;
     [SerializeField] private Vector2 bottomLeft;            // 스폰 가능 지역의 좌하단 좌표
     [SerializeField] private Vector2 upRight;               // 스폰 가능 지역의 우상단 좌표
@@ -35,10 +37,13 @@ public class GameState : MonoBehaviourPun
     private WaitForSecondsRealtime startDelay;
     private WaitForSeconds finishDelay;
 
+    // 자신이 소유한 플레이어 오브젝트
+    protected GameObject selfPlayer;
+
     // 활성화 시점에 모두 초기화
     protected virtual void OnEnable()
     {
-        print($"퍼즐 모드에 진입");
+        //print($"퍼즐 모드에 진입");
 
         // 시작 딜레이는 게임이 멈춰야되는 기능도 포함하므로 Realtime으로 계산
         startDelay = new WaitForSecondsRealtime(startDelayTime);
@@ -56,6 +61,8 @@ public class GameState : MonoBehaviourPun
 
             for (int i = 0; i < players.Length; i++)
             {
+                // 타워 생성
+                var towerObj = PhotonNetwork.Instantiate(towerPrefabPath, playerSpawnPos[i], Quaternion.identity, data: new object[] { players[i].GetPlayerNumber() });
                 // 네트워크 플레이어 오브젝트를 생성하기
                 var playerObj = PhotonNetwork.Instantiate(playerPrefabPath, playerSpawnPos[i], Quaternion.identity, data: new object[] { players[i].NickName });
                 // 각 플레이어 오브젝트의 소유권을 해당되는 클라이언트로 변경하기
@@ -82,6 +89,15 @@ public class GameState : MonoBehaviourPun
         Time.timeScale = 1f;
 
         SceneLoad(SceneIndex.Room);
+    }
+
+    [PunRPC]
+    protected void SetSelfPlayer(int viewID)
+    {
+        var obj = PhotonView.Find(viewID);
+        if (obj.IsMine == false) return;
+
+        selfPlayer = obj.gameObject;
     }
 
     [PunRPC]

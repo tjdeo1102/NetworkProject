@@ -22,9 +22,9 @@ public class PuzzleModeState : GameState
         // Dictionary 초기 세팅
         isBlockCheckDic = new Dictionary<int, bool>();
         // 플레이어 수만큼 미리 요소 추가
-        foreach (var playerID in playerObjectDic.Keys)
+        foreach (var player in PhotonNetwork.PlayerList)
         {
-            isBlockCheckDic.Add(playerID, false);
+            isBlockCheckDic.Add(player.ActorNumber, false);
         }
 
         // 방장만 충돌 감지 루틴 실행

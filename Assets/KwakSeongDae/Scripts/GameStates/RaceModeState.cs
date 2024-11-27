@@ -105,13 +105,32 @@ public class RaceModeState : GameState
         }
     }
 
+    [PunRPC]
+    private void FinishRoutineWrap(int playerID, bool isPlay)
+    {
+        // 해당 플레이어에서만 루틴 실행
+        if (PhotonNetwork.LocalPlayer.ActorNumber != playerID) return;
+
+        if (isPlay)
+        {
+            // 기존에 실행중이면 무시
+            if (goalRoutine == null)
+                goalRoutine = StartCoroutine(FinishRoutine(playerID));
+        }
+        else
+        {
+            if (goalRoutine != null)
+                StopFinishRoutine(goalRoutine);
+
+            goalRoutine = null;
+        }
+    }
+
     protected override IEnumerator FinishRoutine(int playerID)
     {
         yield return StartCoroutine(base.FinishRoutine(playerID));
-        // 제한 시간이 지나면
-        // 모든 플레이어 작동 멈추고 집계
-        AllPlayerStateChange();
-        AllPlayerResult();
+        // 제한 시간이 지나면 모든 플레이어 상태 체크 후, 집계까지 진행
+        photonView.RPC("AllPlayerStateCheck", RpcTarget.MasterClient, playerID);
     }
 
     private void AllPlayerStateChange()
@@ -123,36 +142,51 @@ public class RaceModeState : GameState
                 controlller.IsGoal = true;
             }
             // 기존에 finishRoutineDic의 목록에서 해당 플레이어 삭제
-            goalRoutineDic.Remove(playerID);
             isBlockCheckDic.Remove(playerID);
             print($"{playerID}는 이제 조작할 수 없습니다.");
         }
         print("모든 플레이어의 행동이 중지되었습니다.");
     }
 
-    private void AllPlayerResult()
+    private void AllPlayerStateCheck()
     {
-        if (goalRoutineDic.Count < 1)
+        List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+        foreach (var playerID in playerObjectDic.Keys)
         {
-            List<Tuple<int, int>> result = new List<Tuple<int, int>>();
-            foreach (var playerID in playerObjectDic.Keys)
-            {
-                //TODO: 각 플레이어의 가장 높은 블럭을 집계하는 코드 필요
+            //TODO: 각 플레이어의 가장 높은 블럭을 집계하는 코드 필요
 
-                //테스트 코드
-                result.Add(new Tuple<int, int>(playerID, playerID));
-            }
-            //내림차순으로 블럭 개수 정렬
-            result.Sort((x, y) => y.Item2.CompareTo(x.Item2));
-            //result.ForEach((x) => {
-            //    playerUI?.SetResultEntry(x.Item1.ToString(), x.Item2);
-            //    playerUI?.SetResult();
-            //});
-
-            print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
-            print($"{result[0].Item1}이 퍼즐 모드의 우승자입니다!!!");
-
-            Time.timeScale = 0f;
+            //테스트 코드
+            result.Add(new Tuple<int, int>(playerID, playerID));
         }
+
+        //내림차순으로 블럭 개수 정렬
+        result.Sort((x, y) => y.Item2.CompareTo(x.Item2));
+
+        //각 클라이언트에서, 각각의 UI에 해당 내용 반영되도록 설정
+        var players = new int[result.Count];
+        var blockCounts = new int[result.Count];
+        for (int i = 0; i < result.Count; i++)
+        {
+            players[i] = result[i].Item1;
+            blockCounts[i] = result[i].Item2;
+        }
+
+        // UI 업데이트 작업 및 게임 정지기능은 모든 클라이언트 진행
+        photonView.RPC("UpdateUI", RpcTarget.All, players, blockCounts);
+    }
+
+    [PunRPC]
+    private void UpdateUI(int[] playerIDs, int[] blockCounts)
+    {
+        for (int i = 0; i < playerIDs.Length; i++)
+        {
+            playerUI?.AddResultEntry(playerIDs[i], blockCounts[i]);
+        }
+        playerUI?.SetResult();
+
+        print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
+        print($"{playerIDs[0]}이 레이스 모드의 우승자입니다!!!");
+
+        Time.timeScale = 0f;
     }
 }
