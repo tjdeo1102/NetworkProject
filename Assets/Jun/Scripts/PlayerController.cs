@@ -5,15 +5,17 @@ using Photon.Pun;
 using Photon.Pun.Demo.Procedural;
 using System;
 using Random = UnityEngine.Random;
+using Photon.Pun.UtilityScripts;
 
-public class PlayerController : MonoBehaviourPun
+public class PlayerController : MonoBehaviourPun, IPunObservable
 {
 
     [Header("Block")]
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private GameObject[] blockPrefabs;
     [SerializeField] private Blocks currentBlock;
-
+    public int BlockCount = 0;
+    [SerializeField] private BlockMaxHeightManager blockMaxHeightManager;
 
     [Header("PlayerStat")]
     [SerializeField] private int curHp;
@@ -23,9 +25,26 @@ public class PlayerController : MonoBehaviourPun
     [Header("PlayerCheck")]
     public bool IsGoal = false;
 
+    public event System.Action<int> OnChangeBlockCount;
+
+    public int TowerNumber = 0;
+
     private void Start()
     {
-        //PhotonNetwork.ConnectUsingSettings();
+        //네트워크 테스트용
+        if (photonView.IsMine)
+        {
+            TowerNumber = PhotonNetwork.LocalPlayer.GetPlayerNumber();
+            GameObject TowerTest = GameObject.Find($"Tower{TowerNumber}");
+            blockMaxHeightManager = TowerTest.GetComponent<BlockMaxHeightManager>();
+            GetComponent<PlayerMovement>().SetMaxHeightManager(blockMaxHeightManager);
+
+            transform.position = new Vector2(TowerTest.transform.position.x - 5f, 
+                TowerTest.transform.position.y + 5f);
+        }
+
+
+
         if (spawnPoint == null || blockPrefabs == null || blockPrefabs.Length == 0)
         {
             Debug.LogError("스폰지점, 블럭프리팹이 잘못 설정 되었습니다.");
@@ -34,33 +53,19 @@ public class PlayerController : MonoBehaviourPun
 
         //Start가 아닌 방에 참가 했을 때 스폰하는 것으로 수정 예정
         SpawnBlock();
-        /*if (photonView.IsMine)
-        {
-
-            if (spawnPoint == null || blockPrefabs == null || blockPrefabs.Length == 0)
-            {
-                Debug.LogError("스폰지점, 블럭프리팹이 잘못 설정 되었습니다.");
-                return;
-            }
-
-            //Start가 아닌 방에 참가 했을 때 스폰하는 것으로 수정 예정
-            SpawnBlock();
-
-            currentBlock.OnBlockEntered += BlockEntered;
-        }*/
     }
 
-    private void OnDestroy()
+    /*private void OnDestroy()
     {
         if (photonView.IsMine)
         {
             //Block.OnBlockEntered -= BlockEntered;
         }
-    }
+    }*/
 
     private void Update()
     {
-        if (/*photonView.IsMine && */currentBlock != null )
+        if (photonView.IsMine && currentBlock != null )
         {
             PlayerInput();
         }
@@ -92,32 +97,28 @@ public class PlayerController : MonoBehaviourPun
             currentBlock.Rotate();
         }
     }
-    private void BlockEntered()
-    {
-        // 기존 블럭의 제어 해제
-        if (currentBlock != null)
-        {
-            currentBlock = null;
-        }
-
-        // 새로운 블럭 생성
-        SpawnBlock();
-    }
 
     public void SpawnBlock()
     {
-        /*if (!PhotonNetwork.IsConnected) 
+        if (!PhotonNetwork.IsConnected) 
         {
             Debug.LogError("Photon Network에 연결되어 있지 않습니다. 블럭을 생성할 수 없습니다.");
             return;
-        }*/
+        }
 
         int randomIndex = Random.Range(0, blockPrefabs.Length);
         //SpawnPoint는 플레이어 위치 or 블럭의 쌓인 y값 최대치 or 타워의 높이 상대치를 통해 정해질 예정
-        GameObject newBlock = Instantiate(blockPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
-        //GameObject newBlock = PhotonNetwork.Instantiate(blockPrefabs[randomIndex].name, spawnPoint.position, Quaternion.identity);
+        //GameObject newBlock = Instantiate(blockPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
+        GameObject newBlock = PhotonNetwork.Instantiate(blockPrefabs[randomIndex].name, spawnPoint.position, Quaternion.identity);
+
+        // 블럭 초기 레이어 설정 (예: "Default")
+        SetLayerAll(newBlock, LayerMask.NameToLayer("Default"));
+
         currentBlock = newBlock.GetComponent<Blocks>();
-        //currentBlock.OnDisableControl += BlockEntered;
+        /*currentBlock.OnBlockEntered += BlockEnter;
+        currentBlock.OnBlockExited += BlockExit;
+        currentBlock.OnBlockFallen += BlockFallen;*/
+        //이벤트 해제 어디서?
     }
 
     public void TakeDamage(int damage)
@@ -145,5 +146,63 @@ public class PlayerController : MonoBehaviourPun
         IsGoal = true;
         //골인 했을 때 추가적인 구현
         //ex) 원작 게임처럼 큰 나무집이 떨어져 1등이 엔딩을 장식할 수 있도록
+    }
+
+    public void BlockEnter(Blocks block)
+    {
+        // 기존 블럭의 제어 해제
+        if (currentBlock == block)
+        {
+            //블럭의 레이어 수정
+            SetLayerAll(currentBlock.gameObject, LayerMask.NameToLayer("Blocks"));
+            currentBlock = null;
+            // 새로운 블럭 생성
+            SpawnBlock();
+        }
+
+        BlockCount++;
+        OnChangeBlockCount?.Invoke(BlockCount);
+        blockMaxHeightManager.UpdateHighestPoint();
+    }
+
+    public void BlockExit(Blocks block)
+    {
+        BlockCount--;
+        OnChangeBlockCount?.Invoke(BlockCount);
+        blockMaxHeightManager.UpdateHighestPoint();
+    }
+
+    public void BlockFallen(Blocks block)
+    {
+        Debug.Log("블럭이 카메라 바깥으로 떨어짐");
+        //플레이어 체력처리
+
+        // 기존 블럭의 제어 해제
+        if (currentBlock != null)
+        {
+            currentBlock = null;
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(BlockCount);
+        }
+        else
+        {
+            BlockCount = (int)stream.ReceiveNext();
+        }
+    }
+
+    public void SetLayerAll(GameObject obj, int newLayer)
+    {
+        obj.layer = newLayer;
+        Debug.Log($"SetLayer{obj.name}");
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerAll(child.gameObject, newLayer);
+        }
     }
 }
