@@ -395,8 +395,8 @@ public class Blocks : MonoBehaviourPun
         {
             OnBlockFallen?.Invoke(this);
 
-            // 1초 대기 후 삭제
-            Destroy(gameObject, 1f);
+            // 바로 삭제
+            Destroy(gameObject);
         }
     }
 
