@@ -5,13 +5,21 @@ using UnityEngine;
 using Firebase;
 using Firebase.Extensions;
 using Firebase.Auth;
+using UnityEngine.UI;
+using UnityEditor;
+using Unity.VisualScripting;
 
 public class MainPanel : MonoBehaviour
 {
     [SerializeField] GameObject menuPanel;
     [SerializeField] GameObject createRoomPanel;
+    [SerializeField] Button[] modeButton;
     [SerializeField] TMP_InputField roomNameInputField;
     [SerializeField] TMP_InputField maxPlayerInputField;
+
+    private bool isColored_0;
+    private bool isColored_1;
+    private bool isColored_2;
     
     /// <summary>
     /// 방제목과 인원수 정하는 패널을 OFF
@@ -19,6 +27,13 @@ public class MainPanel : MonoBehaviour
     private void OnEnable()
     {
         createRoomPanel.SetActive(false);
+        isColored_0 = false;
+        isColored_1 = false;
+        isColored_2 = false;
+
+        modeButton[0].gameObject.SetActive(true);
+        modeButton[1].gameObject.SetActive(true);
+        modeButton[2].gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -78,6 +93,48 @@ public class MainPanel : MonoBehaviour
     {
         Debug.Log("로그아웃 요청");
         PhotonNetwork.Disconnect();
+    }
+
+    public void SelectModeButton1()
+    {
+        isColored_0 = true;
+        ButtonColor();
+    }
+
+    public void SelectModeButton2()
+    {
+        isColored_1 = true;
+        ButtonColor();
+    }
+    public void SelectModeButton3()
+    {
+        isColored_2 = true;
+        ButtonColor();
+    }
+
+
+    public void ButtonColor()
+    {
+        ColorBlock colorBlock = new ColorBlock();
+        colorBlock.selectedColor = Color.green;
+        colorBlock.colorMultiplier = 3;
+        if (isColored_0)
+        {
+
+            modeButton[0].colors = colorBlock;
+            modeButton[1].gameObject.SetActive(false);
+            modeButton[2].gameObject.SetActive(false);
+        }else if (isColored_1)
+        {
+            modeButton[1].colors= colorBlock;
+            modeButton[0].gameObject.SetActive(false);
+            modeButton[2].gameObject.SetActive(false);
+        }else if (isColored_2)
+        {
+            modeButton[2].colors= colorBlock;
+            modeButton[0].gameObject.SetActive(false);
+            modeButton[1].gameObject.SetActive(false);
+        }
     }
 
     public void DeleteUser()
