@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestPlayer_Network : MonoBehaviourPun
+public class TestPlayer_Network : MonoBehaviourPun, IPunObservable
 {
     [SerializeField] private Blocks currentBlock;
 
@@ -13,6 +13,8 @@ public class TestPlayer_Network : MonoBehaviourPun
     private Blocks[] testBlockInstances;
 
     private int blockIndex = -1;
+
+    [SerializeField] private int blockCount = 0;
 
     private void Start()
     {
@@ -38,11 +40,23 @@ public class TestPlayer_Network : MonoBehaviourPun
             GameObject blockObj = PhotonNetwork.Instantiate(testBlockPrefabs[blockIndex].name, new Vector3(Random.Range(-3, 3), 3.75f, 0), Quaternion.identity);
             testBlockInstances[blockIndex] = blockObj.GetComponent<Blocks>();
             currentBlock = testBlockInstances[blockIndex];
-            Debug.Log($"<color=yellow>${photonView.Owner.NickName} Instantiated Block</color>");
+            currentBlock.OnBlockEntered += BlockEnter;
+            currentBlock.OnBlockExited += BlockExit;
+            Debug.Log($"<color=yellow>{photonView.Owner.NickName} Instantiated Block</color>");
         }    
 
         if (!currentBlock.gameObject.activeSelf)
             currentBlock.gameObject.SetActive(true);
+    }
+
+    private void BlockEnter()
+    {
+        blockCount++;
+    }
+
+    private void BlockExit()
+    {
+        blockCount--;
     }
 
     void Update()
@@ -77,6 +91,18 @@ public class TestPlayer_Network : MonoBehaviourPun
         if (Input.GetKeyDown(KeyCode.Space))
         {
             currentBlock.Rotate();
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(blockCount);
+        }
+        else
+        {
+            blockCount = (int)stream.ReceiveNext();
         }
     }
 }

@@ -37,11 +37,11 @@ public class Blocks : MonoBehaviourPun
     private Coroutine moveRoutine;          // 이동 시 사용할 코루틴
     private WaitForSeconds wsMoveDelay;     // 이동 코루틴에서 활용할 WaitForSeconds 객체
 
-    public UnityAction OnBlockFallen;       // 블럭이 맵밖으로 떨어질 때 Invoke (체력감소, 사망 처리에 활용)
-    public UnityAction OnBlockEntered;      // 블럭이 안착했을 때 Invoke (블럭 카운팅에 활용)
-    public UnityAction OnBlockExited;       // 블럭이 안착했다가 벗어날 때 (블럭 카운팅에 활용)
-    public UnityAction OnDisableControl;    // 블럭의 제어권이 상실될 때 (블럭 스폰에 활용)
+    public UnityAction<Blocks> OnBlockFallen;       // 블럭이 맵밖으로 떨어질 때 Invoke (체력감소, 사망 처리에 활용)
+    public UnityAction<Blocks> OnBlockEntered;      // 블럭이 안착했을 때 Invoke (블럭 카운팅에 활용)
+    public UnityAction<Blocks> OnBlockExited;       // 블럭이 안착했다가 벗어날 때 (블럭 카운팅에 활용)
   
+    public bool IsControllable { get { return isControllable; } } // 외부에서 제어 가능여부를 확인하기 위한 프로퍼티
     public bool IsEntered { get { return isEntered; } }     // 외부에서 안착여부를 확인하기 위한 프로퍼티
 
     private void Awake()
@@ -270,16 +270,13 @@ public class Blocks : MonoBehaviourPun
 
                 if (resultHit.collider.gameObject.layer == LayerMask.NameToLayer("Wall"))
                 {
-                    Debug.Log("Hit Wall");
+                    Debug.Log("Hit Wall (MoveRoutine)");
                     hitWall = true;
                     break;
                 }
 
                 // 제어권을 해제
                 isControllable = false;
-
-                // 이벤트 발생
-                OnDisableControl?.Invoke();
 
                 // spotlight 비활성화
                 spotlightObject.SetActive(false);
@@ -298,8 +295,6 @@ public class Blocks : MonoBehaviourPun
                 // for debug
                 Debug.Log($"Horizontal Collision : {tiles[i].name} > {resultHit.collider.name}");
                 Debug.Log($"origin : {(Vector2)tiles[i].transform.position}, direction : {lastDir}");
-                SpriteRenderer sr = tiles[i].GetComponent<SpriteRenderer>();
-                sr.color = Color.red;
 
                 yield break;
             }
@@ -322,7 +317,7 @@ public class Blocks : MonoBehaviourPun
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
         {
-            Debug.Log("hit wall");
+            Debug.Log("Hit Wall (OnCollision)");
             return;
         }
 
@@ -334,9 +329,6 @@ public class Blocks : MonoBehaviourPun
 
             // 충돌 시 flag 변경 
             isControllable = false;
-
-            // 이벤트 발생
-            OnDisableControl?.Invoke();
         }
 
         // 충돌체 카운트 증가
@@ -355,12 +347,12 @@ public class Blocks : MonoBehaviourPun
             isEntered = true;
 
             // 이벤트 발생
-            OnBlockEntered?.Invoke();
+            OnBlockEntered?.Invoke(this);
         }
         else
         {
             Debug.Log($"{gameObject.name} not entered");
-        }  
+        }
     }
 
     private void OnCollisionExit2D(Collision2D other)
@@ -382,7 +374,7 @@ public class Blocks : MonoBehaviourPun
         isEntered = false;
 
         // 이벤트 발생
-        OnBlockExited?.Invoke();
+        OnBlockExited?.Invoke(this);
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -390,7 +382,10 @@ public class Blocks : MonoBehaviourPun
         // 블럭 추락 여부 확인
         if (other.CompareTag("FallTrigger"))
         {
-            OnBlockFallen?.Invoke();
+            OnBlockFallen?.Invoke(this);
+
+            // 1초 대기 후 삭제
+            Destroy(gameObject, 1f);
         }
     }
 
