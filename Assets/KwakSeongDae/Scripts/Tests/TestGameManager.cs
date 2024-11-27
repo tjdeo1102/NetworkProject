@@ -14,6 +14,8 @@ public class TestGameManager : MonoBehaviourPunCallbacks
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.NickName = $"{Random.Range(0, 10000)}";
         PhotonNetwork.ConnectUsingSettings();
+
+        DontDestroyOnLoad(gameObject);
     }
 
     public void JoinRoom()
