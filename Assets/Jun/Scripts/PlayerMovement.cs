@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,12 +10,19 @@ public class PlayerMovement : MonoBehaviour
 
     private float previousHighestBlockY = 0f;  // 이전 최대 높이(처음 시작할 위치로 지정할 예정)
 
-    private void Start()
+    public void SetMaxHeightManager(BlockMaxHeightManager blockMaxHeightManager)
     {
+        this.blockMaxHeightManager = blockMaxHeightManager;
         if (blockMaxHeightManager != null)
         {
             blockMaxHeightManager.OnHeightChanged += SetPlayerPosition; // 이벤트 구독
         }
+    }
+
+
+    private void Start()
+    {
+
     }
 
     private void OnDestroy()
