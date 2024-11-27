@@ -15,9 +15,9 @@ public class PuzzleModeState : GameState
     private Dictionary<int, bool> isBlockCheckDic;
     private Coroutine mainCollisionRoutine;
 
-    protected override void OnEnable()
+    protected override void Init()
     {
-        base.OnEnable();
+        base.Init();
         // Dictionary 초기 세팅
         isBlockCheckDic = new Dictionary<int, bool>();
         

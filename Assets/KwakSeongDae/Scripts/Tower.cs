@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class Tower : MonoBehaviourPun
 {
-    void Start()
+    void Awake()
     {
         object[] data = photonView.InstantiationData;
-        gameObject.name = $"{data[0]}";
+        gameObject.name = $"Tower{data[0]}";
     }
 }
