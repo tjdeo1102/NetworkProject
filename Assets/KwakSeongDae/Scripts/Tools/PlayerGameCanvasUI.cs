@@ -13,12 +13,13 @@ public class PlayerGameCanvasUI : MonoBehaviour
     [SerializeField] private GameObject scoreView;
     [SerializeField] private GameObject resultEntryPrefab;
 
-    public void SetResultEntry(string name, int score)
+    public void AddResultEntry(int playerID, int score)
     {
+        //네트워크 오브젝트로 사용할 오브젝트가 아님
         var obj = Instantiate(resultEntryPrefab,scoreView.transform);
         if (obj.TryGetComponent<ResultScoreEntry>(out var entry))
         {
-            entry.SetEntry(name, score);
+            entry.SetEntry(playerID.ToString(), score);
         }
     }
 
