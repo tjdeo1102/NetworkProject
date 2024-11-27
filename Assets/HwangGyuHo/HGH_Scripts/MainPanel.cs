@@ -61,7 +61,6 @@ public class MainPanel : MonoBehaviour
         RoomOptions options = new RoomOptions();
         options.MaxPlayers = maxPlayer;
         PhotonNetwork.CreateRoom(roomName, options);
-
     }
 
     public void CreateRoomCancel()
