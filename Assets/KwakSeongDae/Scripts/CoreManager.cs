@@ -5,11 +5,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public enum StateType
-{
-    Stop,Puzzle,Race,Survival,Size
-}
+//[Serializable]
+//public enum StateType
+//{
+//    Stop,Puzzle,Race,Survival,Size
+//}
 
 public class CoreManager : Singleton<CoreManager>
 {

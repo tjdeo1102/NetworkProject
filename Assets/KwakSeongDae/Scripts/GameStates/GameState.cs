@@ -5,21 +5,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics;
 using UnityEngine;
+using WebSocketSharp;
 
 public enum SceneIndex
 {
     Room, Game
 }
 
-/* 딕셔너리 관리: 방장만
- * 충돌 관리 및 그 외 로직: 방장만 
- * UI 관리: 각 플레이어
- */
-public class GameState : MonoBehaviourPunCallbacks
+[RequireComponent(typeof(PhotonView))]
+public class GameState : MonoBehaviourPun
 {
-    [Header("기본 설정")]
-    public StateType StateType;
+    private const int maxPlayer = 4;
 
     [Header("게임 시작 & 종료 설정")]
     [SerializeField] protected float startDelayTime;
@@ -27,7 +25,8 @@ public class GameState : MonoBehaviourPunCallbacks
     [SerializeField] private PlayerGameCanvasUI uiPrefab;
 
     [Header("플레이어 스폰 설정")]
-    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private string playerPrefabPath;
+    [SerializeField] private string wallPrefabPath;
     [SerializeField] private Vector2 bottomLeft;            // 스폰 가능 지역의 좌하단 좌표
     [SerializeField] private Vector2 upRight;               // 스폰 가능 지역의 우상단 좌표
 
@@ -39,14 +38,16 @@ public class GameState : MonoBehaviourPunCallbacks
     // 활성화 시점에 모두 초기화
     protected virtual void OnEnable()
     {
-        print($"{StateType}에 진입");
+        print($"퍼즐 모드에 진입");
 
         // 시작 딜레이는 게임이 멈춰야되는 기능도 포함하므로 Realtime으로 계산
         startDelay = new WaitForSecondsRealtime(startDelayTime);
         finishDelay = new WaitForSeconds(finishDelayTime);
         playerObjectDic = new Dictionary<int, GameObject>();
 
-        if (playerPrefab != null
+        // 방장이 모든 플레이어 오브젝트 생성 작업 진행
+        if (PhotonNetwork.IsMasterClient
+            && playerPrefabPath.IsNullOrEmpty() == false
             && uiPrefab != null)
         {
             var players = PhotonNetwork.PlayerList;
@@ -55,23 +56,27 @@ public class GameState : MonoBehaviourPunCallbacks
 
             for (int i = 0; i < players.Length; i++)
             {
-                var playerObj = Instantiate(playerPrefab, playerSpawnPos[i], Quaternion.identity, null);
-                // 본인 오브젝트가 생성되는 경우에는 본인 UI도 같이 생성
-                if (players[i] == PhotonNetwork.LocalPlayer)
-                    playerUI = Instantiate(uiPrefab, playerObj.transform);
+                // 네트워크 플레이어 오브젝트를 생성하기
+                var playerObj = PhotonNetwork.Instantiate(playerPrefabPath, playerSpawnPos[i], Quaternion.identity, data: new object[] { players[i].NickName });
+                // 각 플레이어 오브젝트의 소유권을 해당되는 클라이언트로 변경하기
+
+                playerObj.GetComponent<PhotonView>().TransferOwnership(players[i]);
 
                 playerObjectDic.Add(players[i].ActorNumber, playerObj);
             }
         }
 
+        // 본인 오브젝트가 생성되는 경우에는 본인 UI도 같이 생성
+        playerUI = Instantiate(uiPrefab);
+
         // RPC이용해서 시작 시간 동기화, 방장이 RPC날리기
         if (PhotonNetwork.IsMasterClient)
-            photonView.RPC("StartRoutineMiddleware", RpcTarget.AllViaServer);
+            photonView.RPC("StartRoutineWrap", RpcTarget.All);
     }
 
     public virtual void Exit()
     {
-        print($"{StateType}에서 탈출");
+        print($"퍼즐 모드 종료");
 
         // 모든 딕셔너리 초기화 과정 불필요
         Time.timeScale = 1f;
@@ -80,19 +85,18 @@ public class GameState : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void StartRoutineMiddleware()
+    protected void StartRoutineWrap()
     {
-        // 각자 자신의 State에서만 처리
-        if(photonView.IsMine)
-            StartCoroutine(StartRoutine(PhotonNetwork.Time));
+        StartCoroutine(StartRoutine(PhotonNetwork.Time));
     }
 
     /// <summary>
     /// 모드 시작 시, 작동할 타이머 루틴
     /// </summary>
-    private IEnumerator StartRoutine(double startTime)
+    protected IEnumerator StartRoutine(double startTime)
     {
         var delay = PhotonNetwork.Time - startTime;
+        print($"방장이 보낸 RPC를 수신까지 딜레이 {delay}");
         // 지연보상 적용
         playerUI?.SetTimer(startDelayTime - (float)delay);
         Time.timeScale = 0f;
@@ -116,18 +120,31 @@ public class GameState : MonoBehaviourPunCallbacks
     /// </summary>
     protected void StopFinishRoutine(Coroutine routine)
     {
-        // 종료 시, 공통적인 기능들 일괄 처리
         playerUI?.SetTimer(0);
-
         StopCoroutine(routine);
     }
 
+    /// <summary>
+    /// 플레이어가 스폰할 위치 반환 및 블럭 제한구역 설정
+    /// </summary>
+    /// <param name="bottomLeft"> 맵 좌하단 위치</param>
+    /// <param name="upRight"> 맵 우상단 위치</param>
+    /// <param name="playerNum"> 총 플레이어 수</param>
+    /// <returns></returns>
     private Vector2[] PlayerSpawnStartPositions(Vector2 bottomLeft, Vector2 upRight, int playerNum)
     {
-        if (playerNum < 1 || playerNum > 4) return null;
+        if (playerNum < 1 || playerNum >= maxPlayer) return null;
 
         // 개인 플레이어 너비 = 전체 너비 / 플레이어 수
         var width = MathF.Abs(upRight.x - bottomLeft.x) / playerNum;
+
+        // 투명 벽 수 = 플레이어 수 + 1
+        // 투명 벽 위치 (x값) = bottomLeft.x + 투명 벽 인덱스 * width
+        // 투명 벽 위치 (y값) = bottomLeft.y
+        for (int i = 0; i < playerNum+1; i++)
+        {
+            PhotonNetwork.Instantiate(wallPrefabPath, new Vector2(bottomLeft.x + (i * width), bottomLeft.y), Quaternion.identity);
+        }
 
         // 플레이어 스폰 위치 (x값) =
         // (bottomLeft + 개인 너비 * 플레이어 인덱스 = 각 플레이어 영역의 bottomLeft)
