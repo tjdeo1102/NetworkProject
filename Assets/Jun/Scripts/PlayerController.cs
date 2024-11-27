@@ -115,9 +115,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         SetLayerAll(newBlock, LayerMask.NameToLayer("Default"));
 
         currentBlock = newBlock.GetComponent<Blocks>();
-        /*currentBlock.OnBlockEntered += BlockEnter;
+        currentBlock.OnBlockEntered += BlockEnter;
         currentBlock.OnBlockExited += BlockExit;
-        currentBlock.OnBlockFallen += BlockFallen;*/
+        currentBlock.OnBlockFallen += BlockFallen;
         //이벤트 해제 어디서?
     }
 
@@ -178,9 +178,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         //플레이어 체력처리
 
         // 기존 블럭의 제어 해제
-        if (currentBlock != null)
+        if (currentBlock == block)
         {
             currentBlock = null;
+            // 새로운 블럭 생성
+            SpawnBlock();
         }
     }
 
