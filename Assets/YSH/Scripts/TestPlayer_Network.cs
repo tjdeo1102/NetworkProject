@@ -49,12 +49,12 @@ public class TestPlayer_Network : MonoBehaviourPun, IPunObservable
             currentBlock.gameObject.SetActive(true);
     }
 
-    private void BlockEnter()
+    private void BlockEnter(Blocks block)
     {
         blockCount++;
     }
 
-    private void BlockExit()
+    private void BlockExit(Blocks block)
     {
         blockCount--;
     }
