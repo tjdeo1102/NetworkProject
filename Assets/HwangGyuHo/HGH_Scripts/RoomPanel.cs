@@ -12,6 +12,7 @@ public class RoomPanel : MonoBehaviour
 {
     [SerializeField] PlayerEntry[] playerEntries;
     [SerializeField] Button startButton;
+    [SerializeField] private int gameScene;
 
 
     private void OnEnable()
@@ -84,7 +85,7 @@ public class RoomPanel : MonoBehaviour
     {
         // 플레이어들 READY가 모두 되면 게임시작 버튼으로 게임시작
         // 씬 이름이 일치해야 함
-        PhotonNetwork.LoadLevel("HGH_TestScene");
+        PhotonNetwork.LoadLevel(gameScene);
         // 게임 플레이 중에는 방에 들어올 수 없게
         PhotonNetwork.CurrentRoom.IsOpen = false;
     }
