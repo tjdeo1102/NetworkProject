@@ -12,7 +12,8 @@ public class LoginPanel : MonoBehaviour
     [SerializeField] TMP_InputField emailInputField;
     [SerializeField] TMP_InputField passwordInputField;
 
-    
+    [SerializeField] NickNamePanel nickNamePanel;
+    [SerializeField] VerifyPanel verifyPanel;
 
     public void Login()
     {
@@ -54,15 +55,20 @@ public class LoginPanel : MonoBehaviour
 
         if(user.IsEmailVerified == false)
         {
-            // TODO : 이메일 인증 진행
-        }else if (user.DisplayName == "")
+            // 이메일 인증 진행
+            verifyPanel.gameObject.SetActive(true);
+
+
+        }
+        else if (user.DisplayName == "")
         {
-            // TODO : 닉네임 설정 진행
+            // 닉네임 설정 단계
+            nickNamePanel.gameObject.SetActive(true);
 
         }
         else
         {
-            // TODO : 접속 진행
+            // 접속 진행 단계
             PhotonNetwork.LocalPlayer.NickName = user.DisplayName;
             PhotonNetwork.ConnectUsingSettings();
         }
