@@ -1,4 +1,6 @@
+using Photon.Pun;
 using Photon.Pun.Demo.Procedural;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,26 +12,16 @@ public class BlockMaxHeightManager : MonoBehaviour
     [SerializeField] private Vector2 BoxSize = new Vector2(5f, 1f);
     [SerializeField] public float highestPoint = 0f;
 
-    private void Start()
+    public event Action<float> OnHeightChanged; // 높이 변경 이벤트
+
+    public void UpdateHighestPoint()
     {
-        // 모든 블럭 오브젝트를 찾아서 이벤트 구독
-        foreach (Blocks blocks in FindObjectsOfType<Blocks>())
+        float currentHighest = GetHighestBlockPosition();
+        if (currentHighest != highestPoint) // 높이가 변경된 경우에만 실행
         {
-            blocks.OnBlockEntered += HandleBlockEntered;
-            blocks.OnBlockExited += HandleBlockExited;
+            highestPoint = currentHighest;
+            OnHeightChanged?.Invoke(highestPoint); // 이벤트 호출
         }
-    }
-
-    private void HandleBlockEntered()
-    {
-        highestPoint = GetHighestBlockPosition();
-        Debug.Log("가장 높은 블럭의 y값: " + highestPoint);
-    }
-
-    private void HandleBlockExited()
-    {
-        highestPoint = GetHighestBlockPosition();
-        Debug.Log("가장 높은 블럭의 y값: " + highestPoint);
     }
 
     // 타워에서 가장 높은 블럭을 찾는 함수
