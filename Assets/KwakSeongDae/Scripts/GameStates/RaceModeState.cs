@@ -71,10 +71,7 @@ public class RaceModeState : GameState
                 var block = blockTrans.GetComponent<Blocks>();
                 // 블럭이 존재하는 경우, 해당 소유자의 블럭이 있음을 체크
                 // 충돌된 블럭이 있을때, 플레이어의 코루틴의 유무 판단 후, 코루틴 실행
-
-                // TODO: 블럭이 닿은경우를 체크하는 것이 아닌, 컨트롤 여부를 체크해야함
-                if (block.IsEntered == false
-                    //&& block.IsControllable
+                if (block.IsControllable == false
                     && blockTrans.TryGetComponent<PhotonView>(out var view))
                 {
                     int playerID = view.Owner.ActorNumber;

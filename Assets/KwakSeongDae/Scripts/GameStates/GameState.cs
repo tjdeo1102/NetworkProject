@@ -9,6 +9,7 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using WebSocketSharp;
+using static UnityEditor.Progress;
 
 public enum SceneIndex
 {
@@ -37,9 +38,6 @@ public class GameState : MonoBehaviourPun
     private WaitForSecondsRealtime startDelay;
     private WaitForSeconds finishDelay;
 
-    // 자신이 소유한 플레이어 오브젝트
-    protected GameObject selfPlayer;
-
     // 활성화 시점에 모두 초기화
     protected virtual void OnEnable()
     {
@@ -48,6 +46,7 @@ public class GameState : MonoBehaviourPun
         // 시작 딜레이는 게임이 멈춰야되는 기능도 포함하므로 Realtime으로 계산
         startDelay = new WaitForSecondsRealtime(startDelayTime);
         finishDelay = new WaitForSeconds(finishDelayTime);
+        // 플레이어 오브젝트 딕셔너리는 모든 클라이언트가 가질수 있도록 설정
         playerObjectDic = new Dictionary<int, GameObject>();
 
         // 방장이 모든 플레이어 오브젝트 생성 작업 진행
@@ -59,6 +58,9 @@ public class GameState : MonoBehaviourPun
             var playerSpawnPos = PlayerSpawnStartPositions(bottomLeft, upRight, players.Length);
             print($"플레이어 수: {players.Length}");
 
+            // 플레이어 오브젝트 담을 배열
+            var playerObjViewIDs = new int[players.Length];
+
             for (int i = 0; i < players.Length; i++)
             {
                 // 타워 생성
@@ -67,10 +69,11 @@ public class GameState : MonoBehaviourPun
                 var playerObj = PhotonNetwork.Instantiate(playerPrefabPath, playerSpawnPos[i], Quaternion.identity, data: new object[] { players[i].NickName });
                 // 각 플레이어 오브젝트의 소유권을 해당되는 클라이언트로 변경하기
 
-                playerObj.GetComponent<PhotonView>().TransferOwnership(players[i]);
-
-                playerObjectDic.Add(players[i].ActorNumber, playerObj);
+                var playerView = playerObj.GetComponent<PhotonView>();
+                playerView.TransferOwnership(players[i]);
+                playerObjViewIDs[i] = playerView.ViewID;
             }
+            photonView.RPC("SetPlayerObjectDic", RpcTarget.All, playerObjViewIDs,players);
         }
 
         // 본인 오브젝트가 생성되는 경우에는 본인 UI도 같이 생성
@@ -92,12 +95,14 @@ public class GameState : MonoBehaviourPun
     }
 
     [PunRPC]
-    protected void SetSelfPlayer(int viewID)
+    protected void SetPlayerObjectDic(int[] viewIDs, Player[] players)
     {
-        var obj = PhotonView.Find(viewID);
-        if (obj.IsMine == false) return;
+        for(int i = 0; i< viewIDs.Length; i++)
+        {
+            var obj = PhotonView.Find(viewIDs[i]);
+            playerObjectDic.Add(players[i].ActorNumber, obj.gameObject);
 
-        selfPlayer = obj.gameObject;
+        }
     }
 
     [PunRPC]

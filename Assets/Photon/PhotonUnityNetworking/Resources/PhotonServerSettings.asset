@@ -45,6 +45,7 @@ MonoBehaviour:
   - StartRoutineWrap
   - UpdateUI
   - SetSelfPlayer
+  - SetPlayerObjectDic
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -15,17 +15,20 @@ public class SurvivalModeState : GameState
     private Action<int> blockCountAction;
     private List<int> FinishPlayers;
 
+    private GameObject selfPlayer;
+
     protected override void OnEnable()
     {
         base.OnEnable();
         FinishPlayers = new List<int>();
+        //selfPlayer = playerObjectDic[PhotonNetwork.LocalPlayer.ActorNumber];
 
         if (photonView.IsMine == false) return;
 
         // 현재 자신만 이벤트 등록
-        var controller = selfPlayer.GetComponent<PlayerController>();
+        //var controller = selfPlayer.GetComponent<PlayerController>();
         hpAction = (newHP) => PlayerHPHandle(newHP);
-        controller.OnChangeHp += hpAction;
+        //controller.OnChangeHp += hpAction;
         blockCountAction = (newBlockCount) => PlayerBlockCountHandle(newBlockCount);
         //controller.OnChangeBlockCount += blockCountAction;
     }
@@ -36,7 +39,7 @@ public class SurvivalModeState : GameState
         StopCoroutine(winRoutine);
         var controller = selfPlayer.GetComponent<PlayerController>();
         controller.OnChangeHp -= hpAction;
-        //controller.OnChangeBlockCount -= blockCountAction;
+        controller.OnChangeBlockCount -= blockCountAction;
 
         base.Exit();
     }
@@ -106,31 +109,37 @@ public class SurvivalModeState : GameState
         if (isFinishGame)
         {
             List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+            // 결과 목록 초기화
+            foreach (var id in playerObjectDic.Keys)
+            {
+                result.Add(new Tuple<int, int>(id, -1));
+            }
+
+            // 성공한 플레이어 정보 업데이트
             int score = 0;
             for (score = 0; score < FinishPlayers.Count; score++)
             {
-                result.Add(new Tuple<int, int>(FinishPlayers[score], score + 1));
+                var idx = result.FindIndex(x => x.Item1 == FinishPlayers[score]);
+                result[idx] = new Tuple<int,int>(FinishPlayers[score],score + 1);
             }
+
             //내림차순으로 블럭 개수 정렬
             result.Sort((x, y) => y.Item2.CompareTo(x.Item2));
-            //result.ForEach((x) => {
-            //    playerUI?.SetResultEntry(x.Item1.ToString(), x.Item2);
-            //    playerUI?.SetResult();
-            //});
+
             print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
             print($"{result[0].Item1}이 서바이벌 모드의 우승자입니다!!!");
 
             var players = new int[result.Count];
-            var blockCounts = new int[result.Count];
+            var scores = new int[result.Count];
             for (int i = 0; i < result.Count; i++)
             {
                 players[i] = result[i].Item1;
-                blockCounts[i] = result[i].Item2;
+                scores[i] = result[i].Item2;
             }
             Time.timeScale = 0f;
 
             // UI 업데이트 작업 및 게임 정지기능은 모든 클라이언트 진행
-            photonView.RPC("UpdateUI", RpcTarget.All, players, blockCounts);
+            photonView.RPC("UpdateUI", RpcTarget.All, players, scores);
         }
         else
         {
@@ -139,13 +148,10 @@ public class SurvivalModeState : GameState
                 List<Tuple<int, int>> result = new List<Tuple<int, int>>();
                 foreach (var id in playerObjectDic.Keys)
                 {
-                    //if (playerObjectDic[id].TryGetComponent<BlockCountManager>(out var manager))
-                    //{
-                    //    result.Add(new Tuple<int, int>(id manager.BlockCount));
-                    //}
-
-                    //테스트 코드
-                    result.Add(new Tuple<int, int>(id, id));
+                    if (playerObjectDic[id].TryGetComponent<PlayerController>(out var controller))
+                    {
+                        result.Add(new Tuple<int, int>(id,controller.BlockCount));
+                    }
                 }
                 //내림차순으로 블럭 개수 정렬
                 result.Sort((x, y) => y.Item2.CompareTo(x.Item2));
