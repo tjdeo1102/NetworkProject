@@ -325,7 +325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5d034c912a6c0249a6000cefd66f72e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boxCastHeight: 30
+  boxCastHeight: 50
   blockLayer:
     serializedVersion: 2
     m_Bits: 8192
@@ -664,6 +664,7 @@ MonoBehaviour:
   - {fileID: 5564063098573158883, guid: 02769209f19393d4ebeb1d3efbe00606, type: 3}
   currentBlock: {fileID: 0}
   BlockCount: 0
+  blockMaxHeightManager: {fileID: 1786305744}
   curHp: 0
   maxHp: 0
   IsGoal: 0

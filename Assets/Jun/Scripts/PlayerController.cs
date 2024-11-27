@@ -119,10 +119,15 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         //SpawnPoint는 플레이어 위치 or 블럭의 쌓인 y값 최대치 or 타워의 높이 상대치를 통해 정해질 예정
         GameObject newBlock = Instantiate(blockPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
         //GameObject newBlock = PhotonNetwork.Instantiate(blockPrefabs[randomIndex].name, spawnPoint.position, Quaternion.identity);
+
+        // 블럭 초기 레이어 설정 (예: "Default")
+        SetLayerAll(newBlock, LayerMask.NameToLayer("Default"));
+
         currentBlock = newBlock.GetComponent<Blocks>();
         currentBlock.OnDisableControl += BlockDisabled;
         currentBlock.OnBlockEntered += BlockEnter;
         currentBlock.OnBlockExited += BlockExit;
+        currentBlock.OnBlockFallen += BlockFallen;
         //이벤트 해제 어디서?
     }
 
@@ -158,6 +163,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         BlockCount++;
         OnChangeBlockCount?.Invoke(BlockCount);
         blockMaxHeightManager.UpdateHighestPoint();
+
+        // 블럭의 레이어를 "Blocks"로 변경
+        if (currentBlock != null)
+        {
+            SetLayerAll(currentBlock.gameObject, LayerMask.NameToLayer("Blocks"));
+        }
     }
 
     public void BlockExit()
@@ -165,6 +176,11 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         BlockCount--;
         OnChangeBlockCount?.Invoke(BlockCount);
         blockMaxHeightManager.UpdateHighestPoint();
+    }
+
+    public void BlockFallen()
+    {
+        Debug.Log("블럭이 카메라 바깥으로 떨어짐");
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -176,6 +192,16 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         else
         {
             BlockCount = (int)stream.ReceiveNext();
+        }
+    }
+
+    public void SetLayerAll(GameObject obj, int newLayer)
+    {
+        obj.layer = newLayer;
+
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerAll(child.gameObject, newLayer);
         }
     }
 }
