@@ -292,6 +292,17 @@ public class Blocks : MonoBehaviourPun
                     transform.position += new Vector3(toHit.x, 0, 0);
                 }
 
+                // 충돌 시 충돌한 위치를 기준으로 자신에게 반대방향으로 힘을 가한다.
+                rigid.AddForceAtPosition(-lastDir * lastAmount, resultHit.point, ForceMode2D.Impulse);
+
+                // 충돌한 상대 블럭에 대해서도 힘을 가해준다.                
+                // 블럭과 충돌한 경우 리지드바디는 부모에 있기 때문에 GetComponentInParent를 사용
+                Rigidbody2D otherRigid = resultHit.collider.GetComponentInParent<Rigidbody2D>();
+
+                // 결과적으로 상대 오브젝트에서 rigidbody를 찾았으면 힘을 가해준다.
+                if (otherRigid != null)
+                    otherRigid.AddForceAtPosition(lastDir * lastAmount, resultHit.point, ForceMode2D.Impulse);
+
                 // for debug
                 Debug.Log($"Horizontal Collision : {tiles[i].name} > {resultHit.collider.name}");
                 Debug.Log($"origin : {(Vector2)tiles[i].transform.position}, direction : {lastDir}");
