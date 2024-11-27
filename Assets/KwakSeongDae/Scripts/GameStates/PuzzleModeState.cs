@@ -22,9 +22,9 @@ public class PuzzleModeState : GameState
         // Dictionary 초기 세팅
         isBlockCheckDic = new Dictionary<int, bool>();
         // 플레이어 수만큼 미리 요소 추가
-        foreach (var playerID in playerObjectDic.Keys)
+        foreach (var player in PhotonNetwork.PlayerList)
         {
-            isBlockCheckDic.Add(playerID, false);
+            isBlockCheckDic.Add(player.ActorNumber, false);
         }
 
         // 방장만 충돌 감지 루틴 실행
@@ -66,14 +66,17 @@ public class PuzzleModeState : GameState
             print("방장 충돌 감지 중");
             foreach (var collision in cols)
             {
+                var blockTrans = collision.transform.parent;
+                var block = blockTrans.GetComponent<Blocks>();
                 // 블럭이 존재하는 경우, 해당 소유자의 블럭이 있음을 체크
                 // 충돌된 블럭이 있을때, 플레이어의 코루틴의 유무 판단 후, 코루틴 실행
-                if (collision.GetComponent<Blocks>().IsEntered == false
-                    && collision.TryGetComponent<PhotonView>(out var block))
+
+                // TODO: 블럭이 닿은경우를 체크하는 것이 아닌, 컨트롤 여부를 체크해야함
+                if (block.IsEntered == false 
+                    //&& block.IsControllable
+                    && blockTrans.TryGetComponent<PhotonView>(out var view))
                 {
-                    // 테스트 용
-                    //int playerID = block.Owner.ActorNumber;
-                    int playerID = collision.GetComponent<TestBlocks>().PlayerID;
+                    int playerID = view.Owner.ActorNumber;
 
                     if (isBlockCheckDic.ContainsKey(playerID))
                         isBlockCheckDic [playerID] = true;
@@ -89,12 +92,12 @@ public class PuzzleModeState : GameState
                 if (isBlockCheckDic[playerID] == true)
                 {
                     print($"{playerID} 블럭 감지");
-                    photonView.RPC("FinishRoutineMiddleware", RpcTarget.AllViaServer, playerID, true);
+                    photonView.RPC("FinishRoutineWrap", RpcTarget.AllViaServer, playerID, true);
                 }
                 else
                 {
                     print($"{playerID} 블럭 없음");
-                    photonView.RPC("FinishRoutineMiddleware", RpcTarget.AllViaServer, playerID, false);
+                    photonView.RPC("FinishRoutineWrap", RpcTarget.AllViaServer, playerID, false);
                 }
             }
             yield return delay;
@@ -102,9 +105,9 @@ public class PuzzleModeState : GameState
     }
 
     [PunRPC]
-    private void FinishRoutineMiddleware(int playerID, bool isPlay)
+    private void FinishRoutineWrap(int playerID, bool isPlay)
     {
-        // 해당된 플레이어에서만 루틴 실행
+        // 해당 플레이어에서만 루틴 실행
         if (PhotonNetwork.LocalPlayer.ActorNumber != playerID) return;
 
         if (isPlay)
@@ -116,7 +119,7 @@ public class PuzzleModeState : GameState
         else
         {
             if (finishRoutine != null)
-                StopCoroutine(finishRoutine);
+                StopFinishRoutine(finishRoutine);
 
             finishRoutine = null;
         }
@@ -130,8 +133,8 @@ public class PuzzleModeState : GameState
         // 해당 PlayerStateChange은 개인적으로 동작
         PlayerStateChange(playerID);
 
-        // 이후, 방장은 모든 플레이어 상태 체크 후, 집계
-        photonView.RPC("AllPlayerResult",RpcTarget.MasterClient,playerID);
+        // 이후, 모든 플레이어는 상태 체크 후, 집계까지 진행
+        photonView.RPC("AllPlayerStateCheck", RpcTarget.MasterClient,playerID);
     }
 
     private void PlayerStateChange(int playerID)
@@ -155,30 +158,50 @@ public class PuzzleModeState : GameState
             isBlockCheckDic.Remove(playerID);
         }
 
+        // 퍼즐 모드: 모든 플레이어가 끝난 경우에는 집계 진행 
         if (isBlockCheckDic.Count < 1)
         {
             List<Tuple<int,int>> result = new List<Tuple<int,int>>();
             foreach (var playerKey in playerObjectDic.Keys)
             {
-                //if (playerObjectDic[playerKey].TryGetComponent<BlockCountManager>(out var manager))
+                //if (playerObjectDic[playerKey].TryGetComponent<PlayerController>(out var controller))
                 //{
-                //    result.Add(new Tuple<int, int>(playerKey, manager.BlockCount));
+                //    result.Add(new Tuple<int, int>(playerKey, controller.BlockCount));
                 //}
 
                 //테스트 코드
                 result.Add(new Tuple<int, int>(playerKey, playerKey));
             }
+
             //내림차순으로 블럭 개수 정렬
             result.Sort((x, y) => y.Item2.CompareTo(x.Item2));
-            result.ForEach((x) => {
-                playerUI?.SetResultEntry(x.Item1.ToString(), x.Item2);
-                playerUI?.SetResult();
-            });
 
-            print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
-            print($"{result[0].Item1}이 퍼즐 모드의 우승자입니다!!!");
+            //각 클라이언트에서, 각각의 UI에 해당 내용 반영되도록 설정
+            var players = new int[result.Count];
+            var blockCounts = new int[result.Count];
+            for (int i = 0; i < result.Count; i++)
+            {
+                players[i] = result[i].Item1;
+                blockCounts[i] = result[i].Item2;
+            }
 
-            Time.timeScale = 0f;
+            // UI 업데이트 작업 및 게임 정지기능은 모든 클라이언트 진행
+            photonView.RPC("UpdateUI", RpcTarget.All, players, blockCounts);
         }
+    }
+
+    [PunRPC]
+    private void UpdateUI(int[] playerIDs,int[] blockCounts)
+    {
+        for (int i = 0; i < playerIDs.Length; i++)
+        {
+            playerUI?.AddResultEntry(playerIDs[i], blockCounts[i]);
+        }
+        playerUI?.SetResult();
+
+        print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
+        print($"{playerIDs[0]}이 퍼즐 모드의 우승자입니다!!!");
+
+        Time.timeScale = 0f;
     }
 }

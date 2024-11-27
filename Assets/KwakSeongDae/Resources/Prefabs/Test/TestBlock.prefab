@@ -151,7 +151,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   basicFallSpeed: 0
   fastFallSpeed: 0
-  spotlightPrefab: {fileID: 0}
+  spotlightObject: {fileID: 0}
   moveAmount: 0
   pushAmount: 0
   rotateAmount: 0
@@ -161,6 +161,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   rotateSpeed: 0
+  blockSize: {x: 0, y: 0}
 --- !u!50 &9102812947795399751
 Rigidbody2D:
   serializedVersion: 4
