@@ -373,12 +373,14 @@ public class Blocks : MonoBehaviourPun
 
         if (isControllable)
         {
+            rigid.simulated = false;
             rigid.velocity = Vector2.zero;
-
-            spotlightObject.SetActive(false);
+            rigid.angularVelocity = 0;
+            rigid.simulated = true;
 
             // 충돌 시 flag 변경 
             isControllable = false;
+            spotlightObject.SetActive(false);
         }
 
         // 충돌체 카운트 증가
