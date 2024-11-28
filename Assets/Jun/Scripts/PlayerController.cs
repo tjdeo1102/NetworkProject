@@ -26,6 +26,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public bool IsGoal = false;
 
     public event System.Action<int> OnChangeBlockCount;
+    public event Action OnFallenOffTheCamera;
+    public event Action OnPlayerDone;
 
     public int TowerNumber = 0;
 
@@ -109,6 +111,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (photonView.IsMine == false)
             return;
 
+        if (IsGoal == true)
+            return;
+
         int randomIndex = Random.Range(0, blockPrefabs.Length);
         //SpawnPoint는 플레이어 위치 or 블럭의 쌓인 y값 최대치 or 타워의 높이 상대치를 통해 정해질 예정
         //GameObject newBlock = Instantiate(blockPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
@@ -147,6 +152,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public void ReachGoal()
     {
         IsGoal = true;
+        OnPlayerDone?.Invoke();
         //골인 했을 때 추가적인 구현
         //ex) 원작 게임처럼 큰 나무집이 떨어져 1등이 엔딩을 장식할 수 있도록
     }
@@ -178,7 +184,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public void BlockFallen(Blocks block)
     {
         Debug.Log("블럭이 카메라 바깥으로 떨어짐");
+
         //플레이어 체력처리
+        TakeDamage(1);
+
+        // OnBlockFallen 이벤트 호출
+        OnFallenOffTheCamera?.Invoke();
+
 
         // 기존 블럭의 제어 해제
         if (currentBlock == block)
@@ -194,10 +206,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(BlockCount);
+            stream.SendNext(IsGoal);
         }
         else
         {
             BlockCount = (int)stream.ReceiveNext();
+            IsGoal = (bool)stream.ReceiveNext();
         }
     }
 

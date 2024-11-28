@@ -5,14 +5,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockMaxHeightManager : MonoBehaviour
+public class BlockMaxHeightManager : MonoBehaviourPun, IPunObservable
 {
     [SerializeField] private float boxCastHeight = 20f;
     [SerializeField] private LayerMask blockLayer;      // 블럭이 포함된 레이어
-    [SerializeField] private Vector2 BoxSize = new Vector2(5f, 1f);
+    [SerializeField] private Vector2 BoxSize;
     [SerializeField] public float highestPoint = 0f;
 
     public event Action<float> OnHeightChanged; // 높이 변경 이벤트
+
+    private void Start()
+    {
+        //BoxSize = new Vector2(각플레이어의 너비값, 1f);
+    }
 
     public void UpdateHighestPoint()
     {
@@ -79,6 +84,19 @@ public class BlockMaxHeightManager : MonoBehaviour
         {
             // 최대 거리까지 레이저 표시
             Gizmos.DrawRay(rayOrigin, direction * distance);
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(highestPoint);
+        }
+        else
+        {
+            highestPoint = (float)stream.ReceiveNext();
+            OnHeightChanged?.Invoke(highestPoint);
         }
     }
 }
