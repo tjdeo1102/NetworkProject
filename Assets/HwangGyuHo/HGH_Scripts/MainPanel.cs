@@ -17,27 +17,23 @@ public class MainPanel : MonoBehaviour
     [SerializeField] TMP_InputField roomNameInputField;
     [SerializeField] TMP_InputField maxPlayerInputField;
 
-    private bool isColored_0;
-    private bool isColored_1;
-    private bool isColored_2;
-    
+    [Header("모드선택 버튼")]
+    [SerializeField] private bool isColored_0;
+    [SerializeField] private bool isColored_1;
+    [SerializeField] private bool isColored_2;
+
+    ColorBlock colorBlock = new ColorBlock();
+
     /// <summary>
     /// 방제목과 인원수 정하는 패널을 OFF
     /// </summary>
     private void OnEnable()
     {
         createRoomPanel.SetActive(false);
-        isColored_0 = false;
-        isColored_1 = false;
-        isColored_2 = false;
-
-        modeButton[0].gameObject.SetActive(true);
-        modeButton[1].gameObject.SetActive(true);
-        modeButton[2].gameObject.SetActive(true);
     }
 
     /// <summary>
-    /// 
+    /// 방 만드는 창 메뉴
     /// </summary>
     public void CreateRoomMenu()
     {
@@ -96,17 +92,57 @@ public class MainPanel : MonoBehaviour
 
     public void SelectModeButton1()
     {
+        if (isColored_0 == true)
+        {
+            colorBlock.selectedColor = Color.white;
+            colorBlock.normalColor = Color.white;
+            colorBlock.highlightedColor = Color.white;
+
+            modeButton[0].colors = colorBlock;
+            colorBlock.colorMultiplier = 5;
+
+            isColored_0 = false;
+
+            return;
+        }
+
         isColored_0 = true;
         ButtonColor();
     }
 
     public void SelectModeButton2()
     {
+        if (isColored_1 == true)
+        {
+            isColored_1 = false;
+            colorBlock.selectedColor = Color.white;
+            colorBlock.normalColor = Color.white;
+            colorBlock.highlightedColor = Color.white;
+
+            modeButton[1].colors = colorBlock;
+            colorBlock.colorMultiplier = 5;
+
+            return;
+        }
+
         isColored_1 = true;
         ButtonColor();
     }
     public void SelectModeButton3()
     {
+        if (isColored_2 == true)
+        {
+            colorBlock.selectedColor = Color.white;
+            colorBlock.normalColor = Color.white;
+            colorBlock.highlightedColor = Color.white;
+
+            modeButton[2].colors = colorBlock;
+            colorBlock.colorMultiplier = 5;
+
+            isColored_2 = false;
+
+            return;
+        }
         isColored_2 = true;
         ButtonColor();
     }
@@ -116,23 +152,22 @@ public class MainPanel : MonoBehaviour
     {
         ColorBlock colorBlock = new ColorBlock();
         colorBlock.selectedColor = Color.green;
+        colorBlock.normalColor = Color.green;
+        colorBlock.highlightedColor = Color.green;
         colorBlock.colorMultiplier = 3;
-        if (isColored_0)
-        {
 
+        if (isColored_0 == true)
+        {
             modeButton[0].colors = colorBlock;
-            modeButton[1].gameObject.SetActive(false);
-            modeButton[2].gameObject.SetActive(false);
-        }else if (isColored_1)
+        }
+        else if (isColored_1 == true)
         {
             modeButton[1].colors= colorBlock;
-            modeButton[0].gameObject.SetActive(false);
-            modeButton[2].gameObject.SetActive(false);
-        }else if (isColored_2)
+            
+        }
+        else if (isColored_2 == true)
         {
             modeButton[2].colors= colorBlock;
-            modeButton[0].gameObject.SetActive(false);
-            modeButton[1].gameObject.SetActive(false);
         }
     }
 
