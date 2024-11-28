@@ -23,6 +23,7 @@ public class CameraColliderController : MonoBehaviour
     private void Update()
     {
         SetColliderToCamera();
+        Debug.Log($"<color=Greed>Fall Pos: {transform.position} </color>");
     }
 
     private void SetColliderToCamera()

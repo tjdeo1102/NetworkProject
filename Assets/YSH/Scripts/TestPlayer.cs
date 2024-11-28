@@ -28,16 +28,16 @@ public class TestPlayer : MonoBehaviourPun
 
     public UnityAction OnPlayerDone; 
 
-    private void Awake()
-    {
-        if (testBlocks.Length <= 0)
-            return;
+    //private void Awake()
+    //{
+    //    if (testBlocks.Length <= 0)
+    //        return;
 
-        foreach (Blocks block in testBlocks)
-        {
-            block.SetOwner(this);
-        }
-    }
+    //    foreach (Blocks block in testBlocks)
+    //    {
+    //        block.SetOwner(this);
+    //    }
+    //}
 
     private void Start()
     {

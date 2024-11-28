@@ -70,7 +70,7 @@ MonoBehaviour:
   startDelayTime: 3
   finishDelayTime: 3
   uiPrefab: {fileID: 7881674830855549598, guid: e8dcd9e14d6dd0148a0a9e9350a86a0d, type: 3}
-  playerPrefabPath: Test2/Player
+  playerPrefabPath: Test2/SurvivalPlayer
   towerPrefabPath: Test2/TestTower
   wallPrefabPath: Test2/Wall
   bottomLeft: {x: -9, y: -5}

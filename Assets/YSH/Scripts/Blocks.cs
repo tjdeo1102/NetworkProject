@@ -40,7 +40,7 @@ public class Blocks : MonoBehaviourPun
     private Coroutine moveRoutine;          // 이동 시 사용할 코루틴
     private WaitForSeconds wsMoveDelay;     // 이동 코루틴에서 활용할 WaitForSeconds 객체
 
-    private TestPlayer owner;         // 자신을 생성한 Player
+    private PlayerController owner;         // 자신을 생성한 Player
     #endregion
 
     #region Public Field
@@ -50,7 +50,7 @@ public class Blocks : MonoBehaviourPun
   
     public bool IsControllable { get { return isControllable; } } // 외부에서 제어 가능여부를 확인하기 위한 프로퍼티
     public bool IsEntered { get { return isEntered; } }     // 외부에서 안착여부를 확인하기 위한 프로퍼티
-    public TestPlayer Owner { get { return owner; } } // 외부에서 블럭 Owner를 확인하기 위한 프로퍼티
+    public PlayerController Owner { get { return owner; } } // 외부에서 블럭 Owner를 확인하기 위한 프로퍼티
     #endregion
 
     private void Awake()
@@ -131,7 +131,7 @@ public class Blocks : MonoBehaviourPun
         }
     }
 
-    public void SetOwner(TestPlayer player)
+    public void SetOwner(PlayerController player)
     {
         // owner 참조
         owner = player;
@@ -185,7 +185,7 @@ public class Blocks : MonoBehaviourPun
         if (rigid != null)
         {
             // 더 이상 물리처리 하지 않도록 변경
-            rigid.simulated = false;
+            rigid.constraints = RigidbodyConstraints2D.FreezeAll;
             // velocity 초기화
             rigid.velocity = Vector2.zero;
         }
@@ -390,21 +390,13 @@ public class Blocks : MonoBehaviourPun
         if (isEntered)
             return;
 
-        // 충돌한 면이 other의 윗면인지 확인
-        if (other.contacts[0].normal.y >= 0.9f)
-        {
-            Debug.Log($"{gameObject.name} entered");
+        Debug.Log($"{gameObject.name} entered");
 
-            // enter flag set
-            isEntered = true;
+        // enter flag set
+        isEntered = true;
 
-            // 이벤트 발생
-            OnBlockEntered?.Invoke(this);
-        }
-        else
-        {
-            Debug.Log($"{gameObject.name} not entered");
-        }
+        // 이벤트 발생
+        OnBlockEntered?.Invoke(this);
     }
 
     private void OnCollisionExit2D(Collision2D other)
@@ -429,21 +421,14 @@ public class Blocks : MonoBehaviourPun
         OnBlockExited?.Invoke(this);
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         // 블럭 추락 여부 확인
         if (other.CompareTag("FallTrigger"))
         {
-            // 블럭의 y위치가 카메라 y위치보다 높으면 처리하지 않는다. (예외 방지)
-            if (transform.position.y >= Camera.main.transform.position.y)
-            {
-                Debug.Log("<color=red>Block is higher than camera</color>");
-                return;
-            }
-
             // 이벤트 발생
             OnBlockFallen?.Invoke(this);
-
+            if (owner != null) owner.OnPlayerDone -= Freeze;
             // 바로 삭제
             Destroy(gameObject);
         }

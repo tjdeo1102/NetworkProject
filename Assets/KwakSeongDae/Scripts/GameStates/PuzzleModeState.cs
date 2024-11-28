@@ -179,7 +179,7 @@ public class PuzzleModeState : GameState
     {
         if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
         {
-            controller.IsGoal = true;
+            controller.ReachGoal();
         }
 
         print($"{playerID}는 이제 조작할 수 없습니다.");
@@ -237,6 +237,6 @@ public class PuzzleModeState : GameState
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 퍼즐 모드의 우승자입니다!!!");
 
-        Time.timeScale = 0f;
+        Time.timeScale = 1f;
     }
 }

@@ -6,9 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Release/Scenes/LobbyScene.unity
-    guid: c31ed5b18705a154c87e82297f5b0b0f
-  - enabled: 1
     path: Assets/Release/Scenes/Puzzle.unity
-    guid: a1a3e061fa01f7647862f4abe8c3d97d
+    guid: 4b2a665a1fdfd3946b56388b2eff1899
+  - enabled: 1
+    path: Assets/Release/Scenes/Race.unity
+    guid: e7b0a61911601ac4ca6e0e12aec0004b
+  - enabled: 1
+    path: Assets/Release/Scenes/Survival.unity
+    guid: 4b158406eea43a642b2ab4ecac63a270
+  - enabled: 1
+    path: Assets/Release/Scenes/RoomTestScene.unity
+    guid: 6ea83f564c1d2c541b404a977aaf0944
   m_configObjects: {}

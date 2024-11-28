@@ -12,11 +12,12 @@ public class BlockMaxHeightManager : MonoBehaviourPun, IPunObservable
     [SerializeField] private Vector2 BoxSize;
     [SerializeField] public float highestPoint = 0f;
 
+    [HideInInspector] public GameState gameState;
     public event Action<float> OnHeightChanged; // 높이 변경 이벤트
 
     private void Start()
     {
-        //BoxSize = new Vector2(각플레이어의 너비값, 1f);
+        BoxSize = new Vector2(gameState.playerWidth, 1f);
     }
 
     public void UpdateHighestPoint()
