@@ -393,6 +393,14 @@ public class Blocks : MonoBehaviourPun
         // 블럭 추락 여부 확인
         if (other.CompareTag("FallTrigger"))
         {
+            // 블럭의 y위치가 카메라 y위치보다 높으면 처리하지 않는다. (예외 방지)
+            if (transform.position.y >= Camera.main.transform.position.y)
+            {
+                Debug.Log("<color=red>Block is higher than camera</color>");
+                return;
+            }
+
+            // 이벤트 발생
             OnBlockFallen?.Invoke(this);
 
             // 바로 삭제
