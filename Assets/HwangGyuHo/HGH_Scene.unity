@@ -492,6 +492,14 @@ PrefabInstance:
       propertyPath: m_text
       value: "**********\u200B"
       objectReference: {fileID: 0}
+    - target: {fileID: 4013794219637431699, guid: 4031c796270f65847b7a655eda245bf2, type: 3}
+      propertyPath: m_Colors.m_ColorMultiplier
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4013794219637431699, guid: 4031c796270f65847b7a655eda245bf2, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4013794219857077639, guid: 4031c796270f65847b7a655eda245bf2, type: 3}
       propertyPath: m_AnchorMax.x
       value: 1
@@ -707,6 +715,10 @@ PrefabInstance:
     - target: {fileID: 4013794221106822158, guid: 4031c796270f65847b7a655eda245bf2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6044401698285950174, guid: 4031c796270f65847b7a655eda245bf2, type: 3}
+      propertyPath: m_text
+      value: Mode 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4031c796270f65847b7a655eda245bf2, type: 3}
