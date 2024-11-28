@@ -17,9 +17,9 @@ public class SurvivalModeState : GameState
 
     private GameObject selfPlayer;
 
-    protected override void OnEnable()
+    protected override void Init()
     {
-        base.OnEnable();
+        base.Init();
         FinishPlayers = new List<int>();
         //selfPlayer = playerObjectDic[PhotonNetwork.LocalPlayer.ActorNumber];
 

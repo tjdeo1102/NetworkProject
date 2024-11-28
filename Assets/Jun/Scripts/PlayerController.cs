@@ -35,24 +35,24 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (photonView.IsMine)
         {
             TowerNumber = PhotonNetwork.LocalPlayer.GetPlayerNumber();
+            print($"PlayerStart Tower{TowerNumber}");
             GameObject TowerTest = GameObject.Find($"Tower{TowerNumber}");
             blockMaxHeightManager = TowerTest.GetComponent<BlockMaxHeightManager>();
             GetComponent<PlayerMovement>().SetMaxHeightManager(blockMaxHeightManager);
 
             transform.position = new Vector2(TowerTest.transform.position.x - 5f, 
                 TowerTest.transform.position.y + 5f);
+
+
+            if (spawnPoint == null || blockPrefabs == null || blockPrefabs.Length == 0)
+            {
+                Debug.LogError("스폰지점, 블럭프리팹이 잘못 설정 되었습니다.");
+                return;
+            }
+
+            //Start가 아닌 방에 참가 했을 때 스폰하는 것으로 수정 예정
+            SpawnBlock();
         }
-
-
-
-        if (spawnPoint == null || blockPrefabs == null || blockPrefabs.Length == 0)
-        {
-            Debug.LogError("스폰지점, 블럭프리팹이 잘못 설정 되었습니다.");
-            return;
-        }
-
-        //Start가 아닌 방에 참가 했을 때 스폰하는 것으로 수정 예정
-        SpawnBlock();
     }
 
     /*private void OnDestroy()
@@ -105,6 +105,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             Debug.LogError("Photon Network에 연결되어 있지 않습니다. 블럭을 생성할 수 없습니다.");
             return;
         }
+
+        if (photonView.IsMine == false)
+            return;
 
         int randomIndex = Random.Range(0, blockPrefabs.Length);
         //SpawnPoint는 플레이어 위치 or 블럭의 쌓인 y값 최대치 or 타워의 높이 상대치를 통해 정해질 예정

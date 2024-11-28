@@ -7,7 +7,7 @@ using UnityEngine;
 public class TestGameManager : MonoBehaviourPunCallbacks
 {
     private const string roomName = "test";
-    private const int gameSceneNum = 2;
+    private const int gameSceneNum = 1;
 
     private void Start()
     {

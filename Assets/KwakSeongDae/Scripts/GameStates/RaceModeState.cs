@@ -15,9 +15,9 @@ public class RaceModeState : GameState
 
     private Coroutine mainCollisionRoutine;
 
-    protected override void OnEnable()
+    protected override void Init()
     {
-        base.OnEnable();
+        base.Init();
         // Dictionary 초기 세팅
         isBlockCheckDic = new Dictionary<int, bool>();
         // 플레이어 수만큼 미리 요소 추가

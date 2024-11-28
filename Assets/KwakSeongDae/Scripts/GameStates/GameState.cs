@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Events;
 using WebSocketSharp;
 using static UnityEditor.Progress;
 
@@ -39,9 +40,13 @@ public class GameState : MonoBehaviourPun
     private WaitForSeconds finishDelay;
 
     // 활성화 시점에 모두 초기화
-    protected virtual void OnEnable()
+    private void Start()
     {
-        //print($"퍼즐 모드에 진입");
+        StartCoroutine(NetworkWaitRoutine());
+    }
+    protected virtual void Init()
+    {
+        print($"퍼즐 모드에 진입");
 
         // 시작 딜레이는 게임이 멈춰야되는 기능도 포함하므로 Realtime으로 계산
         startDelay = new WaitForSecondsRealtime(startDelayTime);
@@ -49,39 +54,35 @@ public class GameState : MonoBehaviourPun
         // 플레이어 오브젝트 딕셔너리는 모든 클라이언트가 가질수 있도록 설정
         playerObjectDic = new Dictionary<int, GameObject>();
 
-        // 방장이 모든 플레이어 오브젝트 생성 작업 진행
-        if (PhotonNetwork.IsMasterClient
-            && playerPrefabPath.IsNullOrEmpty() == false
+        if (playerPrefabPath.IsNullOrEmpty() == false
             && uiPrefab != null)
         {
             var players = PhotonNetwork.PlayerList;
             var playerSpawnPos = PlayerSpawnStartPositions(bottomLeft, upRight, players.Length);
             print($"플레이어 수: {players.Length}");
 
-            // 플레이어 오브젝트 담을 배열
-            var playerObjViewIDs = new int[players.Length];
+            var playerNum = PhotonNetwork.LocalPlayer.GetPlayerNumber();
+            // 타워 생성
+            var towerObj = PhotonNetwork.Instantiate(towerPrefabPath, playerSpawnPos[playerNum], Quaternion.identity, data: new object[] { playerNum });
+            // 네트워크 플레이어 오브젝트를 생성하기
+            var playerObj = PhotonNetwork.Instantiate(playerPrefabPath, playerSpawnPos[playerNum], Quaternion.identity, data: new object[] { players[playerNum].NickName });
 
-            for (int i = 0; i < players.Length; i++)
-            {
-                // 타워 생성
-                var towerObj = PhotonNetwork.Instantiate(towerPrefabPath, playerSpawnPos[i], Quaternion.identity, data: new object[] { players[i].GetPlayerNumber() });
-                // 네트워크 플레이어 오브젝트를 생성하기
-                var playerObj = PhotonNetwork.Instantiate(playerPrefabPath, playerSpawnPos[i], Quaternion.identity, data: new object[] { players[i].NickName });
-                // 각 플레이어 오브젝트의 소유권을 해당되는 클라이언트로 변경하기
-
-                var playerView = playerObj.GetComponent<PhotonView>();
-                playerView.TransferOwnership(players[i]);
-                playerObjViewIDs[i] = playerView.ViewID;
-            }
-            photonView.RPC("SetPlayerObjectDic", RpcTarget.All, playerObjViewIDs,players);
+            var playerView = playerObj.GetComponent<PhotonView>();
+            photonView.RPC("SetPlayerObjectDic", RpcTarget.All, playerView.ViewID);
+            // 본인 오브젝트가 생성되는 경우에는 본인 UI도 같이 생성
+            playerUI = Instantiate(uiPrefab);
         }
-
-        // 본인 오브젝트가 생성되는 경우에는 본인 UI도 같이 생성
-        playerUI = Instantiate(uiPrefab);
 
         // RPC이용해서 시작 시간 동기화, 방장이 RPC날리기
         if (PhotonNetwork.IsMasterClient)
             photonView.RPC("StartRoutineWrap", RpcTarget.All);
+    }
+    
+    private IEnumerator NetworkWaitRoutine()
+    {
+        var delay = new WaitForSeconds(1f);
+        yield return delay;
+        Init();
     }
 
     public virtual void Exit()
@@ -95,14 +96,10 @@ public class GameState : MonoBehaviourPun
     }
 
     [PunRPC]
-    protected void SetPlayerObjectDic(int[] viewIDs, Player[] players)
+    protected void SetPlayerObjectDic(int viewID)
     {
-        for(int i = 0; i< viewIDs.Length; i++)
-        {
-            var obj = PhotonView.Find(viewIDs[i]);
-            playerObjectDic.Add(players[i].ActorNumber, obj.gameObject);
-
-        }
+        var obj = PhotonView.Find(viewID);
+        playerObjectDic.Add(obj.Owner.ActorNumber, obj.gameObject);
     }
 
     [PunRPC]
