@@ -31,19 +31,20 @@ public class RaceModeState : GameState
             mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
     }
 
-    public override void Exit()
+    private void OnDisable()
     {
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient
+            && mainCollisionRoutine != null)
             StopCoroutine(mainCollisionRoutine);
 
         // goalRoutine이 실행되고 있는 경우에는 해당 코루틴은 중지
-        StopCoroutine(goalRoutine);
+        if (goalRoutine != null)
+            StopCoroutine(goalRoutine);
 
         isBlockCheckDic.Clear();
-
-        // Exit호출은 Enter의 역순
-        base.Exit();
+        Time.timeScale = 1f;
     }
+
     private IEnumerator CollisionCheckRoutine()
     {
         var detectorPos = (Vector2)boxDetector.transform.position + boxDetector.offset;
@@ -127,10 +128,11 @@ public class RaceModeState : GameState
     {
         yield return StartCoroutine(base.FinishRoutine(playerID));
         // 제한 시간이 지나면 모든 플레이어 상태 체크 후, 집계까지 진행
-        photonView.RPC("AllPlayerStateCheck", RpcTarget.MasterClient, playerID);
+        photonView.RPC("AllPlayerStateCheck", RpcTarget.MasterClient);
     }
 
-    private void AllPlayerStateChange()
+    [PunRPC]
+    private void AllPlayerStateCheck()
     {
         foreach (var playerID in playerObjectDic.Keys)
         {
@@ -143,17 +145,15 @@ public class RaceModeState : GameState
             print($"{playerID}는 이제 조작할 수 없습니다.");
         }
         print("모든 플레이어의 행동이 중지되었습니다.");
-    }
 
-    private void AllPlayerStateCheck()
-    {
-        List<Tuple<int, int>> result = new List<Tuple<int, int>>();
-        foreach (var playerID in playerObjectDic.Keys)
+        List<Tuple<int, float>> result = new List<Tuple<int, float>>();
+        foreach (var playerID in towerObjectDic.Keys)
         {
             //TODO: 각 플레이어의 가장 높은 블럭을 집계하는 코드 필요
-
-            //테스트 코드
-            result.Add(new Tuple<int, int>(playerID, playerID));
+            if (towerObjectDic[playerID].TryGetComponent<BlockMaxHeightManager>(out var manager))
+            {
+                result.Add(new Tuple<int, float>(playerID, manager.highestPoint));
+            }
         }
 
         //내림차순으로 블럭 개수 정렬
@@ -161,23 +161,23 @@ public class RaceModeState : GameState
 
         //각 클라이언트에서, 각각의 UI에 해당 내용 반영되도록 설정
         var players = new int[result.Count];
-        var blockCounts = new int[result.Count];
+        var blockHeights = new float[result.Count];
         for (int i = 0; i < result.Count; i++)
         {
             players[i] = result[i].Item1;
-            blockCounts[i] = result[i].Item2;
+            blockHeights[i] = result[i].Item2;
         }
 
         // UI 업데이트 작업 및 게임 정지기능은 모든 클라이언트 진행
-        photonView.RPC("UpdateUI", RpcTarget.All, players, blockCounts);
+        photonView.RPC("UpdateUI", RpcTarget.All, players, blockHeights);
     }
 
     [PunRPC]
-    private void UpdateUI(int[] playerIDs, int[] blockCounts)
+    private void UpdateUI(int[] playerIDs, float[] blockHeights)
     {
         for (int i = 0; i < playerIDs.Length; i++)
         {
-            playerUI?.AddResultEntry(playerIDs[i], blockCounts[i]);
+            playerUI?.AddResultEntry(playerIDs[i], blockHeights[i]);
         }
         playerUI?.SetResult();
 
