@@ -7,15 +7,11 @@ using UnityEngine;
 public class TestGameManager : MonoBehaviourPunCallbacks
 {
     private const string roomName = "test";
-    private const int gameSceneNum = 1;
-
     private void Start()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.NickName = $"{Random.Range(0, 10000)}";
         PhotonNetwork.ConnectUsingSettings();
-
-        DontDestroyOnLoad(gameObject);
     }
 
     public void JoinRoom()
@@ -28,7 +24,7 @@ public class TestGameManager : MonoBehaviourPunCallbacks
         print("¹æ Âü°¡");
     }
 
-    public void SceneLoad()
+    public void SceneLoad(int gameSceneNum)
     {
         if (!PhotonNetwork.IsMasterClient)
             return;

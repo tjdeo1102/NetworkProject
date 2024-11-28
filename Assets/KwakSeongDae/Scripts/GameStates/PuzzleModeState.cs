@@ -10,14 +10,20 @@ public class PuzzleModeState : GameState
 {
     [Header("퍼즐 모드 설정")]
     [SerializeField] private BoxCollider2D boxDetector;
+    [SerializeField] float towerHeightStep;
 
     private Coroutine finishRoutine;
     private Dictionary<int, bool> isBlockCheckDic;
     private Coroutine mainCollisionRoutine;
 
+    private Action<int> hpAction;
+    private GameObject selfPlayer;
+    private Coroutine panaltyRoutine;
+
     protected override void Init()
     {
         base.Init();
+
         // Dictionary 초기 세팅
         isBlockCheckDic = new Dictionary<int, bool>();
         
@@ -27,24 +33,56 @@ public class PuzzleModeState : GameState
             isBlockCheckDic.Add(player.ActorNumber, false);
         }
 
+        var playerID = PhotonNetwork.LocalPlayer.ActorNumber;
+        selfPlayer = playerObjectDic[playerID];
+        hpAction = (newHP) => PlayerHPHandle(newHP, playerID);
+        selfPlayer.GetComponent<PlayerController>().OnChangeHp += hpAction;
+
         // 방장만 충돌 감지 루틴 실행
         if (PhotonNetwork.IsMasterClient)
             mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
     }
 
-    public override void Exit()
+    private void OnDisable()
     {
-        if (PhotonNetwork.IsMasterClient) 
+        // 기존 작업 마무리
+        if (PhotonNetwork.IsMasterClient
+            && mainCollisionRoutine != null)
             StopCoroutine(mainCollisionRoutine);
 
         // finishRoutine이 실행되고 있는 경우에는 해당 코루틴은 중지
-        StopCoroutine(finishRoutine);
+        if (finishRoutine != null)
+            StopCoroutine(finishRoutine);
 
-        isBlockCheckDic.Clear();
+        isBlockCheckDic?.Clear();
 
-        // Exit호출은 Enter의 역순
-        base.Exit();
+        selfPlayer.GetComponent<PlayerController>().OnChangeHp -= hpAction;
+
+        Time.timeScale = 1f;
     }
+
+    private void PlayerHPHandle(int newHP, int playerID)
+    {
+        print("체력 변화");
+        // 자신 이벤트인 경우에만 호출
+        if (PhotonNetwork.LocalPlayer.ActorNumber != playerID) return;
+
+        // 블럭이 동시에 떨어질 때, 중복 호출 방지
+        if (panaltyRoutine == null)
+            panaltyRoutine = StartCoroutine(PanaltyRoutine(playerID));
+    }
+
+    private IEnumerator PanaltyRoutine(int playerID)
+    {
+        // 내 타워의 높이를 towerHegithStep만큼 상승
+        // 해당 타워는 photonView transform이므로 자동으로 위치 동기화
+        towerObjectDic[playerID].transform.Translate(0, towerHeightStep, 0);
+
+        // 블럭이 동시에 떨어지는 경우, 중복 실행 방지
+        yield return new WaitForSeconds(1f);
+        panaltyRoutine = null;
+    }
+
     private IEnumerator CollisionCheckRoutine()
     {
         var detectorPos = (Vector2)boxDetector.transform.position + boxDetector.offset;
@@ -112,6 +150,9 @@ public class PuzzleModeState : GameState
             // 기존에 실행중이면 무시
             if (finishRoutine == null)
                 finishRoutine = StartCoroutine(FinishRoutine(playerID));
+
+            //// 테스트: 타워 패널티 기능
+            //PlayerHPHandle(0,playerID);
         }
         else
         {

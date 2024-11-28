@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6258003170563619795}
   - component: {fileID: 6258003170563619797}
-  - component: {fileID: 828197920}
   - component: {fileID: -1915823901307784242}
   m_Layer: 0
   m_Name: SurvivalMode
@@ -56,19 +55,6 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &828197920
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6258003170563619794}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b28dd60f6abf16d4094cf0f642a043e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 0
 --- !u!114 &-1915823901307784242
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -84,9 +70,10 @@ MonoBehaviour:
   startDelayTime: 3
   finishDelayTime: 3
   uiPrefab: {fileID: 7881674830855549598, guid: e8dcd9e14d6dd0148a0a9e9350a86a0d, type: 3}
-  playerPrefabPath: Prefabs/Test/TestPlayer
-  towerPrefabPath: Prefabs/Test/TestTower
-  wallPrefabPath: Prefabs/Wall
+  playerPrefabPath: Test2/Player
+  towerPrefabPath: Test2/TestTower
+  wallPrefabPath: Test2/Wall
   bottomLeft: {x: -9, y: -5}
   upRight: {x: 9, y: -5}
-  winBlockCount: 66
+  playerWidth: 0
+  winBlockCount: 3
