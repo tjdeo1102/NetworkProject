@@ -45,7 +45,7 @@ public class CameraColliderController : MonoBehaviour
             return;
         }
 
-        boxCollider.size = new Vector2(cameraWidth, cameraHeight * 2);
+        boxCollider.size = new Vector2(cameraWidth * 5, cameraHeight * 2);
 
 
     }

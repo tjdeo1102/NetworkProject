@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public event System.Action<int> OnChangeBlockCount;
     public event Action OnFallenOffTheCamera;
+    public event Action OnPlayerDone;
 
     public int TowerNumber = 0;
 
@@ -151,6 +152,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public void ReachGoal()
     {
         IsGoal = true;
+        OnPlayerDone?.Invoke();
         //골인 했을 때 추가적인 구현
         //ex) 원작 게임처럼 큰 나무집이 떨어져 1등이 엔딩을 장식할 수 있도록
     }
@@ -182,10 +184,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public void BlockFallen(Blocks block)
     {
         Debug.Log("블럭이 카메라 바깥으로 떨어짐");
+
         //플레이어 체력처리
+        TakeDamage(1);
 
         // OnBlockFallen 이벤트 호출
         OnFallenOffTheCamera?.Invoke();
+
 
         // 기존 블럭의 제어 해제
         if (currentBlock == block)
