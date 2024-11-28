@@ -3,6 +3,7 @@ using Photon.Pun.Demo.Procedural;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class TestPlayer : MonoBehaviourPun
 {
@@ -11,6 +12,32 @@ public class TestPlayer : MonoBehaviourPun
     [SerializeField] private Blocks[] testBlocks;
 
     private int blockIndex = -1;
+
+    bool isGoal = false;
+
+    bool IsGoal 
+    { 
+        get { return isGoal; }
+        set 
+        {
+            isGoal = value;
+            if (isGoal == true)
+                OnPlayerDone?.Invoke(); 
+        } 
+    }
+
+    public UnityAction OnPlayerDone; 
+
+    private void Awake()
+    {
+        if (testBlocks.Length <= 0)
+            return;
+
+        foreach (Blocks block in testBlocks)
+        {
+            block.SetOwner(this);
+        }
+    }
 
     private void Start()
     {
@@ -36,10 +63,18 @@ public class TestPlayer : MonoBehaviourPun
 
     void Update()
     {
+        if (isGoal)
+            return;
+
         // for test
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             ChangeBlock();
+        }
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            IsGoal = true;
         }
 
         if (currentBlock == null)
