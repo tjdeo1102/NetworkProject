@@ -2,6 +2,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Pun.UtilityScripts;
 using Photon.Realtime;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Android;
@@ -12,6 +13,8 @@ public class RoomPanel : MonoBehaviour
 {
     [SerializeField] PlayerEntry[] playerEntries;
     [SerializeField] Button startButton;
+    [SerializeField] MainPanel gameMode;
+    [SerializeField] TMP_InputField gameModeText;
     [SerializeField] private int gameScene;
 
 
@@ -29,6 +32,22 @@ public class RoomPanel : MonoBehaviour
     {
         // PlayerNumbering에 플레이어 빼기
         PlayerNumbering.OnPlayerNumberingChanged -= UpdatePlayer;
+    }
+
+    public void GameModeUI()
+    {
+        if(gameMode.isMode_0 == true)
+        {
+            gameModeText.text = "Mode 1";
+        }
+        else if(gameMode.isMode_1 == true)
+        {
+            gameModeText.text = "Mode 2";
+        }
+        else if (gameMode.isMode_2 == true)
+        {
+            gameModeText.text = "Mode 3";
+        }
     }
 
     public void UpdatePlayer()
