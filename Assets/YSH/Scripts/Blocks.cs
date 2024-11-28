@@ -7,6 +7,7 @@ using UnityEngine.Events;
 
 public class Blocks : MonoBehaviourPun
 {
+    #region Serialize Field
     [SerializeField] private float basicFallSpeed;          // 하강 속도
     [SerializeField] private float fastFallSpeed;           // 빠른 하강 속도
     [SerializeField] private GameObject spotlightObject;    // spotlight 오브젝트
@@ -18,7 +19,9 @@ public class Blocks : MonoBehaviourPun
     [SerializeField] private LayerMask castLayer;           // 레이캐스트용 layermask
     [SerializeField] private float rotateSpeed;             // 회전 속도
     [SerializeField] private Vector2 blockSize;             // 블럭 사이즈 (타일 하나당 0.5로 계산)
+    #endregion
 
+    #region Private Field
     private Rigidbody2D rigid;              // Rigidbody2D 컴포넌트 참조                                          
     private Vector2 currentVelocity;        // 현재 하강 속도
     private Vector2 currentDirection;       // 현재 이동 방향
@@ -37,12 +40,18 @@ public class Blocks : MonoBehaviourPun
     private Coroutine moveRoutine;          // 이동 시 사용할 코루틴
     private WaitForSeconds wsMoveDelay;     // 이동 코루틴에서 활용할 WaitForSeconds 객체
 
+    private TestPlayer owner;         // 자신을 생성한 Player
+    #endregion
+
+    #region Public Field
     public UnityAction<Blocks> OnBlockFallen;       // 블럭이 맵밖으로 떨어질 때 Invoke (체력감소, 사망 처리에 활용)
     public UnityAction<Blocks> OnBlockEntered;      // 블럭이 안착했을 때 Invoke (블럭 카운팅에 활용)
     public UnityAction<Blocks> OnBlockExited;       // 블럭이 안착했다가 벗어날 때 (블럭 카운팅에 활용)
   
     public bool IsControllable { get { return isControllable; } } // 외부에서 제어 가능여부를 확인하기 위한 프로퍼티
     public bool IsEntered { get { return isEntered; } }     // 외부에서 안착여부를 확인하기 위한 프로퍼티
+    public TestPlayer Owner { get { return owner; } } // 외부에서 블럭 Owner를 확인하기 위한 프로퍼티
+    #endregion
 
     private void Awake()
     {
@@ -50,7 +59,7 @@ public class Blocks : MonoBehaviourPun
         rigid = GetComponent<Rigidbody2D>();
     }
 
-    void Start()
+    private void Start()
     {
         isControllable = true;
         wsMoveDelay = new WaitForSeconds(moveDelay);
@@ -73,7 +82,7 @@ public class Blocks : MonoBehaviourPun
         currentVelocity = new Vector2(rigid.velocity.x, basicFallSpeed);
     }
 
-    void Update()
+    private void Update()
     {
         // 타워나 블럭에 부딪힌 이후부터는 해당 블럭에 대한 조작 불가능
         if (!isControllable)
@@ -122,6 +131,14 @@ public class Blocks : MonoBehaviourPun
         }
     }
 
+    public void SetOwner(TestPlayer player)
+    {
+        // owner 참조
+        owner = player;
+        // 이벤트 구독
+        owner.OnPlayerDone += Freeze;
+    }
+
     // Player의 빠른 하강 조작을 위한 Interface
     public void Down()
     {
@@ -158,6 +175,28 @@ public class Blocks : MonoBehaviourPun
 
         // flag set
         isRotate = true;
+    }
+
+    private void Freeze()
+    {
+        // 조작 불가 상태로 변경
+        isControllable = false;
+
+        if (rigid != null)
+        {
+            // 더 이상 물리처리 하지 않도록 변경
+            rigid.simulated = false;
+            // velocity 초기화
+            rigid.velocity = Vector2.zero;
+        }
+
+        SpriteRenderer sr;
+        foreach (GameObject tile in tiles)
+        {
+            sr = tile.GetComponent<SpriteRenderer>();
+            // sprite color를 변경하여 freeze 상태를 확인할 수 있도록 함
+            sr.color = Color.gray;
+        }
     }
 
     private void SetSpotlight()
@@ -334,12 +373,14 @@ public class Blocks : MonoBehaviourPun
 
         if (isControllable)
         {
+            rigid.simulated = false;
             rigid.velocity = Vector2.zero;
-
-            spotlightObject.SetActive(false);
+            rigid.angularVelocity = 0;
+            rigid.simulated = true;
 
             // 충돌 시 flag 변경 
             isControllable = false;
+            spotlightObject.SetActive(false);
         }
 
         // 충돌체 카운트 증가
@@ -393,6 +434,14 @@ public class Blocks : MonoBehaviourPun
         // 블럭 추락 여부 확인
         if (other.CompareTag("FallTrigger"))
         {
+            // 블럭의 y위치가 카메라 y위치보다 높으면 처리하지 않는다. (예외 방지)
+            if (transform.position.y >= Camera.main.transform.position.y)
+            {
+                Debug.Log("<color=red>Block is higher than camera</color>");
+                return;
+            }
+
+            // 이벤트 발생
             OnBlockFallen?.Invoke(this);
 
             // 바로 삭제
