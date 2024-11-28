@@ -105,7 +105,12 @@ public class MainPanel : MonoBehaviour
 
             return;
         }
-
+        else if (isColored_1 == true || isColored_2 == true)
+        {
+            modeButton[0].interactable = false;
+            return;
+        }
+        
         isColored_0 = true;
         ButtonColor();
     }
@@ -122,6 +127,11 @@ public class MainPanel : MonoBehaviour
             modeButton[1].colors = colorBlock;
             colorBlock.colorMultiplier = 5;
 
+            return;
+        }
+        else if (isColored_0 == true || isColored_2 == true)
+        {
+            modeButton[1].interactable = false;
             return;
         }
 
@@ -143,6 +153,12 @@ public class MainPanel : MonoBehaviour
 
             return;
         }
+        else if (isColored_0 == true || isColored_1 == true)
+        {
+            modeButton[2].interactable = false;
+            return;
+        }
+
         isColored_2 = true;
         ButtonColor();
     }
