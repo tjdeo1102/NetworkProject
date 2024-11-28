@@ -13,4 +13,9 @@ public class ResultScoreEntry : MonoBehaviour
         playerName?.SetText(name);
         blockScore?.SetText(score.ToString());
     }
+    public void SetEntry(string name, float score)
+    {
+        playerName?.SetText("Player ID: "+name);
+        blockScore?.SetText(score.ToString("F2")+"M");
+    }
 }
