@@ -17,10 +17,12 @@ public class MainPanel : MonoBehaviour
     [SerializeField] TMP_InputField roomNameInputField;  // 방이름 적는 InputField
     [SerializeField] TMP_InputField maxPlayerInputField; // 최대 플레이어수 적는 InputField
 
-    [Header("모드선택버튼 색깔")]
+    [Header("모드선택")]
     [SerializeField] public bool isMode_0;           // 모드1 버튼의 색깔
     [SerializeField] public bool isMode_1;           // 모드2 버튼의 색깔
     [SerializeField] public bool isMode_2;           // 모드3 버튼의 색깔
+
+
 
     /// <summary>
     /// 방 만들기창 ON
@@ -145,6 +147,7 @@ public class MainPanel : MonoBehaviour
     /// </summary>
     public void SelectModeButton1()
     {
+        ColorBlock colorBlock = modeButton[0].colors;
         if (isMode_0 == true)
         {
             // 선택을 해제했을때 각 버튼을 누를 수 있게 활성화
@@ -152,16 +155,21 @@ public class MainPanel : MonoBehaviour
             modeButton[0].interactable = true;
             modeButton[1].interactable = true;
             modeButton[2].interactable = true;
+
+            colorBlock.normalColor = Color.white;
+
+            modeButton[0].colors = colorBlock;
             return;
         }
         else if (isMode_1 == true || isMode_2 == true)
         {
-            // 다른 2개의 버튼 중 하나라도 선택되어 있다면 버튼 비활성화
-            modeButton[0].interactable = false;
-            return;
+            colorBlock.normalColor = Color.white;
+            colorBlock.highlightedColor = Color.white;
+            modeButton[0].colors = colorBlock;
         }
-        
-        // 칼라 bool값이 트루가 되면 버튼칼라가 바꾸는 함수 실행
+
+        isMode_1 = false;
+        isMode_2 = false;
         isMode_0 = true;
     }
 
@@ -170,24 +178,29 @@ public class MainPanel : MonoBehaviour
     /// </summary>
     public void SelectModeButton2()
     {
+        ColorBlock colorBlock = modeButton[1].colors;
         if (isMode_1 == true)
         {
             isMode_1 = false;
-            
+
             modeButton[0].interactable = true;
             modeButton[1].interactable = true;
             modeButton[2].interactable = true;
+
+            colorBlock.normalColor = Color.white;
+            modeButton[1].colors = colorBlock;
             return;
         }
         else if (isMode_0 == true || isMode_2 == true)
         {
-            modeButton[1].interactable = false;
-            return;
+            colorBlock.normalColor = Color.white;
+            colorBlock.highlightedColor = Color.white;
+            modeButton[1].colors = colorBlock;
         }
-        
 
+        isMode_0 = false;
+        isMode_2 = false;
         isMode_1 = true;
-        
     }
 
     /// <summary>
@@ -195,22 +208,29 @@ public class MainPanel : MonoBehaviour
     /// </summary>
     public void SelectModeButton3()
     {
+        ColorBlock colorBlock = modeButton[2].colors;
         if (isMode_2 == true)
         {
             isMode_2 = false;
             modeButton[0].interactable = true;
             modeButton[1].interactable = true;
             modeButton[2].interactable = true;
+
+            colorBlock.normalColor = Color.white;
+            colorBlock.highlightedColor = Color.white;
+            modeButton[2].colors = colorBlock;
             return;
         }
         else if (isMode_0 == true || isMode_1 == true)
         {
-            modeButton[2].interactable = false;
-            return;
+            colorBlock.normalColor = Color.white;
+            colorBlock.highlightedColor = Color.green;
+            modeButton[2].colors = colorBlock;
         }
 
+        isMode_1 = false;
+        isMode_0 = false;
         isMode_2 = true;
-        
     }
 
     /// <summary>
