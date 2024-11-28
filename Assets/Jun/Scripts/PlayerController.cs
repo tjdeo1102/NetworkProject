@@ -123,6 +123,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         SetLayerAll(newBlock, LayerMask.NameToLayer("Default"));
 
         currentBlock = newBlock.GetComponent<Blocks>();
+        currentBlock.SetOwner(this);
         currentBlock.OnBlockEntered += BlockEnter;
         currentBlock.OnBlockExited += BlockExit;
         currentBlock.OnBlockFallen += BlockFallen;
@@ -131,6 +132,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public void TakeDamage(int damage)
     {
+        if (photonView.IsMine == false) return;
+
         curHp -= damage;
         Debug.Log($"현재 체력 : {curHp}");
 
@@ -183,18 +186,17 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public void BlockFallen(Blocks block)
     {
-        Debug.Log("블럭이 카메라 바깥으로 떨어짐");
-
-        //플레이어 체력처리
-        TakeDamage(1);
-
-        // OnBlockFallen 이벤트 호출
-        OnFallenOffTheCamera?.Invoke();
-
-
         // 기존 블럭의 제어 해제
         if (currentBlock == block)
         {
+            Debug.Log("블럭이 카메라 바깥으로 떨어짐");
+
+            // OnBlockFallen 이벤트 호출
+            OnFallenOffTheCamera?.Invoke();
+
+            //플레이어 체력처리
+            TakeDamage(1);
+
             currentBlock = null;
             // 새로운 블럭 생성
             SpawnBlock();
@@ -207,11 +209,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         {
             stream.SendNext(BlockCount);
             stream.SendNext(IsGoal);
+            stream.SendNext(curHp);
         }
         else
         {
             BlockCount = (int)stream.ReceiveNext();
             IsGoal = (bool)stream.ReceiveNext();
+            curHp = (int)stream.ReceiveNext();
         }
     }
 

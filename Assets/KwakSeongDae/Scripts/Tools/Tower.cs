@@ -9,5 +9,7 @@ public class Tower : MonoBehaviourPun
     {
         object[] data = photonView.InstantiationData;
         gameObject.name = $"Tower{data[0]}";
+
+        GetComponent<BlockMaxHeightManager>().gameState = PhotonView.Find((int)data[1]).GetComponent<GameState>();
     }
 }

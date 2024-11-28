@@ -138,7 +138,7 @@ public class RaceModeState : GameState
         {
             if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controlller))
             {
-                controlller.IsGoal = true;
+                controlller.ReachGoal();
             }
             // 기존에 finishRoutineDic의 목록에서 해당 플레이어 삭제
             isBlockCheckDic.Remove(playerID);
@@ -184,6 +184,6 @@ public class RaceModeState : GameState
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 레이스 모드의 우승자입니다!!!");
 
-        Time.timeScale = 0f;
+        Time.timeScale = 1f;
     }
 }

@@ -20,6 +20,7 @@ public class CameraController : MonoBehaviour
     private void Update()
     {
         ModulateCameraZoom();
+        Debug.Log($"<color=Greed>Camera Pos: {transform.position} </color>");
     }
 
     public void GetHighestTowerHeight()

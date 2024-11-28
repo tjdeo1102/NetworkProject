@@ -60,12 +60,13 @@ public class GameState : MonoBehaviourPun
 
             var playerNum = PhotonNetwork.LocalPlayer.GetPlayerNumber();
             // 타워 생성
-            var towerObj = PhotonNetwork.Instantiate(towerPrefabPath, playerSpawnPos[playerNum], Quaternion.identity, data: new object[] { playerNum });
+            var towerObj = PhotonNetwork.Instantiate(towerPrefabPath, playerSpawnPos[playerNum], Quaternion.identity, data: new object[] { playerNum, photonView.ViewID });
             // 네트워크 플레이어 오브젝트를 생성하기
             var playerObj = PhotonNetwork.Instantiate(playerPrefabPath, playerSpawnPos[playerNum], Quaternion.identity, data: new object[] { players[playerNum].NickName });
 
             var playerView = playerObj.GetComponent<PhotonView>();
             var towerView = towerObj.GetComponent<PhotonView>();
+
             photonView.RPC("SetPlayerObjectDic", RpcTarget.All, playerView.ViewID);
             photonView.RPC("SetTowerObjectDic", RpcTarget.All, towerView.ViewID);
             // 본인 오브젝트가 생성되는 경우에는 본인 UI도 같이 생성

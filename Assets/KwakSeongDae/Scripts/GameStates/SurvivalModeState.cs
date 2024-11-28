@@ -85,7 +85,7 @@ public class SurvivalModeState : GameState
             if (selfPlayer.TryGetComponent<PlayerController>(out var controller))
             {
                 // 해당 플레이어는 더 이상 조작 불가
-                controller.IsGoal = true;
+                controller.ReachGoal();
                 controller.OnChangeHp -= hpAction;
                 controller.OnChangeBlockCount -= blockCountAction;
 
@@ -106,7 +106,7 @@ public class SurvivalModeState : GameState
         // 해당 플레이어는 더 이상 조작 불가
         if (selfPlayer.TryGetComponent<PlayerController>(out var controller))
         {
-            controller.IsGoal = true;
+            controller.ReachGoal();
             controller.OnChangeHp -= hpAction;
             controller.OnChangeBlockCount -= blockCountAction;
 
@@ -178,6 +178,6 @@ public class SurvivalModeState : GameState
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 서바이벌 모드의 우승자입니다!!!");
 
-        Time.timeScale = 0f;
+        Time.timeScale = 1f;
     }
 }
