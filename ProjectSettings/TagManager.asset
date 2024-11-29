@@ -42,3 +42,21 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 498344439
+    locked: 0
+  - name: Spotlight
+    uniqueID: 3352418427
+    locked: 0
+  - name: GoalLine
+    uniqueID: 1918959225
+    locked: 0
+  - name: Block
+    uniqueID: 2246245555
+    locked: 0
+  - name: Tower
+    uniqueID: 970887509
+    locked: 0
+  - name: Player
+    uniqueID: 1219084083
+    locked: 0
