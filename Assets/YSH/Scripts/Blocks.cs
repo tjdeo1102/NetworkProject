@@ -5,7 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Blocks : MonoBehaviourPun
+public class Blocks : MonoBehaviourPun, IPunObservable
 {
     #region Serialize Field
     [SerializeField] private float basicFallSpeed;          // 하강 속도
@@ -185,9 +185,11 @@ public class Blocks : MonoBehaviourPun
         if (rigid != null)
         {
             // 더 이상 물리처리 하지 않도록 변경
-            rigid.constraints = RigidbodyConstraints2D.FreezeAll;
+            rigid.simulated = false;
+
             // velocity 초기화
             rigid.velocity = Vector2.zero;
+            rigid.angularVelocity = 0;
         }
 
         SpriteRenderer sr;
@@ -401,6 +403,13 @@ public class Blocks : MonoBehaviourPun
 
     private void OnCollisionExit2D(Collision2D other)
     {
+        if (!photonView.IsMine)
+            return;
+
+        // 골인한 상태면 exit 처리 안함
+        if (owner.IsGoal)
+            return;
+
         // 충돌체 카운트 감소
         collisionCount--;
 
@@ -446,6 +455,20 @@ public class Blocks : MonoBehaviourPun
             Gizmos.DrawRay((tiles[i].transform.position+Vector3.left*0.25f) + (Vector3.down * 0.22f), Vector3.left * 0.2f);
             Gizmos.DrawRay((tiles[i].transform.position+Vector3.right*0.25f) + (Vector3.up * 0.22f), Vector3.right * 0.2f);
             Gizmos.DrawRay((tiles[i].transform.position+Vector3.right*0.25f) + (Vector3.down * 0.22f), Vector3.right * 0.2f);
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(rigid.simulated);
+            stream.SendNext(rigid.rotation);
+        }
+        else
+        {
+            rigid.simulated = (bool)stream.ReceiveNext();
+            rigid.rotation = (float)stream.ReceiveNext();
         }
     }
 }
