@@ -12,10 +12,17 @@ using PhotonHashtable = ExitGames.Client.Photon.Hashtable;
 public class RoomPanel : MonoBehaviour
 {
     [SerializeField] PlayerEntry[] playerEntries;
+    [SerializeField] Button[] modeButton;                // 모드 선택하는 버튼 3개
     [SerializeField] Button startButton;
-    [SerializeField] MainPanel gameMode;
-    [SerializeField] TMP_InputField gameModeText;
+    // [SerializeField] MainPanel gameMode;
+    // [SerializeField] private TMP_InputField gameModeText;
     [SerializeField] private int gameScene;
+    [SerializeField] PhotonView photonView;
+
+    [Header("Mode Select")]
+    [SerializeField] private bool isMode_0;           // 모드1 버튼
+    [SerializeField] private bool isMode_1;           // 모드2 버튼
+    [SerializeField] private bool isMode_2;           // 모드3 버튼
 
 
     private void OnEnable()
@@ -26,6 +33,10 @@ public class RoomPanel : MonoBehaviour
         PlayerNumbering.OnPlayerNumberingChanged += UpdatePlayer;
 
         PhotonNetwork.LocalPlayer.SetReady(false);
+
+        isMode_0 = false;
+        isMode_1 = false;
+        isMode_2 = false;
     }
 
     private void OnDisable()
@@ -34,21 +45,162 @@ public class RoomPanel : MonoBehaviour
         PlayerNumbering.OnPlayerNumberingChanged -= UpdatePlayer;
     }
 
-    public void GameModeUI()
+    // public void GameModeUI()
+    // {
+    //     if(gameMode.isMode_0 == true)
+    //     {
+    //         gameModeText.text = "Mode 1";
+    //     }
+    //     else if(gameMode.isMode_1 == true)
+    //     {
+    //         gameModeText.text = "Mode 2";
+    //     }
+    //     else if (gameMode.isMode_2 == true)
+    //     {
+    //         gameModeText.text = "Mode 3";
+    //     }
+    // }
+
+    /// <summary>
+    /// 버튼1을 선택했을때 함수
+    /// </summary>
+    [PunRPC]
+    public void SelectModeButton1()
     {
-        if(gameMode.isMode_0 == true)
+        ColorBlock colorBlock = modeButton[0].colors;
+        colorBlock.normalColor = Color.green;
+        modeButton[0].colors = colorBlock;
+
+        if (isMode_0 == true)
         {
-            gameModeText.text = "Mode 1";
+            // 선택을 해제했을때 각 버튼을 누를 수 있게 활성화
+            isMode_0 = false;
+            modeButton[0].interactable = true;
+            modeButton[1].interactable = true;
+            modeButton[2].interactable = true;
+
+            colorBlock.normalColor = Color.white;
+            modeButton[0].colors = colorBlock;
+            Debug.Log($"isMode_0: {isMode_0}, isMode_1: {isMode_1}, isMode_2: {isMode_2}");
+
+            return;
         }
-        else if(gameMode.isMode_1 == true)
+        // 모드2, 모드3 버튼이 true 라면 모드1의 버튼을 하얗게, ismode_1,2 을 false로.
+        else if (isMode_1 == true || isMode_2 == true)
         {
-            gameModeText.text = "Mode 2";
+            colorBlock.normalColor = Color.white;
+            modeButton[1].colors = colorBlock;
+            modeButton[2].colors = colorBlock;
+
+            isMode_1 = false;
+            isMode_2 = false;
+
+            Debug.Log($"isMode_0: {isMode_0}, isMode_1: {isMode_1}, isMode_2: {isMode_2}");
         }
-        else if (gameMode.isMode_2 == true)
-        {
-            gameModeText.text = "Mode 3";
+        isMode_0 = true;
+        modeButton[1].interactable = false;
+        modeButton[2].interactable = false;
+    }
+
+    public void SendSelectMode1()
+    {
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {            
+            photonView.RPC("SelectModeButton1", RpcTarget.All);
         }
     }
+
+    public void SendSelectMode2()
+    {
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {            
+            photonView.RPC("SelectModeButton2", RpcTarget.All);
+        }
+    }
+
+    public void SendSelectMode3()
+    {
+        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        {            
+            photonView.RPC("SelectModeButton3", RpcTarget.All);
+        }
+    }
+
+    /// <summary>
+    /// 모드버튼2 를 눌렀을때
+    /// </summary>
+    [PunRPC]
+    public void SelectModeButton2()
+    {
+        ColorBlock colorBlock = modeButton[1].colors;
+        colorBlock.normalColor = Color.green;
+        modeButton[1].colors = colorBlock;
+
+        if (isMode_1 == true)
+        {
+            isMode_1 = false;
+
+            modeButton[0].interactable = true;
+            modeButton[1].interactable = true;
+            modeButton[2].interactable = true;
+
+            colorBlock.normalColor = Color.white;
+            modeButton[1].colors = colorBlock;
+            return;
+        }
+        else if (isMode_0 == true || isMode_2 == true)
+        {
+            colorBlock.normalColor = Color.white;
+            modeButton[0].colors = colorBlock;
+            modeButton[2].colors = colorBlock;
+
+            isMode_0 = false;
+            isMode_2 = false;
+        }
+        isMode_1 = true;
+        modeButton[0].interactable = false;
+        modeButton[2].interactable = false;
+        Debug.Log($"isMode_0: {isMode_0}, isMode_1: {isMode_1}, isMode_2: {isMode_2}");
+    }
+
+    /// <summary>
+    /// 모드버튼3 을 눌렀을때
+    /// </summary>
+    [PunRPC]
+    public void SelectModeButton3()
+    {
+        ColorBlock colorBlock = modeButton[2].colors;
+        colorBlock.normalColor = Color.green;
+        modeButton[2].colors = colorBlock;
+
+        if (isMode_2 == true)
+        {
+            isMode_2 = false;
+            modeButton[0].interactable = true;
+            modeButton[1].interactable = true;
+            modeButton[2].interactable = true;
+
+            colorBlock.normalColor = Color.white;
+
+            modeButton[2].colors = colorBlock;
+            return;
+        }
+        else if (isMode_0 == true || isMode_1 == true)
+        {
+            colorBlock.normalColor = Color.white;
+            modeButton[0].colors = colorBlock;
+            modeButton[1].colors = colorBlock;
+
+            isMode_1 = false;
+            isMode_0 = false;
+        }
+
+        isMode_2 = true;
+        modeButton[0].interactable = false;
+        modeButton[1].interactable = false;
+        Debug.Log($"isMode_0: {isMode_0}, isMode_1: {isMode_1}, isMode_2: {isMode_2}");
+    }
+
 
     public void UpdatePlayer()
     {

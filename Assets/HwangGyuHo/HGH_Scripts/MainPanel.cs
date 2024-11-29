@@ -13,16 +13,8 @@ public class MainPanel : MonoBehaviour
 {
     [SerializeField] GameObject menuPanel;               // 메뉴패널 오브젝트
     [SerializeField] GameObject createRoomPanel;         // 방만드는 오브젝트
-    [SerializeField] Button[] modeButton;                // 모드 선택하는 버튼 3개
     [SerializeField] TMP_InputField roomNameInputField;  // 방이름 적는 InputField
     [SerializeField] TMP_InputField maxPlayerInputField; // 최대 플레이어수 적는 InputField
-
-    [Header("모드선택")]
-    [SerializeField] public bool isMode_0;           // 모드1 버튼의 색깔
-    [SerializeField] public bool isMode_1;           // 모드2 버튼의 색깔
-    [SerializeField] public bool isMode_2;           // 모드3 버튼의 색깔
-
-
 
     /// <summary>
     /// 방 만들기창 ON
@@ -47,56 +39,22 @@ public class MainPanel : MonoBehaviour
     /// </summary>
     public void CreateRoomConfirm()
     {
-        if (isMode_0 == true)
+        Debug.Log("방 만들기 성공했습니다.");
+        string roomName = roomNameInputField.text;
+        if (roomName == "")
         {
-            Debug.Log("방 만들기 성공했습니다.");
-            string roomName = roomNameInputField.text;
-            if (roomName == "")
-            {
-                Debug.LogWarning("방 이름을 입력해야 방을 생성할 수 있습니다.");
-                return;
-            }
-            int maxPlayer = int.Parse(maxPlayerInputField.text);
-            maxPlayer = Mathf.Clamp(maxPlayer, 1, 4);
-
-            RoomOptions options = new RoomOptions();
-            options.MaxPlayers = maxPlayer;
-            PhotonNetwork.CreateRoom(roomName, options);
-        }
-        else if (isMode_1 == true)
-        {
-            Debug.Log("방 만들기 성공했습니다.");
-            string roomName = roomNameInputField.text;
-            if (roomName == "")
-            {
-                Debug.LogWarning("방 이름을 입력해야 방을 생성할 수 있습니다.");
-                return;
-            }
-            int maxPlayer = int.Parse(maxPlayerInputField.text);
-            maxPlayer = Mathf.Clamp(maxPlayer, 1, 4);
-
-            RoomOptions options = new RoomOptions();
-            options.MaxPlayers = maxPlayer;
-            PhotonNetwork.CreateRoom(roomName, options);
-        }
-        else if (isMode_2 == true)
-        {
-            Debug.Log("방 만들기 성공했습니다.");
-            string roomName = roomNameInputField.text;
-            if (roomName == "")
-            {
-                Debug.LogWarning("방 이름을 입력해야 방을 생성할 수 있습니다.");
-                return;
-            }
-            int maxPlayer = int.Parse(maxPlayerInputField.text);
-            maxPlayer = Mathf.Clamp(maxPlayer, 1, 4);
-
-            RoomOptions options = new RoomOptions();
-            options.MaxPlayers = maxPlayer;
-            PhotonNetwork.CreateRoom(roomName, options);
-        }
-        else
+            Debug.LogWarning("방 이름을 입력해야 방을 생성할 수 있습니다.");
             return;
+        }
+        int maxPlayer = int.Parse(maxPlayerInputField.text);
+        maxPlayer = Mathf.Clamp(maxPlayer, 1, 4);
+
+        RoomOptions options = new RoomOptions();
+        options.MaxPlayers = maxPlayer;
+        PhotonNetwork.CreateRoom(roomName, options);
+       
+        
+        return;
     }
 
     /// <summary>
@@ -140,97 +98,6 @@ public class MainPanel : MonoBehaviour
     {
         Debug.Log("로그아웃 요청");
         PhotonNetwork.Disconnect();
-    }
-
-    /// <summary>
-    /// 버튼1을 선택했을때 함수
-    /// </summary>
-    public void SelectModeButton1()
-    {
-        ColorBlock colorBlock = modeButton[0].colors;
-        if (isMode_0 == true)
-        {
-            // 선택을 해제했을때 각 버튼을 누를 수 있게 활성화
-            isMode_0 = false;
-            modeButton[0].interactable = true;
-            modeButton[1].interactable = true;
-            modeButton[2].interactable = true;
-
-            colorBlock.normalColor = Color.white;
-
-            modeButton[0].colors = colorBlock;
-            return;
-        }
-        else if (isMode_1 == true || isMode_2 == true)
-        {
-            colorBlock.normalColor = Color.white;
-            colorBlock.highlightedColor = Color.white;
-            modeButton[0].colors = colorBlock;
-        }
-
-        isMode_1 = false;
-        isMode_2 = false;
-        isMode_0 = true;
-    }
-
-    /// <summary>
-    /// 모드버튼2 를 눌렀을때
-    /// </summary>
-    public void SelectModeButton2()
-    {
-        ColorBlock colorBlock = modeButton[1].colors;
-        if (isMode_1 == true)
-        {
-            isMode_1 = false;
-
-            modeButton[0].interactable = true;
-            modeButton[1].interactable = true;
-            modeButton[2].interactable = true;
-
-            colorBlock.normalColor = Color.white;
-            modeButton[1].colors = colorBlock;
-            return;
-        }
-        else if (isMode_0 == true || isMode_2 == true)
-        {
-            colorBlock.normalColor = Color.white;
-            colorBlock.highlightedColor = Color.white;
-            modeButton[1].colors = colorBlock;
-        }
-
-        isMode_0 = false;
-        isMode_2 = false;
-        isMode_1 = true;
-    }
-
-    /// <summary>
-    /// 모드버튼3 을 눌렀을때
-    /// </summary>
-    public void SelectModeButton3()
-    {
-        ColorBlock colorBlock = modeButton[2].colors;
-        if (isMode_2 == true)
-        {
-            isMode_2 = false;
-            modeButton[0].interactable = true;
-            modeButton[1].interactable = true;
-            modeButton[2].interactable = true;
-
-            colorBlock.normalColor = Color.white;
-            colorBlock.highlightedColor = Color.white;
-            modeButton[2].colors = colorBlock;
-            return;
-        }
-        else if (isMode_0 == true || isMode_1 == true)
-        {
-            colorBlock.normalColor = Color.white;
-            colorBlock.highlightedColor = Color.green;
-            modeButton[2].colors = colorBlock;
-        }
-
-        isMode_1 = false;
-        isMode_0 = false;
-        isMode_2 = true;
     }
 
     /// <summary>

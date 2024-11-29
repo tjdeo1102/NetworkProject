@@ -48,6 +48,9 @@ MonoBehaviour:
   - SetPlayerObjectDic
   - SetTowerObjectDic
   - FreezeRPC
+  - SelectModeButton1
+  - SelectModeButton2
+  - SelectModeButton3
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
