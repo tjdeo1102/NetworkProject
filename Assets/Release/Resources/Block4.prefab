@@ -150,7 +150,6 @@ MonoBehaviour:
     m_Bits: 12352
   rotateSpeed: 990
   blockSize: {x: 1.5, y: 1}
-  constraintsValue: -1
 --- !u!50 &5564063098573158911
 Rigidbody2D:
   serializedVersion: 4
@@ -209,7 +208,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizeVelocity: 1
-  m_SynchronizeAngularVelocity: 1
+  m_SynchronizeAngularVelocity: 0
   m_TeleportEnabled: 0
   m_TeleportIfDistanceGreaterThan: 3
 --- !u!1 &5564063098824068280

@@ -463,10 +463,12 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(rigid.simulated);
+            stream.SendNext(rigid.rotation);
         }
         else
         {
             rigid.simulated = (bool)stream.ReceiveNext();
+            rigid.rotation = (float)stream.ReceiveNext();
         }
     }
 }
