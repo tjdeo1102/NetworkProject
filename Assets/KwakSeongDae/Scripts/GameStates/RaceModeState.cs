@@ -184,6 +184,6 @@ public class RaceModeState : GameState
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 레이스 모드의 우승자입니다!!!");
 
-        Time.timeScale = 1f;
+        Time.timeScale = 0f;
     }
 }

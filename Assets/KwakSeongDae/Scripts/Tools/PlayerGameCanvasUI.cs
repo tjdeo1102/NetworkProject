@@ -2,12 +2,14 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 public class PlayerGameCanvasUI : MonoBehaviour
 {
     [Header("기본 UI 설정")]
     [SerializeField] private GameObject scorePanel;
+    [SerializeField] private GameObject button;
     [SerializeField] private GameTimer gameTimer;
     [SerializeField] private int returnSceneIndex;
 
@@ -54,8 +56,10 @@ public class PlayerGameCanvasUI : MonoBehaviour
 
     public void SetResult()
     {
-        // 개별로 씬을 전환할 수 있도록 허용
-        PhotonNetwork.AutomaticallySyncScene = false;
+        //// 개별로 씬을 전환할 수 있도록 허용
+        //PhotonNetwork.AutomaticallySyncScene = false;
+        if (PhotonNetwork.IsMasterClient)   
+            button.SetActive(true);
 
         scorePanel.SetActive(true); 
     }
