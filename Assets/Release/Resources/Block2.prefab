@@ -486,6 +486,7 @@ MonoBehaviour:
     m_Bits: 12352
   rotateSpeed: 990
   blockSize: {x: 1, y: 1}
+  constraintsValue: -1
 --- !u!50 &7382279234303379018
 Rigidbody2D:
   serializedVersion: 4
@@ -522,10 +523,11 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 3
+  Synchronization: 2
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 7382279234303379019}
   - {fileID: 4413704574581602890}
   sceneViewId: 0
   InstantiationId: 0
