@@ -24,12 +24,13 @@ public class SurvivalModeState : GameState
         DeadPlayers = new List<int>();
         var playerID = PhotonNetwork.LocalPlayer.ActorNumber;
         selfPlayer = playerObjectDic[playerID];
-        if (photonView.IsMine == false) return;
 
         // 현재 자신만 이벤트 등록
         var controller = selfPlayer.GetComponent<PlayerController>();
         hpAction = (newHP) => PlayerHPHandle(newHP, playerID);
         controller.OnChangeHp += hpAction;
+
+
         blockCountAction = (newBlockCount) => PlayerBlockCountHandle(newBlockCount, playerID);
         controller.OnChangeBlockCount += blockCountAction;
     }
@@ -46,6 +47,7 @@ public class SurvivalModeState : GameState
 
     public void PlayerHPHandle(int newHP, int playerID)
     {
+        print($"{playerID} 체력 감소: {newHP}");
         // 자신 이벤트인 경우에만 호출
         if (PhotonNetwork.LocalPlayer.ActorNumber != playerID) return;
 
@@ -178,6 +180,6 @@ public class SurvivalModeState : GameState
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 서바이벌 모드의 우승자입니다!!!");
 
-        Time.timeScale = 1f;
+        Time.timeScale = 0f;
     }
 }

@@ -264,10 +264,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scorePanel: {fileID: 7881674829287173273}
+  button: {fileID: 7881674830766642165}
   gameTimer: {fileID: 7881674830233940878}
   returnSceneIndex: 3
   scoreView: {fileID: 7881674830702679025}
   resultEntryPrefab: {fileID: 7191565955913467639, guid: df955eee07cf9e84ab954255cae3aff4, type: 3}
+  gameState: {fileID: 0}
 --- !u!1 &7881674829820385952
 GameObject:
   m_ObjectHideFlags: 0
@@ -794,7 +796,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7881674830766642170
 RectTransform:
   m_ObjectHideFlags: 0
