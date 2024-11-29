@@ -55,6 +55,7 @@ MonoBehaviour:
   OwnershipTransfer: 1
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 5046531576826329988}
   - {fileID: 8511349656917415288}
   sceneViewId: 0
   InstantiationId: 0
@@ -89,6 +90,7 @@ MonoBehaviour:
     m_Bits: 8192
   BoxSize: {x: 10, y: 1}
   highestPoint: 0
+  gameState: {fileID: 0}
 --- !u!114 &8511349656917415288
 MonoBehaviour:
   m_ObjectHideFlags: 0
