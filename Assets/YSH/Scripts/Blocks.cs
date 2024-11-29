@@ -471,4 +471,10 @@ public class Blocks : MonoBehaviourPun, IPunObservable
             rigid.rotation = (float)stream.ReceiveNext();
         }
     }
+
+    private void LateUpdate()
+    {
+        var x = Mathf.Round(rigid.position.x / 0.25f) * 0.25f;
+        rigid.position = new Vector2(x, rigid.position.y);
+    }
 }
