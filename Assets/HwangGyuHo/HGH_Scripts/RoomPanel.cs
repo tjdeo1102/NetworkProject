@@ -18,6 +18,7 @@ public class RoomPanel : MonoBehaviour
     // [SerializeField] private TMP_InputField gameModeText;
     [SerializeField] private int gameScene;
     [SerializeField] PhotonView photonView;
+    [SerializeField] TMP_Text modeText;
 
     [Header("Mode Select")]
     [SerializeField] private bool isMode_0;           // 모드1 버튼
@@ -33,10 +34,7 @@ public class RoomPanel : MonoBehaviour
         PlayerNumbering.OnPlayerNumberingChanged += UpdatePlayer;
 
         PhotonNetwork.LocalPlayer.SetReady(false);
-
-        isMode_0 = false;
-        isMode_1 = false;
-        isMode_2 = false;
+        
     }
 
     private void OnDisable()
@@ -67,10 +65,12 @@ public class RoomPanel : MonoBehaviour
     [PunRPC]
     public void SelectModeButton1()
     {
+        gameScene = 0;
+        modeText.text = $"Puzzle";
         ColorBlock colorBlock = modeButton[0].colors;
         colorBlock.normalColor = Color.green;
         modeButton[0].colors = colorBlock;
-
+        
         if (isMode_0 == true)
         {
             // 선택을 해제했을때 각 버튼을 누를 수 있게 활성화
@@ -104,26 +104,26 @@ public class RoomPanel : MonoBehaviour
 
     public void SendSelectMode1()
     {
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
-        {            
-            photonView.RPC("SelectModeButton1", RpcTarget.All);
-        }
+        if (photonView.IsMine == false)
+            return;
+
+        photonView.RPC("SelectModeButton1", RpcTarget.AllBuffered);
     }
 
     public void SendSelectMode2()
     {
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
-        {            
-            photonView.RPC("SelectModeButton2", RpcTarget.All);
-        }
+        if (photonView.IsMine == false)
+            return;
+
+        photonView.RPC("SelectModeButton2", RpcTarget.AllBuffered);
     }
 
     public void SendSelectMode3()
     {
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
-        {            
-            photonView.RPC("SelectModeButton3", RpcTarget.All);
-        }
+        if (photonView.IsMine == false)
+            return;
+
+        photonView.RPC("SelectModeButton3", RpcTarget.AllBuffered);
     }
 
     /// <summary>
@@ -132,6 +132,8 @@ public class RoomPanel : MonoBehaviour
     [PunRPC]
     public void SelectModeButton2()
     {
+        gameScene = 1;
+        modeText.text = $"Race";
         ColorBlock colorBlock = modeButton[1].colors;
         colorBlock.normalColor = Color.green;
         modeButton[1].colors = colorBlock;
@@ -146,6 +148,7 @@ public class RoomPanel : MonoBehaviour
 
             colorBlock.normalColor = Color.white;
             modeButton[1].colors = colorBlock;
+            
             return;
         }
         else if (isMode_0 == true || isMode_2 == true)
@@ -160,6 +163,7 @@ public class RoomPanel : MonoBehaviour
         isMode_1 = true;
         modeButton[0].interactable = false;
         modeButton[2].interactable = false;
+        
         Debug.Log($"isMode_0: {isMode_0}, isMode_1: {isMode_1}, isMode_2: {isMode_2}");
     }
 
@@ -169,6 +173,8 @@ public class RoomPanel : MonoBehaviour
     [PunRPC]
     public void SelectModeButton3()
     {
+        gameScene = 2;
+        modeText.text = $"Surviver";
         ColorBlock colorBlock = modeButton[2].colors;
         colorBlock.normalColor = Color.green;
         modeButton[2].colors = colorBlock;
@@ -198,13 +204,14 @@ public class RoomPanel : MonoBehaviour
         isMode_2 = true;
         modeButton[0].interactable = false;
         modeButton[1].interactable = false;
+        
         Debug.Log($"isMode_0: {isMode_0}, isMode_1: {isMode_1}, isMode_2: {isMode_2}");
     }
 
 
     public void UpdatePlayer()
     {
-       
+        
         foreach (PlayerEntry entry in playerEntries)
         {
             entry.SetEmpty();
@@ -218,14 +225,19 @@ public class RoomPanel : MonoBehaviour
             int number = player.GetPlayerNumber();
             playerEntries[number].SetPlayer(player);
         }
-
+        Debug.Log($"LocalPlayer: {PhotonNetwork.LocalPlayer.NickName}");
         if (PhotonNetwork.LocalPlayer.IsMasterClient)
         {
             startButton.interactable = AllPlayerReadyCheck();
+            Debug.Log($"photonView:{photonView.ViewID}");
         }
         else
         {
             startButton.interactable = false;
+            for (int i = 0; i < modeButton.Length; i++)
+            {
+                modeButton[i].gameObject.SetActive(false);
+            }
         }
     }
 
@@ -254,6 +266,7 @@ public class RoomPanel : MonoBehaviour
 
     public void StartGame()
     {
+        
         // 플레이어들 READY가 모두 되면 게임시작 버튼으로 게임시작
         // 씬 이름이 일치해야 함
         PhotonNetwork.LoadLevel(gameScene);
