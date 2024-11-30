@@ -41,6 +41,8 @@ public class Blocks : MonoBehaviourPun, IPunObservable
     private WaitForSeconds wsMoveDelay;     // 이동 코루틴에서 활용할 WaitForSeconds 객체
 
     private PlayerController owner;         // 자신을 생성한 Player
+
+    private Coroutine freezeRotateRoutine;
     #endregion
 
     #region Public Field
@@ -114,21 +116,49 @@ public class Blocks : MonoBehaviourPun, IPunObservable
 
         if (isRotate)
         {
-            rigid.rotation += rotateSpeed * Time.deltaTime;
-            if (rigid.rotation >= targetAngle || targetAngle == 360 && rigid.rotation < 2f)
-            {
+            rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+            if (rigid.rotation >= targetAngle)
                 rigid.rotation = targetAngle;
+            else
+                rigid.rotation += rotateSpeed;
 
-                // spotlight의 크기 설정
-                SetSpotlight();
+            if (freezeRotateRoutine == null)
+                freezeRotateRoutine = StartCoroutine(FreezeRotateRoutine());
 
-                // spotlight 활성화
-                spotlightObject.SetActive(true);
+            //if (rigid.rotation >= targetAngle || targetAngle % 360 == 0 && rigid.rotation < 10f)
+            //{
+            //    print($"리지드:{rigid.rotation} 타겟: {targetAngle}");
+            //    rigid.rotation = targetAngle;
 
-                // 다시 회전이 가능하도록 회전 완료 처리
-                isRotate = false;
-            }
+            //    print($"리지드 변화: {rigid.rotation}");
+
+            //    // spotlight의 크기 설정
+            //    SetSpotlight();
+
+            //    // spotlight 활성화
+            //    spotlightObject.SetActive(true);
+
+            //    // 다시 회전이 가능하도록 회전 완료 처리
+            //    isRotate = false;
+            //}
         }
+    }
+
+    private IEnumerator FreezeRotateRoutine()
+    {
+        var delay = new WaitForSeconds(0.2f);
+        yield return delay;
+        // spotlight의 크기 설정
+        SetSpotlight();
+
+        rigid.constraints = RigidbodyConstraints2D.None;
+
+        spotlightObject.SetActive(isControllable);
+
+        // 다시 회전이 가능하도록 회전 완료 처리
+        isRotate = false;
+        freezeRotateRoutine = null;
     }
 
     public void SetOwner(PlayerController player)
@@ -311,6 +341,9 @@ public class Blocks : MonoBehaviourPun, IPunObservable
 
                 if (resultHit.collider.gameObject.layer == LayerMask.NameToLayer("Wall"))
                 {
+                    //rigid.rotation = targetAngle;
+                    //print($"이동 중에 회전처리{rigid.rotation}");
+
                     Debug.Log("Hit Wall (MoveRoutine)");
                     hitWall = true;
                     break;
@@ -369,9 +402,14 @@ public class Blocks : MonoBehaviourPun, IPunObservable
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
         {
+            //rigid.rotation = targetAngle;
+            //print($"벽 충돌 시 회전처리{rigid.rotation}");
+
             Debug.Log("Hit Wall (OnCollision)");
             return;
         }
+
+        spotlightObject.SetActive(false);
 
         if (isControllable)
         {
@@ -382,7 +420,6 @@ public class Blocks : MonoBehaviourPun, IPunObservable
 
             // 충돌 시 flag 변경 
             isControllable = false;
-            spotlightObject.SetActive(false);
         }
 
         // 충돌체 카운트 증가
@@ -392,7 +429,7 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         if (isEntered)
             return;
 
-        Debug.Log($"{gameObject.name} entered");
+        //Debug.Log($"{gameObject.name} entered");
 
         // enter flag set
         isEntered = true;
@@ -472,9 +509,14 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         }
     }
 
-    private void LateUpdate()
-    {
-        var x = Mathf.Round(rigid.position.x / 0.25f) * 0.25f;
-        rigid.position = new Vector2(x, rigid.position.y);
-    }
+    //private void LateUpdate()
+    //{
+    //    // 회전하는 경우에는 x값 위치 보정
+    //    if (isRotate)
+    //    {
+    //        var x = Mathf.Round(rigid.position.x / 0.25f) * 0.25f;
+    //        rigid.position = new Vector2(x, rigid.position.y);
+    //        print($"회전 후, 위치 조정{x}");
+    //    }
+    //}
 }
