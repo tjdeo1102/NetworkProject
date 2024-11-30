@@ -21,9 +21,9 @@ public class RaceModeState : GameState
         // Dictionary 초기 세팅
         isBlockCheckDic = new Dictionary<int, bool>();
         // 플레이어 수만큼 미리 요소 추가
-        foreach (var playerID in playerObjectDic.Keys)
+        foreach (var player in PhotonNetwork.PlayerList)
         {
-            isBlockCheckDic.Add(playerID, false);
+            isBlockCheckDic.Add(player.ActorNumber, false);
         }
 
         // 방장만 충돌 감지 루틴 실행
@@ -42,6 +42,7 @@ public class RaceModeState : GameState
             StopCoroutine(goalRoutine);
 
         isBlockCheckDic.Clear();
+        ReturnScene();
         Time.timeScale = 1f;
     }
 
@@ -50,8 +51,6 @@ public class RaceModeState : GameState
         var detectorPos = (Vector2)boxDetector.transform.position + boxDetector.offset;
         var detectorScale = Vector2.Scale(boxDetector.transform.localScale, boxDetector.size);
         var delay = new WaitForSeconds(0.1f);
-        // 코루틴 실행 즉시 실행 하지 말기 => 로그가 더러워짐
-        yield return null;
 
         while (true)
         {
