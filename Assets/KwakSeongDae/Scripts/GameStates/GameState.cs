@@ -13,7 +13,7 @@ using WebSocketSharp;
 using static UnityEditor.Progress;
 
 [RequireComponent(typeof(PhotonView))]
-public class GameState : MonoBehaviourPun
+public class GameState : MonoBehaviourPunCallbacks
 {
     private const int maxPlayer = 4;
 
@@ -21,6 +21,7 @@ public class GameState : MonoBehaviourPun
     [SerializeField] protected float startDelayTime;
     [SerializeField] protected float finishDelayTime;
     [SerializeField] private PlayerGameCanvasUI uiPrefab;
+    [SerializeField] private int returnSceneIndex;
 
     [Header("플레이어 스폰 설정")]
     [SerializeField] private string playerPrefabPath;
@@ -39,9 +40,32 @@ public class GameState : MonoBehaviourPun
     // 활성화 시점에 모두 초기화
     private void OnEnable()
     {
-        print("진입");
+        PhotonNetwork.AddCallbackTarget(this);
         StartCoroutine(NetworkWaitRoutine());
     }
+
+    private void OnDestroy()
+    {
+        PhotonNetwork.RemoveCallbackTarget(this);
+
+        // 방장만 게임 씬 정리 작업 수행
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        // 모든 플레이어가 생성한 네트워크 오브젝트들 삭제 (블럭 및 RPC 포함)
+        PhotonNetwork.DestroyAll();
+        print("네트워크 오브젝트들 전부 삭제");
+        playerObjectDic.Clear();
+        towerObjectDic.Clear();
+
+    }
+    protected void ReturnScene()
+    {
+        // 방장만 게임 씬 로드 작업 수행
+        if (PhotonNetwork.IsMasterClient == false) return;
+
+        PhotonNetwork.CurrentRoom.IsOpen = true;
+    }
+
     protected virtual void Init()
     {
         // 시작 딜레이는 게임이 멈춰야되는 기능도 포함하므로 Realtime으로 계산
@@ -56,7 +80,7 @@ public class GameState : MonoBehaviourPun
         {
             var players = PhotonNetwork.PlayerList;
             var playerSpawnPos = PlayerSpawnStartPositions(bottomLeft, upRight, players.Length);
-            print($"플레이어 수: {players.Length}");
+            print($"플레이어 수: {players.Length}"); 
 
             var playerNum = PhotonNetwork.LocalPlayer.GetPlayerNumber();
             // 타워 생성
@@ -112,7 +136,7 @@ public class GameState : MonoBehaviourPun
     protected IEnumerator StartRoutine(double startTime)
     {
         var delay = PhotonNetwork.Time - startTime;
-        print($"방장이 보낸 RPC를 수신까지 딜레이 {delay}");
+        //print($"방장이 보낸 RPC를 수신까지 딜레이 {delay}");
         // 지연보상 적용
         playerUI?.SetTimer(startDelayTime - (float)delay);
         Time.timeScale = 0f;
@@ -178,5 +202,18 @@ public class GameState : MonoBehaviourPun
             playerPositions[i] = new Vector2((bottomLeft.x + playerWidth * i) + (playerWidth / 2), bottomLeft.y);
         }
         return playerPositions;
+    }
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        print("방장이 나감에 따라서 게임이 종료됩니다.");
+
+        // 방장이 바뀌는 경우 (강제종료 된 경우)
+        // 1. 게임 씬의 모든 오브젝트 정리 
+        gameObject.SetActive(false);
+        // 2. 방 떠나기
+        PhotonNetwork.LeaveRoom();
+        // 3. 로비 씬으로 리턴
+        PhotonNetwork.LoadLevel(returnSceneIndex);
     }
 }

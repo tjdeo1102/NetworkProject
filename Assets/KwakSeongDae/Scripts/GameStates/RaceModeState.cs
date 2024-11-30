@@ -1,4 +1,6 @@
 using Photon.Pun;
+using Photon.Pun.Demo.PunBasics;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -128,6 +130,20 @@ public class RaceModeState : GameState
         yield return StartCoroutine(base.FinishRoutine(playerID));
         // 제한 시간이 지나면 모든 플레이어 상태 체크 후, 집계까지 진행
         photonView.RPC("AllPlayerStateCheck", RpcTarget.MasterClient);
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        // 방장이 강제 종료 예외 처리
+        if (PhotonNetwork.IsMasterClient == false) return;
+
+        if (playerObjectDic[otherPlayer.ActorNumber].TryGetComponent<PlayerController>(out var controller))
+        {
+            controller.ReachGoal();
+        }
+
+        playerObjectDic.Remove(otherPlayer.ActorNumber);
+        towerObjectDic.Remove(otherPlayer.ActorNumber);
     }
 
     [PunRPC]

@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,6 +43,7 @@ public class SurvivalModeState : GameState
         if (winRoutine != null)
             StopCoroutine(winRoutine);
 
+        ReturnScene();
         Time.timeScale = 1f;
     }
 
@@ -118,6 +120,16 @@ public class SurvivalModeState : GameState
             // 모든 플레이어 상태 체크 후, 집계 시작
             photonView.RPC("AllPlayerStateCheck", RpcTarget.MasterClient, true, photonView.Owner.ActorNumber);
         }
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        // 방장이 강제 종료 예외 처리
+        if (PhotonNetwork.IsMasterClient == false) return;
+        playerObjectDic.Remove(otherPlayer.ActorNumber);
+        towerObjectDic.Remove(otherPlayer.ActorNumber);
+
+        AllPlayerStateCheck(false);
     }
 
     [PunRPC]

@@ -1,4 +1,6 @@
 using Photon.Pun;
+using Photon.Pun.Demo.PunBasics;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -57,6 +59,8 @@ public class PuzzleModeState : GameState
         isBlockCheckDic?.Clear();
 
         selfPlayer.GetComponent<PlayerController>().OnChangeHp -= hpAction;
+
+        ReturnScene();
 
         Time.timeScale = 1f;
     }
@@ -150,9 +154,6 @@ public class PuzzleModeState : GameState
             // 기존에 실행중이면 무시
             if (finishRoutine == null)
                 finishRoutine = StartCoroutine(FinishRoutine(playerID));
-
-            //// 테스트: 타워 패널티 기능
-            //PlayerHPHandle(0,playerID);
         }
         else
         {
@@ -173,6 +174,20 @@ public class PuzzleModeState : GameState
 
         // 이후, 모든 플레이어는 상태 체크 후, 집계까지 진행
         photonView.RPC("AllPlayerStateCheck", RpcTarget.MasterClient,playerID);
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        print($"{otherPlayer.ActorNumber}가 나감");
+
+        // 방장이 강제 종료 예외 처리
+        if (PhotonNetwork.IsMasterClient == false) return;
+
+        PlayerStateChange(otherPlayer.ActorNumber);
+        playerObjectDic.Remove(otherPlayer.ActorNumber);
+        towerObjectDic.Remove(otherPlayer.ActorNumber);
+
+        AllPlayerStateCheck(otherPlayer.ActorNumber);
     }
 
     private void PlayerStateChange(int playerID)
@@ -203,7 +218,6 @@ public class PuzzleModeState : GameState
             {
                 if (playerObjectDic[playerKey].TryGetComponent<PlayerController>(out var controller))
                 {
-                    print(controller.BlockCount);
                     result.Add(new Tuple<int, int>(playerKey, controller.BlockCount));
                 }
             }

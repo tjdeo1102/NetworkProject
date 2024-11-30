@@ -458,7 +458,7 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         if (collisionCount > 0)
             return;
 
-        Debug.Log($"{gameObject.name} exited");
+        //Debug.Log($"{gameObject.name} exited");
 
         // enter flag set
         isEntered = false;
