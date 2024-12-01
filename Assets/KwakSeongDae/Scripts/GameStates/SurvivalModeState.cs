@@ -35,7 +35,7 @@ public class SurvivalModeState : GameState
         blockCountAction = (newBlockCount) => PlayerBlockCountHandle(newBlockCount, playerID);
         controller.OnChangeBlockCount += blockCountAction;
     }
-    private void OnDisable()
+    public override void OnDisable()
     {
         // Routine이 실행되고 있는 경우에는 해당 코루틴은 중지
         if (deadRoutine != null)
@@ -43,8 +43,8 @@ public class SurvivalModeState : GameState
         if (winRoutine != null)
             StopCoroutine(winRoutine);
 
-        ReturnScene();
         Time.timeScale = 1f;
+        base.OnDisable();
     }
 
     public void PlayerHPHandle(int newHP, int playerID)
@@ -126,8 +126,15 @@ public class SurvivalModeState : GameState
     {
         // 방장이 강제 종료 예외 처리
         if (PhotonNetwork.IsMasterClient == false) return;
-        playerObjectDic.Remove(otherPlayer.ActorNumber);
-        towerObjectDic.Remove(otherPlayer.ActorNumber);
+        if (playerObjectDic.ContainsKey(otherPlayer.ActorNumber)
+            && playerObjectDic[otherPlayer.ActorNumber].TryGetComponent<PlayerController>(out var controller))
+        {
+            controller.ReachGoal();
+            playerObjectDic.Remove(otherPlayer.ActorNumber);
+        }
+
+        if (towerObjectDic.ContainsKey(otherPlayer.ActorNumber))
+            towerObjectDic.Remove(otherPlayer.ActorNumber);
 
         AllPlayerStateCheck(false);
     }
@@ -192,6 +199,6 @@ public class SurvivalModeState : GameState
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 서바이벌 모드의 우승자입니다!!!");
 
-        Time.timeScale = 0f;
+        //Time.timeScale = 0f;
     }
 }

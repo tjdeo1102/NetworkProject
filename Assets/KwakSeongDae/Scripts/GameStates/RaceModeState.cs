@@ -33,7 +33,7 @@ public class RaceModeState : GameState
             mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
     }
 
-    private void OnDisable()
+    public override void OnDisable()
     {
         if (PhotonNetwork.IsMasterClient
             && mainCollisionRoutine != null)
@@ -44,8 +44,9 @@ public class RaceModeState : GameState
             StopCoroutine(goalRoutine);
 
         isBlockCheckDic.Clear();
-        ReturnScene();
         Time.timeScale = 1f;
+
+        base.OnDisable();
     }
 
     private IEnumerator CollisionCheckRoutine()
@@ -137,13 +138,15 @@ public class RaceModeState : GameState
         // 방장이 강제 종료 예외 처리
         if (PhotonNetwork.IsMasterClient == false) return;
 
-        if (playerObjectDic[otherPlayer.ActorNumber].TryGetComponent<PlayerController>(out var controller))
+        if (playerObjectDic.ContainsKey(otherPlayer.ActorNumber)
+            && playerObjectDic[otherPlayer.ActorNumber].TryGetComponent<PlayerController>(out var controller))
         {
             controller.ReachGoal();
+            playerObjectDic.Remove(otherPlayer.ActorNumber);
         }
 
-        playerObjectDic.Remove(otherPlayer.ActorNumber);
-        towerObjectDic.Remove(otherPlayer.ActorNumber);
+        if (towerObjectDic.ContainsKey(otherPlayer.ActorNumber))
+            towerObjectDic.Remove(otherPlayer.ActorNumber);
     }
 
     [PunRPC]
@@ -199,6 +202,7 @@ public class RaceModeState : GameState
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 레이스 모드의 우승자입니다!!!");
 
-        Time.timeScale = 0f;
+        //타임스케일이 0일때, LoadLevel이 안됨
+        //Time.timeScale = 0f;
     }
 }

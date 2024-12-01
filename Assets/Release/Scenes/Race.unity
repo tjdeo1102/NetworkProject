@@ -371,14 +371,6 @@ PrefabInstance:
       propertyPath: sceneViewId
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6258003170614702549, guid: 94043029c9601a645a926a362b0ea98e, type: 3}
-      propertyPath: m_SortingLayer
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6258003170614702549, guid: 94043029c9601a645a926a362b0ea98e, type: 3}
-      propertyPath: m_SortingLayerID
-      value: 1918959225
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 94043029c9601a645a926a362b0ea98e, type: 3}
 --- !u!114 &1583521882 stripped

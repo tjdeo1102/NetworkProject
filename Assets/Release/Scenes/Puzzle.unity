@@ -183,6 +183,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90e64e29237db8a41a460ca2c74b5b42, type: 3}
+--- !u!114 &958568308 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6258003170563619796, guid: 90e64e29237db8a41a460ca2c74b5b42, type: 3}
+  m_PrefabInstance: {fileID: 958568307}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f75d369fe2f8b22448afd719a61b3e6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1138325896
 GameObject:
   m_ObjectHideFlags: 0
@@ -242,7 +253,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0.92734635, b: 0.5990566, a: 1}
+  m_Color: {r: 0.735849, g: 0.66391164, b: 0.35751158, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -284,7 +295,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4538821578143997904, guid: 0bffc203779fc8142a2ef5536ed7cae5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4538821578143997904, guid: 0bffc203779fc8142a2ef5536ed7cae5, type: 3}
       propertyPath: m_LocalPosition.z
@@ -322,6 +333,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Main Camera
       objectReference: {fileID: 0}
+    - target: {fileID: 4538821578143997911, guid: 0bffc203779fc8142a2ef5536ed7cae5, type: 3}
+      propertyPath: gameState
+      value: 
+      objectReference: {fileID: 958568308}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0bffc203779fc8142a2ef5536ed7cae5, type: 3}
 --- !u!1 &1864775052

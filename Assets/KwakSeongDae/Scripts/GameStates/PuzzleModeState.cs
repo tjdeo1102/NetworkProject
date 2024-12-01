@@ -45,7 +45,7 @@ public class PuzzleModeState : GameState
             mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
     }
 
-    private void OnDisable()
+    public override void OnDisable()
     {
         // 기존 작업 마무리
         if (PhotonNetwork.IsMasterClient
@@ -60,9 +60,8 @@ public class PuzzleModeState : GameState
 
         selfPlayer.GetComponent<PlayerController>().OnChangeHp -= hpAction;
 
-        ReturnScene();
-
         Time.timeScale = 1f;
+        base.OnDisable();
     }
 
     private void PlayerHPHandle(int newHP, int playerID)
@@ -183,16 +182,23 @@ public class PuzzleModeState : GameState
         // 방장이 강제 종료 예외 처리
         if (PhotonNetwork.IsMasterClient == false) return;
 
-        PlayerStateChange(otherPlayer.ActorNumber);
-        playerObjectDic.Remove(otherPlayer.ActorNumber);
-        towerObjectDic.Remove(otherPlayer.ActorNumber);
+        if (playerObjectDic.ContainsKey(otherPlayer.ActorNumber)
+            && playerObjectDic[otherPlayer.ActorNumber].TryGetComponent<PlayerController>(out var controller))
+        {
+            controller.ReachGoal();
+            playerObjectDic.Remove(otherPlayer.ActorNumber);
+        }
+
+        if (towerObjectDic.ContainsKey(otherPlayer.ActorNumber))
+            towerObjectDic.Remove(otherPlayer.ActorNumber);
 
         AllPlayerStateCheck(otherPlayer.ActorNumber);
     }
 
     private void PlayerStateChange(int playerID)
     {
-        if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
+        if (playerObjectDic.ContainsKey(playerID)
+            && playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
         {
             controller.ReachGoal();
         }
@@ -251,6 +257,6 @@ public class PuzzleModeState : GameState
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 퍼즐 모드의 우승자입니다!!!");
 
-        Time.timeScale = 0f;
+        //Time.timeScale = 0f;
     }
 }

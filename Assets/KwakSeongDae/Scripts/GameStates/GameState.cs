@@ -1,16 +1,11 @@
 using Photon.Pun;
-using Photon.Pun.Demo.PunBasics;
 using Photon.Pun.UtilityScripts;
 using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Events;
 using WebSocketSharp;
-using static UnityEditor.Progress;
 
 [RequireComponent(typeof(PhotonView))]
 public class GameState : MonoBehaviourPunCallbacks
@@ -38,15 +33,14 @@ public class GameState : MonoBehaviourPunCallbacks
     private WaitForSeconds finishDelay;
 
     // 활성화 시점에 모두 초기화
-    private void OnEnable()
+    public override void OnEnable()
     {
-        PhotonNetwork.AddCallbackTarget(this);
+        base.OnEnable();
         StartCoroutine(NetworkWaitRoutine());
     }
 
     private void OnDestroy()
     {
-        PhotonNetwork.RemoveCallbackTarget(this);
 
         // 방장만 게임 씬 정리 작업 수행
         if (!PhotonNetwork.IsMasterClient) return;
@@ -58,12 +52,16 @@ public class GameState : MonoBehaviourPunCallbacks
         towerObjectDic.Clear();
 
     }
-    protected void ReturnScene()
+    public override void OnDisable()
     {
         // 방장만 게임 씬 로드 작업 수행
         if (PhotonNetwork.IsMasterClient == false) return;
 
         PhotonNetwork.CurrentRoom.IsOpen = true;
+        print("게임이 끝났으므로 씬이 전환됩니다.");
+        PhotonNetwork.LoadLevel(returnSceneIndex);
+
+        base.OnDisable();
     }
 
     protected virtual void Init()
@@ -213,6 +211,10 @@ public class GameState : MonoBehaviourPunCallbacks
         gameObject.SetActive(false);
         // 2. 방 떠나기
         PhotonNetwork.LeaveRoom();
+    }
+
+    public override void OnLeftRoom()
+    {
         // 3. 로비 씬으로 리턴
         PhotonNetwork.LoadLevel(returnSceneIndex);
     }
