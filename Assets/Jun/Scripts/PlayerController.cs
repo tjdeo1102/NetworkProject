@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             blockMaxHeightManager = TowerTest.GetComponent<BlockMaxHeightManager>();
             GetComponent<PlayerMovement>().SetMaxHeightManager(blockMaxHeightManager);
 
+            print($"타워 x 포지션 {TowerTest.transform.position.x}");
             transform.position = new Vector2(TowerTest.transform.position.x - 5f, 
                 TowerTest.transform.position.y + 5f);
 
