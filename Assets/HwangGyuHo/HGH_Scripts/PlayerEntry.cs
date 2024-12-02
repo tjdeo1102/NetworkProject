@@ -12,7 +12,7 @@ public class PlayerEntry : MonoBehaviour
 {
     [SerializeField] TMP_Text nameText;
     [SerializeField] TMP_Text readyText;
-    [SerializeField] Button readyButton;
+    [SerializeField] Toggle readyToggle;
 
     public void SetPlayer(Player player)
     {
@@ -27,11 +27,11 @@ public class PlayerEntry : MonoBehaviour
             // 닉네임은 nameText.text로
             nameText.text = player.NickName;
         }
-        
+
         // 레디버튼은 활성화 시키고
-        readyButton.gameObject.SetActive(true);
+        readyToggle.gameObject.SetActive(true);
         // 상호작용은 주체가 자기자신, LocalPlayer일때 가능
-        readyButton.interactable = player == PhotonNetwork.LocalPlayer;
+        readyToggle.interactable = player == PhotonNetwork.LocalPlayer;
 
         if (player.GetReady())
         {
@@ -47,7 +47,7 @@ public class PlayerEntry : MonoBehaviour
     {
         readyText.text = "";
         nameText.text = "None";
-        readyButton.gameObject.SetActive(false);
+        readyToggle.gameObject.SetActive(false);
     }
 
     public void Ready()
