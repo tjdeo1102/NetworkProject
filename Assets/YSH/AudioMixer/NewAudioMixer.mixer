@@ -20,28 +20,6 @@ AudioMixerEffectController:
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
---- !u!244 &-1396282703333924773
-AudioMixerEffectController:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_EffectID: abb8c25da6003a54499f10e446ec40cc
-  m_EffectName: Pitch Shifter
-  m_MixLevel: 15b3c6d663460ba4a952586824892cca
-  m_Parameters:
-  - m_ParameterName: Pitch
-    m_GUID: 4f99a07e963d6b943b6b57f7b232a0b9
-  - m_ParameterName: FFT size
-    m_GUID: 4d155d9ce83a04d49a9b019bf1ec2f19
-  - m_ParameterName: Overlap
-    m_GUID: f04c6d841553dd742a9ec22e051d8fa2
-  - m_ParameterName: Max channels
-    m_GUID: 0122fd0b808ef8640bd7f05306ea8e6a
-  m_SendTarget: {fileID: 0}
-  m_EnableWetMix: 0
-  m_Bypass: 0
 --- !u!241 &24100000
 AudioMixerController:
   m_ObjectHideFlags: 0
@@ -97,7 +75,6 @@ AudioMixerGroupController:
   m_Send: 00000000000000000000000000000000
   m_Effects:
   - {fileID: 24400004}
-  - {fileID: 5869625753308147940}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
@@ -168,7 +145,6 @@ AudioMixerGroupController:
   m_Send: 00000000000000000000000000000000
   m_Effects:
   - {fileID: 5658197692690468737}
-  - {fileID: -1396282703333924773}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
@@ -226,28 +202,6 @@ AudioMixerEffectController:
   m_EffectName: Attenuation
   m_MixLevel: 902b97b83f685a24795e884c04cbbb19
   m_Parameters: []
-  m_SendTarget: {fileID: 0}
-  m_EnableWetMix: 0
-  m_Bypass: 0
---- !u!244 &5869625753308147940
-AudioMixerEffectController:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_EffectID: 16402abefbc945f4cb676a6ad783f4e8
-  m_EffectName: Pitch Shifter
-  m_MixLevel: 2f4caf193d1af2f4fb1e97e3187e8b18
-  m_Parameters:
-  - m_ParameterName: Pitch
-    m_GUID: d50ccb72a17620c4bb33a6404a95487a
-  - m_ParameterName: FFT size
-    m_GUID: a2d30611d5850ff4a9e3bf679c290af3
-  - m_ParameterName: Overlap
-    m_GUID: 9161a0b87af6b064dbe1b08ecb3127b9
-  - m_ParameterName: Max channels
-    m_GUID: 63277786dac48fe4e97d23da9b7bc930
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0

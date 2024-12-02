@@ -7,10 +7,13 @@ using UnityEngine.UI;
 public class UI_SoundTest : MonoBehaviour
 {
     [SerializeField] TMP_Text txtBgm;
+    [SerializeField] TMP_Text txtTempo;
     [SerializeField] Button buttonPrefab;
     [SerializeField] Button btnStop;
+    [SerializeField] Button btnReset;
     [SerializeField] RectTransform bgmContentArea;
     [SerializeField] RectTransform sfxContentArea;
+    [SerializeField] Slider tempoSlider;
 
     private void Start()
     {
@@ -19,6 +22,19 @@ public class UI_SoundTest : MonoBehaviour
             SoundManager.Instance.Stop(Enums.ESoundType.BGM);
             txtBgm.text = "Select BGM : ";
         });
+
+        btnReset.onClick.AddListener(() =>
+        {
+            tempoSlider.value = 1.0f;
+        });
+
+        tempoSlider.onValueChanged.AddListener((value) =>
+        {
+            txtTempo.text = $"Target Tempo : {value:F2}";
+            SoundManager.Instance.ChangeTempo(Enums.ESoundType.BGM, value);
+        });
+
+        txtTempo.text = $"Target Tempo : {tempoSlider.value:F2}";
     }
 
     public void AddSound(Enums.ESoundType eType, AudioClip[] sounds)
@@ -32,7 +48,7 @@ public class UI_SoundTest : MonoBehaviour
             {
                 btn.onClick.AddListener(() =>
                 {
-                    SoundManager.Instance.Play(Enums.ESoundType.BGM, clip);
+                    SoundManager.Instance.Play(Enums.ESoundType.BGM, clip, tempoSlider.value);
                     txtBgm.text = $"Select BGM : {clip.name}";
                 });
                 btn.transform.SetParent(bgmContentArea);
