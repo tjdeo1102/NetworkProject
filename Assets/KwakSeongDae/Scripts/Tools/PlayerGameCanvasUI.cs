@@ -11,7 +11,6 @@ public class PlayerGameCanvasUI : MonoBehaviour
     [SerializeField] private GameObject scorePanel;
     [SerializeField] private GameObject button;
     [SerializeField] private GameTimer gameTimer;
-    [SerializeField] private int returnSceneIndex;
 
     [Header("스코어 패널 설정")]
     [SerializeField] private GameObject scoreView;
@@ -56,9 +55,8 @@ public class PlayerGameCanvasUI : MonoBehaviour
 
     public void SetResult()
     {
-        //// 개별로 씬을 전환할 수 있도록 허용
-        //PhotonNetwork.AutomaticallySyncScene = false;
-        if (PhotonNetwork.IsMasterClient)   
+        // 방장만 떠나는 버튼 활성화
+        if (PhotonNetwork.IsMasterClient)
             button.SetActive(true);
 
         scorePanel.SetActive(true); 
@@ -67,6 +65,5 @@ public class PlayerGameCanvasUI : MonoBehaviour
     public void ReturnScene()
     {
         gameState?.SetActive(false);
-        PhotonNetwork.LoadLevel(returnSceneIndex);
     }
 }

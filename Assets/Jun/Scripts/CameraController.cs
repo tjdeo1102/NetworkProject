@@ -22,11 +22,14 @@ public class CameraController : MonoBehaviour
     {
         GetHighestTowerHeight();
         ModulateCameraZoom();
-        Debug.Log($"<color=Greed>Camera Pos: {transform.position} </color>");
+        //Debug.Log($"<color=Greed>Camera Pos: {transform.position} </color>");
     }
 
     public void GetHighestTowerHeight()
     {
+        // 예외 처리
+        if (gameState == null || gameState.towerObjectDic == null) return;
+
         // 초기화
         highestPlayerHeight = float.MinValue;
         lowestPlayerHeight = float.MaxValue;

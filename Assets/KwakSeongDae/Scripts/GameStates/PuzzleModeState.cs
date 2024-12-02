@@ -1,4 +1,6 @@
 using Photon.Pun;
+using Photon.Pun.Demo.PunBasics;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -43,7 +45,7 @@ public class PuzzleModeState : GameState
             mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
     }
 
-    private void OnDisable()
+    public override void OnDisable()
     {
         // 기존 작업 마무리
         if (PhotonNetwork.IsMasterClient
@@ -59,6 +61,7 @@ public class PuzzleModeState : GameState
         selfPlayer.GetComponent<PlayerController>().OnChangeHp -= hpAction;
 
         Time.timeScale = 1f;
+        base.OnDisable();
     }
 
     private void PlayerHPHandle(int newHP, int playerID)
@@ -150,9 +153,6 @@ public class PuzzleModeState : GameState
             // 기존에 실행중이면 무시
             if (finishRoutine == null)
                 finishRoutine = StartCoroutine(FinishRoutine(playerID));
-
-            //// 테스트: 타워 패널티 기능
-            //PlayerHPHandle(0,playerID);
         }
         else
         {
@@ -175,9 +175,30 @@ public class PuzzleModeState : GameState
         photonView.RPC("AllPlayerStateCheck", RpcTarget.MasterClient,playerID);
     }
 
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        print($"{otherPlayer.ActorNumber}가 나감");
+
+        // 방장이 강제 종료 예외 처리
+        if (PhotonNetwork.IsMasterClient == false) return;
+
+        if (playerObjectDic.ContainsKey(otherPlayer.ActorNumber)
+            && playerObjectDic[otherPlayer.ActorNumber].TryGetComponent<PlayerController>(out var controller))
+        {
+            controller.ReachGoal();
+            playerObjectDic.Remove(otherPlayer.ActorNumber);
+        }
+
+        if (towerObjectDic.ContainsKey(otherPlayer.ActorNumber))
+            towerObjectDic.Remove(otherPlayer.ActorNumber);
+
+        AllPlayerStateCheck(otherPlayer.ActorNumber);
+    }
+
     private void PlayerStateChange(int playerID)
     {
-        if (playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
+        if (playerObjectDic.ContainsKey(playerID)
+            && playerObjectDic[playerID].TryGetComponent<PlayerController>(out var controller))
         {
             controller.ReachGoal();
         }
@@ -203,7 +224,6 @@ public class PuzzleModeState : GameState
             {
                 if (playerObjectDic[playerKey].TryGetComponent<PlayerController>(out var controller))
                 {
-                    print(controller.BlockCount);
                     result.Add(new Tuple<int, int>(playerKey, controller.BlockCount));
                 }
             }
@@ -237,6 +257,6 @@ public class PuzzleModeState : GameState
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 퍼즐 모드의 우승자입니다!!!");
 
-        Time.timeScale = 0f;
+        //Time.timeScale = 0f;
     }
 }

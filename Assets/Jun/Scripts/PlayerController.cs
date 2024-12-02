@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         if (photonView.IsMine)
         {
             TowerNumber = PhotonNetwork.LocalPlayer.GetPlayerNumber();
-            print($"PlayerStart Tower{TowerNumber}");
+            //print($"PlayerStart Tower{TowerNumber}");
             GameObject TowerTest = GameObject.Find($"Tower{TowerNumber}");
             blockMaxHeightManager = TowerTest.GetComponent<BlockMaxHeightManager>();
             GetComponent<PlayerMovement>().SetMaxHeightManager(blockMaxHeightManager);
@@ -222,7 +222,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public void SetLayerAll(GameObject obj, int newLayer)
     {
         obj.layer = newLayer;
-        Debug.Log($"SetLayer{obj.name}");
+        //Debug.Log($"SetLayer{obj.name}");
         foreach (Transform child in obj.transform)
         {
             SetLayerAll(child.gameObject, newLayer);

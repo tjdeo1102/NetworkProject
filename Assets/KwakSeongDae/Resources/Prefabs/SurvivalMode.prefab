@@ -70,10 +70,11 @@ MonoBehaviour:
   startDelayTime: 3
   finishDelayTime: 3
   uiPrefab: {fileID: 7881674830855549598, guid: e8dcd9e14d6dd0148a0a9e9350a86a0d, type: 3}
+  returnSceneIndex: 3
   playerPrefabPath: SurvivalPlayer
-  towerPrefabPath: TestTower
+  towerPrefabPath: Tower
   wallPrefabPath: Wall
-  bottomLeft: {x: -9, y: -5}
-  upRight: {x: 9, y: -5}
+  bottomLeft: {x: -9, y: 0}
+  upRight: {x: 9, y: 0}
   playerWidth: 0
   winBlockCount: 3

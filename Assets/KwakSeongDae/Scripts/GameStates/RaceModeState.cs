@@ -1,4 +1,6 @@
 using Photon.Pun;
+using Photon.Pun.Demo.PunBasics;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,9 +23,9 @@ public class RaceModeState : GameState
         // Dictionary 초기 세팅
         isBlockCheckDic = new Dictionary<int, bool>();
         // 플레이어 수만큼 미리 요소 추가
-        foreach (var playerID in playerObjectDic.Keys)
+        foreach (var player in PhotonNetwork.PlayerList)
         {
-            isBlockCheckDic.Add(playerID, false);
+            isBlockCheckDic.Add(player.ActorNumber, false);
         }
 
         // 방장만 충돌 감지 루틴 실행
@@ -31,7 +33,7 @@ public class RaceModeState : GameState
             mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
     }
 
-    private void OnDisable()
+    public override void OnDisable()
     {
         if (PhotonNetwork.IsMasterClient
             && mainCollisionRoutine != null)
@@ -43,6 +45,8 @@ public class RaceModeState : GameState
 
         isBlockCheckDic.Clear();
         Time.timeScale = 1f;
+
+        base.OnDisable();
     }
 
     private IEnumerator CollisionCheckRoutine()
@@ -50,8 +54,6 @@ public class RaceModeState : GameState
         var detectorPos = (Vector2)boxDetector.transform.position + boxDetector.offset;
         var detectorScale = Vector2.Scale(boxDetector.transform.localScale, boxDetector.size);
         var delay = new WaitForSeconds(0.1f);
-        // 코루틴 실행 즉시 실행 하지 말기 => 로그가 더러워짐
-        yield return null;
 
         while (true)
         {
@@ -131,6 +133,22 @@ public class RaceModeState : GameState
         photonView.RPC("AllPlayerStateCheck", RpcTarget.MasterClient);
     }
 
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        // 방장이 강제 종료 예외 처리
+        if (PhotonNetwork.IsMasterClient == false) return;
+
+        if (playerObjectDic.ContainsKey(otherPlayer.ActorNumber)
+            && playerObjectDic[otherPlayer.ActorNumber].TryGetComponent<PlayerController>(out var controller))
+        {
+            controller.ReachGoal();
+            playerObjectDic.Remove(otherPlayer.ActorNumber);
+        }
+
+        if (towerObjectDic.ContainsKey(otherPlayer.ActorNumber))
+            towerObjectDic.Remove(otherPlayer.ActorNumber);
+    }
+
     [PunRPC]
     private void AllPlayerStateCheck()
     {
@@ -184,6 +202,7 @@ public class RaceModeState : GameState
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 레이스 모드의 우승자입니다!!!");
 
-        Time.timeScale = 0f;
+        //타임스케일이 0일때, LoadLevel이 안됨
+        //Time.timeScale = 0f;
     }
 }
