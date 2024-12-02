@@ -15,8 +15,8 @@ public class CameraController : MonoBehaviour
     [SerializeField] private GameState gameState;
     public float cameraSize;
 
-    [SerializeField] private float highestPlayerHeight = 0f;
-    [SerializeField] private float lowestPlayerHeight = 0f;
+    [SerializeField] private float highestPlayerHeight;
+    [SerializeField] private float lowestPlayerHeight;
 
     private void Update()
     {
@@ -59,7 +59,7 @@ public class CameraController : MonoBehaviour
     {
         // 높이 차이가 작으면 줌인, 크면 줌아웃
         float heightDifference = highestPlayerHeight - lowestPlayerHeight;
-        float targetZoom = Mathf.Lerp(minZoomIn, maxZoomOut, heightDifference / 10f); // 높이에 비례하여 줌
+        float targetZoom = Mathf.Lerp(minZoomIn, maxZoomOut, heightDifference / 20f); // 높이에 비례하여 줌
 
         // 현재 카메라 줌을 목표 값에 맞게 천천히 변화
         mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, targetZoom, Time.deltaTime * zoomSpeed);

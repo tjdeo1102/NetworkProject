@@ -297,6 +297,7 @@ MonoBehaviour:
     m_Bits: 8192
   BoxSize: {x: 10, y: 1}
   highestPoint: 0
+  gameState: {fileID: 0}
 --- !u!1 &429235204
 GameObject:
   m_ObjectHideFlags: 0
