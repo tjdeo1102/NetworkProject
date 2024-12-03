@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     [SerializeField] private Blocks currentBlock;
     public int BlockCount = 0;
     [SerializeField] private BlockMaxHeightManager blockMaxHeightManager;
+    public int InvisibleTime;
+    private WaitForSeconds wsInvisibleTime;
+    private Coroutine invisibleRoutine;
 
     [Header("PlayerStat")]
     [SerializeField] private int curHp;
@@ -25,6 +28,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     [Header("PlayerCheck")]
     public bool IsGoal = false;
+    [SerializeField] private bool canDie;
 
     public event System.Action<int> OnChangeBlockCount;
     public event Action OnFallenOffTheCamera;
@@ -45,6 +49,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         //네트워크 테스트용
         if (photonView.IsMine)
         {
+            wsInvisibleTime = new WaitForSeconds(InvisibleTime);
             TowerNumber = PhotonNetwork.LocalPlayer.GetPlayerNumber();
             //print($"PlayerStart Tower{TowerNumber}");
             GameObject TowerTest = GameObject.Find($"Tower{TowerNumber}");
@@ -52,7 +57,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             GetComponent<PlayerMovement>().SetMaxHeightManager(blockMaxHeightManager);
 
             print($"타워 x 포지션 {TowerTest.transform.position.x}");
-            transform.position = new Vector2(TowerTest.transform.position.x - 5f, 
+            transform.position = new Vector2(TowerTest.transform.position.x - 2.5f, 
                 TowerTest.transform.position.y + 5f);
 
             curHp = maxHp;
@@ -155,7 +160,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         UpdateHealthUI();
 
         // 플레이어의 체력이 0 이하가 되면 그 이후의 상황을 처리
-        if (curHp <= 0)
+        if (curHp <= 0
+            && canDie == true)
         {
             Die();
         }
@@ -227,13 +233,26 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             // OnBlockFallen 이벤트 호출
             OnFallenOffTheCamera?.Invoke();
 
-            //플레이어 체력처리
-            TakeDamage(1);
-
             currentBlock = null;
             // 새로운 블럭 생성
             SpawnBlock();
         }
+
+        //플레이어 체력처리
+        if (invisibleRoutine == null)
+        {
+            TakeDamage(1);
+            SoundManager.Instance.Play(Enums.ESoundType.SFX, SoundManager.SFX_DAMAGED);
+            invisibleRoutine = StartCoroutine(InvisibleRoutine());
+        }
+        blockMaxHeightManager.UpdateHighestPoint();
+    }
+    private IEnumerator InvisibleRoutine()
+    {
+        Debug.Log("<color=yellow>Invisible Start</color>");
+        yield return wsInvisibleTime;
+        invisibleRoutine = null;
+        Debug.Log("<color=yellow>Invisible End</color>");
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

@@ -15,6 +15,6 @@ EditorBuildSettings:
     path: Assets/Release/Scenes/Survival.unity
     guid: 4b158406eea43a642b2ab4ecac63a270
   - enabled: 1
-    path: Assets/KwakSeongDae/Scenes/Test/UICanvasScene.unity
-    guid: 1696a230153af9b4aad3f2e4437e9215
+    path: Assets/Release/Scenes/LobbyScene.unity
+    guid: e7801760888bc5640984f60800cdd674
   m_configObjects: {}

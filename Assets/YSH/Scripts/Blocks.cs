@@ -490,11 +490,15 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         {
             stream.SendNext(rigid.simulated);
             stream.SendNext(rigid.rotation);
+            stream.SendNext(rigid.position);
+            //print($"Sender: {rigid.position}");
         }
         else
         {
             rigid.simulated = (bool)stream.ReceiveNext();
             rigid.rotation = (float)stream.ReceiveNext();
+            //print($"Reciever: {(Vector2)(stream.ReceiveNext())}");
+            rigid.position = (Vector2)(stream.ReceiveNext());
         }
     }
 

@@ -82,9 +82,12 @@ public class GameState : MonoBehaviourPunCallbacks
 
             var playerNum = PhotonNetwork.LocalPlayer.GetPlayerNumber();
             // 타워 생성
+            print(playerSpawnPos[playerNum]);
+
             var towerObj = PhotonNetwork.Instantiate(towerPrefabPath, playerSpawnPos[playerNum], Quaternion.identity, data: new object[] { playerNum, photonView.ViewID });
             // 네트워크 플레이어 오브젝트를 생성하기
-            var playerObj = PhotonNetwork.Instantiate(playerPrefabPath, playerSpawnPos[playerNum], Quaternion.identity, data: new object[] { players[playerNum].NickName });
+            var playerPath = playerPrefabPath + playerNum.ToString();
+            var playerObj = PhotonNetwork.Instantiate(playerPath, playerSpawnPos[playerNum], Quaternion.identity, data: new object[] { players[playerNum].NickName });
 
             var playerView = playerObj.GetComponent<PhotonView>();
             var towerView = towerObj.GetComponent<PhotonView>();
@@ -171,7 +174,7 @@ public class GameState : MonoBehaviourPunCallbacks
     /// <returns></returns>
     private Vector2[] PlayerSpawnStartPositions(Vector2 bottomLeft, Vector2 upRight, int playerNum)
     {
-        if (playerNum < 1 || playerNum >= maxPlayer) return null;
+        if (playerNum < 1 || playerNum > maxPlayer) return null;
 
         // 개인 플레이어 너비 = 전체 너비 / 플레이어 수
         // 개인 플레이어 영역은 0.25단위로 움직일 수 있도록 조정
@@ -185,7 +188,7 @@ public class GameState : MonoBehaviourPunCallbacks
         // 투명 벽 수 = 플레이어 수 + 1
         // 투명 벽 위치 (x값) = bottomLeft.x + 투명 벽 인덱스 * width
         // 투명 벽 위치 (y값) = bottomLeft.y
-        for (int i = 0; i < playerNum+1; i++)
+        for (int i = 0; i < playerNum; i++)
         {
             PhotonNetwork.Instantiate(wallPrefabPath, new Vector2(bottomLeft.x + (i * playerWidth), bottomLeft.y), Quaternion.identity);
         }
