@@ -6,6 +6,7 @@ using Photon.Pun.Demo.Procedural;
 using System;
 using Random = UnityEngine.Random;
 using Photon.Pun.UtilityScripts;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviourPun, IPunObservable
 {
@@ -31,6 +32,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     public int TowerNumber = 0;
 
+    [Header("PlayerUI")]
+    public SpriteRenderer[] HeartImages;     // 하트 이미지 배열 (UI에서 할당)
+    public Sprite FullHeartSprite;  // 켜진 하트 이미지
+    public Sprite EmptyHeartSprite; // 꺼진 하트 이미지
+    public Animator Animator;
+
+    [SerializeField] private GameObject Heart;
+
     private void Start()
     {
         //네트워크 테스트용
@@ -46,6 +55,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             transform.position = new Vector2(TowerTest.transform.position.x - 5f, 
                 TowerTest.transform.position.y + 5f);
 
+            curHp = maxHp;
+            UpdateHealthUI(); // 게임 시작 시 하트 UI 초기화
 
             if (spawnPoint == null || blockPrefabs == null || blockPrefabs.Length == 0)
             {
@@ -138,7 +149,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         curHp -= damage;
         Debug.Log($"현재 체력 : {curHp}");
 
+
         OnChangeHp?.Invoke(curHp);
+
+        UpdateHealthUI();
 
         // 플레이어의 체력이 0 이하가 되면 그 이후의 상황을 처리
         if (curHp <= 0)
@@ -147,10 +161,28 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         }
     }
 
+    private void UpdateHealthUI()
+    {
+        for (int i = 0; i < HeartImages.Length; i++)
+        {
+            if (i >= curHp)
+            {
+                // 체력이 없으면 꺼진 하트 이미지 설정
+                HeartImages[i].sprite = EmptyHeartSprite;
+            }
+            else
+            {
+                //체력이 있으면 켜진 하트 이미지 설정
+                HeartImages[i].sprite = FullHeartSprite;
+            }
+        }
+    }
+
     private void Die()
     {
-        //플레이어 죽음 애니메이션 추가
-        //한명의 플레이어가 생존할 때 까지 대기
+        Animator.CrossFade("Die", 0.1f);
+        //Destroy(gameObject);
+        Heart.SetActive(false);
     }
 
     public void ReachGoal()
