@@ -471,10 +471,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 324896015626279778}
   m_HandleRect: {fileID: 325711871783202244}
   m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 1
+  m_MinValue: -80
+  m_MaxValue: 20
   m_WholeNumbers: 0
-  m_Value: 0.2
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -535,6 +535,7 @@ GameObject:
   - component: {fileID: 7114612816275200880}
   - component: {fileID: 1620765916707581429}
   - component: {fileID: 1955777746813201113}
+  - component: {fileID: 5946828426515067865}
   m_Layer: 5
   m_Name: SettingPanel
   m_TagString: Untagged
@@ -605,6 +606,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5946828426515067865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 934754150120869614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f638a7055a5b8f4f8ac69b769fd170c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BGMSlider: {fileID: 436588582718393824}
+  SFXSlider: {fileID: 7132754258807606400}
 --- !u!1 &2617119203405153216
 GameObject:
   m_ObjectHideFlags: 0
@@ -689,10 +704,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 861606990694671177}
   m_HandleRect: {fileID: 2813009451582572309}
   m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 1
+  m_MinValue: -80
+  m_MaxValue: 20
   m_WholeNumbers: 0
-  m_Value: 0.2
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
