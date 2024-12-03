@@ -42,7 +42,7 @@ public class Blocks : MonoBehaviourPun, IPunObservable
 
     private PlayerController owner;         // 자신을 생성한 Player
 
-    private Coroutine freezeRotateRoutine;
+    private Coroutine freezeRotateRoutine;  // 회전 처리를 위한 코루틴
     #endregion
 
     #region Public Field
@@ -125,23 +125,6 @@ public class Blocks : MonoBehaviourPun, IPunObservable
 
             if (freezeRotateRoutine == null)
                 freezeRotateRoutine = StartCoroutine(FreezeRotateRoutine());
-
-            //if (rigid.rotation >= targetAngle || targetAngle % 360 == 0 && rigid.rotation < 10f)
-            //{
-            //    print($"리지드:{rigid.rotation} 타겟: {targetAngle}");
-            //    rigid.rotation = targetAngle;
-
-            //    print($"리지드 변화: {rigid.rotation}");
-
-            //    // spotlight의 크기 설정
-            //    SetSpotlight();
-
-            //    // spotlight 활성화
-            //    spotlightObject.SetActive(true);
-
-            //    // 다시 회전이 가능하도록 회전 완료 처리
-            //    isRotate = false;
-            //}
         }
     }
 
@@ -352,6 +335,9 @@ public class Blocks : MonoBehaviourPun, IPunObservable
                 // 제어권을 해제
                 isControllable = false;
 
+                // 최초 충돌 시 충돌 효과음 재생
+                SoundManager.Instance.Play(Enums.ESoundType.SFX, SoundManager.SFX_FIRSTCOLLISION);
+
                 // spotlight 비활성화
                 spotlightObject.SetActive(false);
 
@@ -420,6 +406,9 @@ public class Blocks : MonoBehaviourPun, IPunObservable
 
             // 충돌 시 flag 변경 
             isControllable = false;
+
+            // 최초 충돌 시 충돌 효과음 재생
+            SoundManager.Instance.Play(Enums.ESoundType.SFX, SoundManager.SFX_FIRSTCOLLISION);
         }
 
         // 충돌체 카운트 증가

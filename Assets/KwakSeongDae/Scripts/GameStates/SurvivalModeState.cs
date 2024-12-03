@@ -19,9 +19,18 @@ public class SurvivalModeState : GameState
 
     private GameObject selfPlayer;
 
+    public override void OnEnable()
+    {
+        base.OnEnable();
+
+        // 배경음악 재생 (Survival)
+        SoundManager.Instance.Play(Enums.ESoundType.BGM, SoundManager.BGM_SURVIVAL);
+    }
+
     protected override void Init()
     {
         base.Init();
+
         DeadPlayers = new List<int>();
         var playerID = PhotonNetwork.LocalPlayer.ActorNumber;
         selfPlayer = playerObjectDic[playerID];

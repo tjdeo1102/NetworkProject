@@ -22,6 +22,14 @@ public class PuzzleModeState : GameState
     private GameObject selfPlayer;
     private Coroutine panaltyRoutine;
 
+    public override void OnEnable()
+    {
+        base.OnEnable();
+
+        // 배경음악 재생 (Puzzle)
+        SoundManager.Instance.Play(Enums.ESoundType.BGM, SoundManager.BGM_PUZZLE);
+    }
+
     protected override void Init()
     {
         base.Init();

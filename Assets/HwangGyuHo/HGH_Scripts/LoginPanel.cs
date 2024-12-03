@@ -15,6 +15,12 @@ public class LoginPanel : MonoBehaviour
     [SerializeField] NickNamePanel nickNamePanel;
     [SerializeField] VerifyPanel verifyPanel;
 
+    public void OnEnable()
+    {
+        // 배경음악 재생 (Login)
+        SoundManager.Instance.Play(Enums.ESoundType.BGM, SoundManager.BGM_LOGIN);
+    }
+
     public void Login()
     {
         string email = emailInputField.text;
