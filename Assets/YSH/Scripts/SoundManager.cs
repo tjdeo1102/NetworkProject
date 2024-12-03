@@ -126,6 +126,12 @@ public class SoundManager : Singleton<SoundManager>
         audioSource.outputAudioMixerGroup.audioMixer.SetFloat($"{playType}{MIXER_PARAM_VOLUME}", volume);
     }
 
+    public void GetVolume(ESoundType playType, out float ret)
+    {
+        AudioSource audioSource = audioSources[(int)playType];
+        audioSource.outputAudioMixerGroup.audioMixer.GetFloat($"{playType}{MIXER_PARAM_VOLUME}", out ret);
+    }
+
     public void ChangeTempo(ESoundType playType, float tempo)
     {
         AudioSource audioSource = audioSources[(int)playType];
