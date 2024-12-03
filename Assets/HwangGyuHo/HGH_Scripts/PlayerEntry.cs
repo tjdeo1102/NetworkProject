@@ -41,6 +41,8 @@ public class PlayerEntry : MonoBehaviour
         {
             readyText.text = "";
         }
+        // 토글 상태 업데이트
+        readyToggle.animator.GetComponent<Animator>().SetBool("Pressed", player.GetReady());
     }
 
     public void SetEmpty()
