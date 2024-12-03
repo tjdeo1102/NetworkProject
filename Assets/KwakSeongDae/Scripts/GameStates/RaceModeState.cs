@@ -17,9 +17,18 @@ public class RaceModeState : GameState
 
     private Coroutine mainCollisionRoutine;
 
+    public override void OnEnable()
+    {
+        base.OnEnable();
+
+        // 배경음악 재생 (Race) - 배속 0.9
+        SoundManager.Instance.Play(Enums.ESoundType.BGM, SoundManager.BGM_RACE, 0.9f);
+    }
+
     protected override void Init()
     {
         base.Init();
+
         // Dictionary 초기 세팅
         isBlockCheckDic = new Dictionary<int, bool>();
         // 플레이어 수만큼 미리 요소 추가
