@@ -7,9 +7,26 @@ using static Enums;
 
 public class SoundManager : Singleton<SoundManager>
 {
+    #region Const Field
+    // MIXER Parameters
     const string MIXER_PARAM_VOLUME = "_Volume";
     const string MIXER_PARAM_PITCH = "_Pitch";
     const string MIXER_PARAM_PITCHSHIFT = "_PitchShift";
+
+    // Audio Path
+    const string AUDIO_PATH = "Audio/";
+
+    // Clip Names
+    public const string BGM_LOGIN = "BGM_Login";
+    public const string BGM_PUZZLE = "BGM_Puzzle";
+    public const string BGM_RACE = "BGM_Race";
+    public const string BGM_SURVIVAL = "BGM_Survival";
+
+    public const string SFX_CLICK = "SFX_Click";
+    public const string SFX_COUNTING = "SFX_Counting";
+    public const string SFX_DAMAGED = "SFX_Damaged";
+    public const string SFX_FIRSTCOLLISION = "SFX_FirstCollision";
+    #endregion
 
     [SerializeField] AudioMixer mixer;
 
@@ -94,7 +111,7 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip LoadAudio(string clipName)
     {
         AudioClip clip = null;
-        clip = ResourceManager.Instance.Load<AudioClip>($"Audio/{clipName}");
+        clip = ResourceManager.Instance.Load<AudioClip>($"{AUDIO_PATH}{clipName}");
         return clip;
     }
 
