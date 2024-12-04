@@ -13,6 +13,7 @@ public class PuzzleModeState : GameState
     [Header("퍼즐 모드 설정")]
     [SerializeField] private BoxCollider2D boxDetector;
     [SerializeField] float towerHeightStep;
+    [SerializeField] float towerSpeed;
 
     private Coroutine finishRoutine;
     private Dictionary<int, bool> isBlockCheckDic;
@@ -21,6 +22,10 @@ public class PuzzleModeState : GameState
     private Action<int> hpAction;
     private GameObject selfPlayer;
     private Coroutine panaltyRoutine;
+    private Vector2 targetTowerPos;
+    private bool isMoveTower;
+
+    private int playerID;
 
     public override void OnEnable()
     {
@@ -43,17 +48,18 @@ public class PuzzleModeState : GameState
             isBlockCheckDic.Add(player.ActorNumber, false);
         }
 
-        var playerID = PhotonNetwork.LocalPlayer.ActorNumber;
+        playerID = PhotonNetwork.LocalPlayer.ActorNumber;
         selfPlayer = playerObjectDic[playerID];
-        hpAction = (newHP) => PlayerHPHandle(newHP, playerID);
-        selfPlayer.GetComponent<PlayerController>().OnChangeHp += hpAction;
+        //hpAction = (newHP) => PlayerHPHandle(newHP, playerID);
+        selfPlayer.GetComponent<PlayerController>().OnChangeHp += PlayerHPHandle;
+
 
         // 방장만 충돌 감지 루틴 실행
         if (PhotonNetwork.IsMasterClient)
             mainCollisionRoutine = StartCoroutine(CollisionCheckRoutine());
     }
 
-    public override void OnDisable()
+    private void Finish()
     {
         // 기존 작업 마무리
         if (PhotonNetwork.IsMasterClient
@@ -66,32 +72,55 @@ public class PuzzleModeState : GameState
 
         isBlockCheckDic?.Clear();
 
-        selfPlayer.GetComponent<PlayerController>().OnChangeHp -= hpAction;
-
-        Time.timeScale = 1f;
-        base.OnDisable();
+        selfPlayer.GetComponent<PlayerController>().OnChangeHp -= PlayerHPHandle;
     }
 
-    private void PlayerHPHandle(int newHP, int playerID)
+    private void PlayerHPHandle(int newHP)
     {
         print("체력 변화");
-        // 자신 이벤트인 경우에만 호출
-        if (PhotonNetwork.LocalPlayer.ActorNumber != playerID) return;
+        //// 자신 이벤트인 경우에만 호출
+        //if (PhotonNetwork.LocalPlayer.ActorNumber != playerID) return;
 
         // 블럭이 동시에 떨어질 때, 중복 호출 방지
         if (panaltyRoutine == null)
-            panaltyRoutine = StartCoroutine(PanaltyRoutine(playerID));
+            panaltyRoutine = StartCoroutine(PanaltyRoutine());
     }
 
-    private IEnumerator PanaltyRoutine(int playerID)
+    private IEnumerator PanaltyRoutine()
     {
         // 내 타워의 높이를 towerHegithStep만큼 상승
         // 해당 타워는 photonView transform이므로 자동으로 위치 동기화
-        towerObjectDic[playerID].transform.Translate(0, towerHeightStep, 0);
-
+        targetTowerPos = (Vector2)towerObjectDic[playerID].transform.position + Vector2.up * towerHeightStep;
+        towerObjectDic[playerID].GetComponent<Rigidbody2D>().velocity = Vector2.up * towerSpeed;
+        isMoveTower = true;
         // 블럭이 동시에 떨어지는 경우, 중복 실행 방지
         yield return new WaitForSeconds(1f);
         panaltyRoutine = null;
+    }
+
+    private void FixedUpdate()
+    {
+        if (towerObjectDic != null && towerObjectDic.ContainsKey(playerID))
+        {
+            if (isMoveTower)
+            {
+                var curPos = (Vector2)towerObjectDic[playerID].transform.position;
+                var dif = targetTowerPos - curPos;
+                // 거리 차이가 미미해지거나, 현재 y값이 목표치의 y값을 넘어간 경우에는 위치 조정 및 속도 0
+                if (Vector2.Distance(targetTowerPos, curPos) < 0.01f
+                    || dif.y < -0.01f)
+                {
+                    towerObjectDic[playerID].GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+                    towerObjectDic[playerID].transform.position = targetTowerPos;
+                    isMoveTower = false;
+                }
+            }
+            else
+            {
+                // 타겟 타워 위치 초기화
+                targetTowerPos = towerObjectDic[playerID].transform.position;
+            }
+        }
     }
 
     private IEnumerator CollisionCheckRoutine()
@@ -103,10 +132,10 @@ public class PuzzleModeState : GameState
         while (true)
         {
             // 1. 현재 블럭 충돌 Check를 False로 초기화
-            var playerIDs = isBlockCheckDic.Keys.ToArray();
-            foreach (var playerID in playerIDs)
+            var IDs = isBlockCheckDic.Keys.ToArray();
+            foreach (var ID in IDs)
             {
-                isBlockCheckDic[playerID] = false;
+                isBlockCheckDic[ID] = false;
             }
 
             // 2. Physics2D로 충돌체 검사
@@ -122,28 +151,47 @@ public class PuzzleModeState : GameState
                 if (block.IsControllable == false
                     && blockTrans.TryGetComponent<PhotonView>(out var view))
                 {
-                    int playerID = view.Owner.ActorNumber;
+                    int ID = view.Owner.ActorNumber;
 
-                    if (isBlockCheckDic.ContainsKey(playerID))
-                        isBlockCheckDic [playerID] = true;
+                    if (isBlockCheckDic.ContainsKey(ID))
+                        isBlockCheckDic [ID] = true;
+                }
+            }
+
+            // 타워가 충돌된 경우도 감지
+            Collider2D[] towerCols = Physics2D.OverlapBoxAll(detectorPos, detectorScale, 0, LayerMask.GetMask("Ground"));
+            foreach (var collision in towerCols)
+            {
+                var towerTrans = collision.transform.parent;
+                var tower = towerTrans.GetComponent<Tower>();
+                // 타워가 충돌된 경우는 그 즉시 종료
+                if (towerTrans.TryGetComponent<PhotonView>(out var view))
+                {
+                    int ID = view.Owner.ActorNumber;
+
+                    // 해당 PlayerStateChange은 개인적으로 동작
+                    PlayerStateChange(ID);
+
+                    // 이후, 모든 플레이어는 상태 체크 후, 집계까지 진행
+                    AllPlayerStateCheck(ID);
                 }
             }
 
             // 3. 현재 충돌된 블럭이 있는 플레이어에서 FInishRoutine을 RPC로 수행하도록 만들기
             // 충돌된 블럭이 없는 플레이어들은 기존 수행되던 루틴을 해제
-            playerIDs = isBlockCheckDic.Keys.ToArray();
-            foreach (var playerID in playerIDs)
+            IDs = isBlockCheckDic.Keys.ToArray();
+            foreach (var ID in IDs)
             {
                 // 블럭체크에 해당 플레이어가 있으면서 true인 경우 => 현재 FInish지점이 블럭이 있음
-                if (isBlockCheckDic[playerID] == true)
+                if (isBlockCheckDic[ID] == true)
                 {
-                    print($"{playerID} 블럭 감지");
-                    photonView.RPC("FinishRoutineWrap", RpcTarget.AllViaServer, playerID, true);
+                    print($"{ID} 블럭 감지");
+                    photonView.RPC("FinishRoutineWrap", RpcTarget.AllViaServer, ID, true);
                 }
                 else
                 {
                     print($"{playerID} 블럭 없음");
-                    photonView.RPC("FinishRoutineWrap", RpcTarget.AllViaServer, playerID, false);
+                    photonView.RPC("FinishRoutineWrap", RpcTarget.AllViaServer, ID, false);
                 }
             }
             yield return delay;
@@ -151,16 +199,16 @@ public class PuzzleModeState : GameState
     }
 
     [PunRPC]
-    private void FinishRoutineWrap(int playerID, bool isPlay)
+    private void FinishRoutineWrap(int ID, bool isPlay)
     {
         // 해당 플레이어에서만 루틴 실행
-        if (PhotonNetwork.LocalPlayer.ActorNumber != playerID) return;
+        if (playerID != ID) return;
 
         if (isPlay)
         {
             // 기존에 실행중이면 무시
             if (finishRoutine == null)
-                finishRoutine = StartCoroutine(FinishRoutine(playerID));
+                finishRoutine = StartCoroutine(FinishRoutine(ID));
         }
         else
         {
@@ -261,6 +309,9 @@ public class PuzzleModeState : GameState
             playerUI?.AddResultEntry(playerIDs[i], blockCounts[i]);
         }
         playerUI?.SetResult();
+
+        // 마무리 작업
+        Finish();
 
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 퍼즐 모드의 우승자입니다!!!");
