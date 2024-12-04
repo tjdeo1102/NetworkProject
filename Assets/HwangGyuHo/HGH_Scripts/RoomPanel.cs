@@ -34,7 +34,9 @@ public class RoomPanel : MonoBehaviour
         PlayerNumbering.OnPlayerNumberingChanged += UpdatePlayer;
 
         PhotonNetwork.LocalPlayer.SetReady(false);
-        
+
+        if (PhotonNetwork.IsMasterClient == true)
+            SendSelectMode1();
     }
 
     private void OnDisable()
@@ -67,20 +69,20 @@ public class RoomPanel : MonoBehaviour
     {
         gameScene = 0;
         modeText.text = $"Puzzle";
-        ColorBlock colorBlock = modeButton[0].colors;
-        colorBlock.normalColor = Color.green;
-        modeButton[0].colors = colorBlock;
+        //ColorBlock colorBlock = modeButton[0].colors;
+        //colorBlock.normalColor = Color.green;
+        //modeButton[0].colors = colorBlock;
         
         if (isMode_0 == true)
         {
             // 선택을 해제했을때 각 버튼을 누를 수 있게 활성화
             isMode_0 = false;
-            modeButton[0].interactable = true;
-            modeButton[1].interactable = true;
-            modeButton[2].interactable = true;
+            //modeButton[0].interactable = true;
+            //modeButton[1].interactable = true;
+            //modeButton[2].interactable = true;
 
-            colorBlock.normalColor = Color.white;
-            modeButton[0].colors = colorBlock;
+            //colorBlock.normalColor = Color.white;
+            //modeButton[0].colors = colorBlock;
             Debug.Log($"isMode_0: {isMode_0}, isMode_1: {isMode_1}, isMode_2: {isMode_2}");
 
             return;
@@ -88,9 +90,9 @@ public class RoomPanel : MonoBehaviour
         // 모드2, 모드3 버튼이 true 라면 모드1의 버튼을 하얗게, ismode_1,2 을 false로.
         else if (isMode_1 == true || isMode_2 == true)
         {
-            colorBlock.normalColor = Color.white;
-            modeButton[1].colors = colorBlock;
-            modeButton[2].colors = colorBlock;
+            //colorBlock.normalColor = Color.white;
+            //modeButton[1].colors = colorBlock;
+            //modeButton[2].colors = colorBlock;
 
             isMode_1 = false;
             isMode_2 = false;
@@ -98,14 +100,25 @@ public class RoomPanel : MonoBehaviour
             Debug.Log($"isMode_0: {isMode_0}, isMode_1: {isMode_1}, isMode_2: {isMode_2}");
         }
         isMode_0 = true;
-        modeButton[1].interactable = false;
-        modeButton[2].interactable = false;
+        modeButton[0].interactable = false;
+        if (PhotonNetwork.IsMasterClient == true)
+        {
+            modeButton[1].interactable = true;
+            modeButton[2].interactable = true;
+        }
+        else
+        {
+            modeButton[1].interactable = false;
+            modeButton[2].interactable = false;
+        }
     }
 
     public void SendSelectMode1()
     {
         if (photonView.IsMine == false)
             return;
+
+        if (PhotonNetwork.IsMasterClient == false) return;
 
         photonView.RPC("SelectModeButton1", RpcTarget.AllBuffered);
     }
@@ -115,6 +128,8 @@ public class RoomPanel : MonoBehaviour
         if (photonView.IsMine == false)
             return;
 
+        if (PhotonNetwork.IsMasterClient == false) return;
+
         photonView.RPC("SelectModeButton2", RpcTarget.AllBuffered);
     }
 
@@ -122,6 +137,8 @@ public class RoomPanel : MonoBehaviour
     {
         if (photonView.IsMine == false)
             return;
+
+        if (PhotonNetwork.IsMasterClient == false) return;
 
         photonView.RPC("SelectModeButton3", RpcTarget.AllBuffered);
     }
@@ -134,36 +151,45 @@ public class RoomPanel : MonoBehaviour
     {
         gameScene = 1;
         modeText.text = $"Race";
-        ColorBlock colorBlock = modeButton[1].colors;
-        colorBlock.normalColor = Color.green;
-        modeButton[1].colors = colorBlock;
+        //ColorBlock colorBlock = modeButton[1].colors;
+        //colorBlock.normalColor = Color.green;
+        //modeButton[1].colors = colorBlock;
 
         if (isMode_1 == true)
         {
             isMode_1 = false;
 
-            modeButton[0].interactable = true;
-            modeButton[1].interactable = true;
-            modeButton[2].interactable = true;
+            //modeButton[0].interactable = true;
+            //modeButton[1].interactable = true;
+            //modeButton[2].interactable = true;
 
-            colorBlock.normalColor = Color.white;
-            modeButton[1].colors = colorBlock;
+            //colorBlock.normalColor = Color.white;
+            //modeButton[1].colors = colorBlock;
             
             return;
         }
         else if (isMode_0 == true || isMode_2 == true)
         {
-            colorBlock.normalColor = Color.white;
-            modeButton[0].colors = colorBlock;
-            modeButton[2].colors = colorBlock;
+            //colorBlock.normalColor = Color.white;
+            //modeButton[0].colors = colorBlock;
+            //modeButton[2].colors = colorBlock;
 
             isMode_0 = false;
             isMode_2 = false;
         }
         isMode_1 = true;
-        modeButton[0].interactable = false;
-        modeButton[2].interactable = false;
-        
+        modeButton[1].interactable = false;
+        if (PhotonNetwork.IsMasterClient == true)
+        {
+            modeButton[0].interactable = true;
+            modeButton[2].interactable = true;
+        }
+        else
+        {
+            modeButton[0].interactable = false;
+            modeButton[2].interactable = false;
+        }
+
         Debug.Log($"isMode_0: {isMode_0}, isMode_1: {isMode_1}, isMode_2: {isMode_2}");
     }
 
@@ -175,36 +201,45 @@ public class RoomPanel : MonoBehaviour
     {
         gameScene = 2;
         modeText.text = $"Surviver";
-        ColorBlock colorBlock = modeButton[2].colors;
-        colorBlock.normalColor = Color.green;
-        modeButton[2].colors = colorBlock;
+        //ColorBlock colorBlock = modeButton[2].colors;
+        //colorBlock.normalColor = Color.green;
+        //modeButton[2].colors = colorBlock;
 
         if (isMode_2 == true)
         {
             isMode_2 = false;
-            modeButton[0].interactable = true;
-            modeButton[1].interactable = true;
-            modeButton[2].interactable = true;
+            //modeButton[0].interactable = true;
+            //modeButton[1].interactable = true;
+            //modeButton[2].interactable = true;
 
-            colorBlock.normalColor = Color.white;
+            //colorBlock.normalColor = Color.white;
 
-            modeButton[2].colors = colorBlock;
+            //modeButton[2].colors = colorBlock;
             return;
         }
         else if (isMode_0 == true || isMode_1 == true)
         {
-            colorBlock.normalColor = Color.white;
-            modeButton[0].colors = colorBlock;
-            modeButton[1].colors = colorBlock;
+            //colorBlock.normalColor = Color.white;
+            //modeButton[0].colors = colorBlock;
+            //modeButton[1].colors = colorBlock;
 
             isMode_1 = false;
             isMode_0 = false;
         }
 
         isMode_2 = true;
-        modeButton[0].interactable = false;
-        modeButton[1].interactable = false;
-        
+        modeButton[2].interactable = true;
+        if (PhotonNetwork.IsMasterClient == true)
+        {
+            modeButton[0].interactable = true;
+            modeButton[1].interactable = true;
+        }
+        else
+        {
+            modeButton[0].interactable = false;
+            modeButton[1].interactable = false;
+        }
+
         Debug.Log($"isMode_0: {isMode_0}, isMode_1: {isMode_1}, isMode_2: {isMode_2}");
     }
 
@@ -234,10 +269,10 @@ public class RoomPanel : MonoBehaviour
         else
         {
             startButton.interactable = false;
-            for (int i = 0; i < modeButton.Length; i++)
-            {
-                modeButton[i].gameObject.SetActive(false);
-            }
+            //for (int i = 0; i < modeButton.Length; i++)
+            //{
+            //    modeButton[i].gameObject.SetActive(false);
+            //}
         }
     }
 
