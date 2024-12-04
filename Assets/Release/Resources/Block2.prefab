@@ -486,6 +486,7 @@ MonoBehaviour:
     m_Bits: 12352
   rotateSpeed: 25
   blockSize: {x: 1, y: 1}
+  panaltyDrag: 100
 --- !u!50 &7382279234303379018
 Rigidbody2D:
   serializedVersion: 4
@@ -528,7 +529,6 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 7382279234303379019}
   - {fileID: 4413704574581602890}
-  - {fileID: 0}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

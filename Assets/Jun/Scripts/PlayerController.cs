@@ -34,6 +34,9 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
     public event Action OnFallenOffTheCamera;
     public event Action OnPlayerDone;
 
+    // test
+    public event Action<bool> OnProcessPanalty;
+
     public int TowerNumber = 0;
 
     [Header("PlayerUI")]
@@ -88,6 +91,12 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         {
             PlayerInput();
         }
+    }
+
+    // test
+    public void ProcessPanalty(bool bProcessing)
+    {
+        OnProcessPanalty?.Invoke(bProcessing);
     }
 
     private void PlayerInput()

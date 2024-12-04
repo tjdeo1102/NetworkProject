@@ -51,6 +51,7 @@ MonoBehaviour:
   - SelectModeButton1
   - SelectModeButton2
   - SelectModeButton3
+  - ChangeDragRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

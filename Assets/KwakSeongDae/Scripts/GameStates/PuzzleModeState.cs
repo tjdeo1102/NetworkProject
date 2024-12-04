@@ -92,6 +92,8 @@ public class PuzzleModeState : GameState
         // 해당 타워는 photonView transform이므로 자동으로 위치 동기화
         targetTowerPos = (Vector2)towerObjectDic[playerID].transform.position + Vector2.up * towerHeightStep;
         towerObjectDic[playerID].GetComponent<Rigidbody2D>().velocity = Vector2.up * towerSpeed;
+        // 플레이어에 패널티 처리 알림
+        playerObjectDic[playerID].GetComponent<PlayerController>().ProcessPanalty(true);
         isMoveTower = true;
         // 블럭이 동시에 떨어지는 경우, 중복 실행 방지
         yield return new WaitForSeconds(1f);
@@ -111,14 +113,18 @@ public class PuzzleModeState : GameState
                     || dif.y < -0.01f)
                 {
                     towerObjectDic[playerID].GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-                    towerObjectDic[playerID].transform.position = targetTowerPos;
+                    //towerObjectDic[playerID].transform.position = targetTowerPos;
+                    towerObjectDic[playerID].GetComponent<Rigidbody2D>().position = targetTowerPos;
                     isMoveTower = false;
+                    // 플레이어에 패널티 처리 종료 알림
+                    playerObjectDic[playerID].GetComponent<PlayerController>().ProcessPanalty(false);
                 }
             }
             else
             {
                 // 타겟 타워 위치 초기화
-                targetTowerPos = towerObjectDic[playerID].transform.position;
+                //targetTowerPos = towerObjectDic[playerID].transform.position;
+                targetTowerPos = towerObjectDic[playerID].GetComponent<Rigidbody2D>().position;
             }
         }
     }

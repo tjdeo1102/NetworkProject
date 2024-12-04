@@ -18,7 +18,8 @@ public class Blocks : MonoBehaviourPun, IPunObservable
     [SerializeField] private GameObject[] tiles;            // 블럭 타일들
     [SerializeField] private LayerMask castLayer;           // 레이캐스트용 layermask
     [SerializeField] private float rotateSpeed;             // 회전 속도
-    [SerializeField] private Vector2 blockSize;             // 블럭 사이즈 (타일 하나당 0.5로 계산)
+    [SerializeField] private Vector2 blockSize;             // 블럭 사이즈 (타일 하나당 0.5로 계산)  
+    [SerializeField] private float panaltyDrag;             // 타워 상승 시 적용할 Drag
     #endregion
 
     #region Private Field
@@ -36,6 +37,7 @@ public class Blocks : MonoBehaviourPun, IPunObservable
     private bool isVertical = false;        // 회전 상태를 확인하기 위한 flag
 
     private int collisionCount = 0;         // 현재 블럭과 충돌해있는 충돌체의 수 (exit 판정에 사용)
+    private float normalDrag;               // 일반 상태의 Drag 수치 (최초 설정된 Drag) 
 
     private Coroutine moveRoutine;          // 이동 시 사용할 코루틴
     private WaitForSeconds wsMoveDelay;     // 이동 코루틴에서 활용할 WaitForSeconds 객체
@@ -59,6 +61,9 @@ public class Blocks : MonoBehaviourPun, IPunObservable
     {
         // 컴포넌트 참조
         rigid = GetComponent<Rigidbody2D>();
+
+        // 최초 Drag 저장
+        normalDrag = rigid.drag;
     }
 
     private void Start()
@@ -144,12 +149,39 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         freezeRotateRoutine = null;
     }
 
+    public void ChangeDrag(bool bPanalty)
+    {
+        photonView.RPC("ChangeDragRPC", RpcTarget.All, bPanalty);
+    }
+
+    [PunRPC]
+    private void ChangeDragRPC(bool bPanalty)
+    {
+        // 타워 상승 진행 시
+        if (bPanalty)
+        {
+            // 안착해있는 블럭인 경우
+            if (isEntered)
+            {
+                rigid.drag = panaltyDrag;
+                rigid.velocity = Vector2.zero;
+            }
+        }
+        // 타워 상승 종료 시
+        else
+        {
+            rigid.drag = normalDrag;
+            rigid.velocity = Vector2.zero;
+        }
+    }
+
     public void SetOwner(PlayerController player)
     {
         // owner 참조
         owner = player;
         // 이벤트 구독
         owner.OnPlayerDone += Freeze;
+        owner.OnProcessPanalty += ChangeDrag;
     }
 
     // Player의 빠른 하강 조작을 위한 Interface
@@ -418,8 +450,6 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         if (isEntered)
             return;
 
-        //Debug.Log($"{gameObject.name} entered");
-
         // enter flag set
         isEntered = true;
 
@@ -447,8 +477,6 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         if (collisionCount > 0)
             return;
 
-        //Debug.Log($"{gameObject.name} exited");
-
         // enter flag set
         isEntered = false;
 
@@ -461,9 +489,13 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         // 블럭 추락 여부 확인
         if (other.CompareTag("FallTrigger"))
         {
+            if (owner != null)
+            {
+                owner.OnPlayerDone -= Freeze;
+                owner.OnProcessPanalty -= ChangeDrag;
+            }
             // 이벤트 발생
             OnBlockFallen?.Invoke(this);
-            if (owner != null) owner.OnPlayerDone -= Freeze;
             // 바로 삭제
             Destroy(gameObject);
         }
@@ -491,25 +523,12 @@ public class Blocks : MonoBehaviourPun, IPunObservable
             stream.SendNext(rigid.simulated);
             stream.SendNext(rigid.rotation);
             stream.SendNext(rigid.position);
-            //print($"Sender: {rigid.position}");
         }
         else
         {
             rigid.simulated = (bool)stream.ReceiveNext();
             rigid.rotation = (float)stream.ReceiveNext();
-            //print($"Reciever: {(Vector2)(stream.ReceiveNext())}");
             rigid.position = (Vector2)(stream.ReceiveNext());
         }
     }
-
-    //private void LateUpdate()
-    //{
-    //    // 회전하는 경우에는 x값 위치 보정
-    //    if (isRotate)
-    //    {
-    //        var x = Mathf.Round(rigid.position.x / 0.25f) * 0.25f;
-    //        rigid.position = new Vector2(x, rigid.position.y);
-    //        print($"회전 후, 위치 조정{x}");
-    //    }
-    //}
 }

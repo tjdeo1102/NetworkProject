@@ -150,6 +150,7 @@ MonoBehaviour:
     m_Bits: 12352
   rotateSpeed: 25
   blockSize: {x: 1.5, y: 1}
+  panaltyDrag: 100
 --- !u!50 &5564063098573158911
 Rigidbody2D:
   serializedVersion: 4
