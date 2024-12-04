@@ -49,7 +49,7 @@ MonoBehaviour:
   startDelayTime: 3
   finishDelayTime: 3
   uiPrefab: {fileID: 7881674830855549598, guid: e8dcd9e14d6dd0148a0a9e9350a86a0d, type: 3}
-  returnSceneIndex: 3
+  returnSceneIndex: 0
   playerPrefabPath: Players/Player
   towerPrefabPath: Tower
   wallPrefabPath: Wall
@@ -60,7 +60,7 @@ MonoBehaviour:
   playerWidth: 0
   boxDetector: {fileID: 6258003170614702548}
   towerHeightStep: 1
-  towerSpeed: 0
+  towerSpeed: 10
 --- !u!114 &6258003170563619797
 MonoBehaviour:
   m_ObjectHideFlags: 0

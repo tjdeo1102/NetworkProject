@@ -67,7 +67,7 @@ public class RoomPanel : MonoBehaviour
     [PunRPC]
     public void SelectModeButton1()
     {
-        gameScene = 0;
+        gameScene = 1;
         modeText.text = $"Puzzle";
         //ColorBlock colorBlock = modeButton[0].colors;
         //colorBlock.normalColor = Color.green;
@@ -149,7 +149,7 @@ public class RoomPanel : MonoBehaviour
     [PunRPC]
     public void SelectModeButton2()
     {
-        gameScene = 1;
+        gameScene = 2;
         modeText.text = $"Race";
         //ColorBlock colorBlock = modeButton[1].colors;
         //colorBlock.normalColor = Color.green;
@@ -199,7 +199,7 @@ public class RoomPanel : MonoBehaviour
     [PunRPC]
     public void SelectModeButton3()
     {
-        gameScene = 2;
+        gameScene = 3;
         modeText.text = $"Surviver";
         //ColorBlock colorBlock = modeButton[2].colors;
         //colorBlock.normalColor = Color.green;
