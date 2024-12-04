@@ -151,6 +151,12 @@ public class Blocks : MonoBehaviourPun, IPunObservable
 
     public void ChangeDrag(bool bPanalty)
     {
+        photonView.RPC("ChangeDragRPC", RpcTarget.All, bPanalty);
+    }
+
+    [PunRPC]
+    private void ChangeDragRPC(bool bPanalty)
+    {
         // 타워 상승 진행 시
         if (bPanalty)
         {
@@ -483,20 +489,15 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         // 블럭 추락 여부 확인
         if (other.CompareTag("FallTrigger"))
         {
+            if (owner != null)
+            {
+                owner.OnPlayerDone -= Freeze;
+                owner.OnProcessPanalty -= ChangeDrag;
+            }
             // 이벤트 발생
             OnBlockFallen?.Invoke(this);
             // 바로 삭제
             Destroy(gameObject);
-        }
-    }
-
-    // 이벤트 해제
-    private void OnDestroy()
-    {
-        if (owner != null)
-        {
-            owner.OnPlayerDone -= Freeze;
-            owner.OnProcessPanalty -= ChangeDrag;
         }
     }
 
@@ -522,14 +523,12 @@ public class Blocks : MonoBehaviourPun, IPunObservable
             stream.SendNext(rigid.simulated);
             stream.SendNext(rigid.rotation);
             stream.SendNext(rigid.position);
-            stream.SendNext(rigid.drag);
         }
         else
         {
             rigid.simulated = (bool)stream.ReceiveNext();
             rigid.rotation = (float)stream.ReceiveNext();
             rigid.position = (Vector2)(stream.ReceiveNext());
-            rigid.drag = (float)stream.ReceiveNext();
         }
     }
 }

@@ -113,7 +113,8 @@ public class PuzzleModeState : GameState
                     || dif.y < -0.01f)
                 {
                     towerObjectDic[playerID].GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-                    towerObjectDic[playerID].transform.position = targetTowerPos;
+                    //towerObjectDic[playerID].transform.position = targetTowerPos;
+                    towerObjectDic[playerID].GetComponent<Rigidbody2D>().position = targetTowerPos;
                     isMoveTower = false;
                     // 플레이어에 패널티 처리 종료 알림
                     playerObjectDic[playerID].GetComponent<PlayerController>().ProcessPanalty(false);
@@ -122,7 +123,8 @@ public class PuzzleModeState : GameState
             else
             {
                 // 타겟 타워 위치 초기화
-                targetTowerPos = towerObjectDic[playerID].transform.position;
+                //targetTowerPos = towerObjectDic[playerID].transform.position;
+                targetTowerPos = towerObjectDic[playerID].GetComponent<Rigidbody2D>().position;
             }
         }
     }
