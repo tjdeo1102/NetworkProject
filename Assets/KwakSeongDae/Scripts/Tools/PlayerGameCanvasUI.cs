@@ -1,6 +1,7 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
@@ -15,9 +16,35 @@ public class PlayerGameCanvasUI : MonoBehaviour
     [Header("스코어 패널 설정")]
     [SerializeField] private GameObject scoreView;
     [SerializeField] private GameObject resultEntryPrefab;
+    public GameObject survivalBlockCount;
+    [SerializeField] private TextMeshProUGUI blockCountText;
 
 
     [HideInInspector]public GameObject gameState;
+
+    private SurvivalModeState survivalMode;
+
+    private void Start()
+    {
+        if (gameState.TryGetComponent<SurvivalModeState>(out survivalMode))
+        {
+            BlockFallenHandle(0);
+            survivalMode.selfPlayer.GetComponent<PlayerController>().OnChangeBlockCount += BlockFallenHandle;
+            survivalBlockCount.SetActive(true);
+        }
+        else
+        {
+            survivalBlockCount.SetActive(false);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (survivalMode != null)
+        {
+            survivalMode.selfPlayer.GetComponent<PlayerController>().OnChangeBlockCount -= BlockFallenHandle;
+        }
+    }
 
     public void AddResultEntry(int playerID, int score)
     {
@@ -36,6 +63,12 @@ public class PlayerGameCanvasUI : MonoBehaviour
         {
             entry.SetEntry(playerID.ToString(), score);
         }
+    }
+
+    // (서바이벌) 타워에 남은 블럭 개수 체크 
+    private void BlockFallenHandle(int newBlockCount)
+    {
+        blockCountText?.SetText((survivalMode.winBlockCount - newBlockCount).ToString());
     }
 
     public void SetTimer(float time)

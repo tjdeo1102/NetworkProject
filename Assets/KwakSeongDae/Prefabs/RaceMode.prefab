@@ -186,7 +186,9 @@ MonoBehaviour:
   playerPrefabPath: Players/Player
   towerPrefabPath: Tower
   wallPrefabPath: Wall
-  bottomLeft: {x: -9, y: 0}
-  upRight: {x: 9, y: 0}
+  maxLeft: -18
+  maxRight: 18
+  playerSpaceMaxWidth: 9
+  initY: 0
   playerWidth: 0
   boxDetector: {fileID: 740638737441513913}

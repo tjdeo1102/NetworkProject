@@ -9,7 +9,7 @@ using UnityEngine;
 public class SurvivalModeState : GameState
 {
     [Header("서바이벌 모드 설정")]
-    [SerializeField] int winBlockCount;
+    public int winBlockCount;
 
     private Coroutine winRoutine;
     private Coroutine deadRoutine;
@@ -17,7 +17,7 @@ public class SurvivalModeState : GameState
     private Action<int> blockCountAction;
     private List<int> DeadPlayers;
 
-    private GameObject selfPlayer;
+    [HideInInspector] public GameObject selfPlayer;
 
     public override void OnEnable()
     {
@@ -205,9 +205,12 @@ public class SurvivalModeState : GameState
         }
         playerUI?.SetResult();
 
+        // 각 이벤트 등록 해제
+        var controller = selfPlayer.GetComponent<PlayerController>();
+        controller.OnChangeHp -= hpAction;
+        controller.OnChangeBlockCount -= blockCountAction;
+
         print($"모든 플레이어의 블럭 개수 집계 및 게임 종료");
         print($"{playerIDs[0]}이 서바이벌 모드의 우승자입니다!!!");
-
-        //Time.timeScale = 0f;
     }
 }

@@ -22,8 +22,10 @@ public class GameState : MonoBehaviourPunCallbacks
     [SerializeField] private string playerPrefabPath;
     [SerializeField] private string towerPrefabPath;
     [SerializeField] private string wallPrefabPath;
-    [SerializeField] private Vector2 bottomLeft;            // 스폰 가능 지역의 좌하단 좌표
-    [SerializeField] private Vector2 upRight;               // 스폰 가능 지역의 우상단 좌표
+    [SerializeField] private float maxLeft;                // 스폰 가능 지역의 좌하단 좌표
+    [SerializeField] private float maxRight;               // 스폰 가능 지역의 우상단 좌표
+    [SerializeField] private float playerSpaceMaxWidth;    // 플레이어 개인 영역 최대치 제한
+    [SerializeField] private float initY;
 
     [HideInInspector] public Dictionary<int, GameObject> playerObjectDic;
     [HideInInspector] public Dictionary<int, GameObject> towerObjectDic;
@@ -77,7 +79,7 @@ public class GameState : MonoBehaviourPunCallbacks
             && uiPrefab != null)
         {
             var players = PhotonNetwork.PlayerList;
-            var playerSpawnPos = PlayerSpawnStartPositions(bottomLeft, upRight, players.Length);
+            var playerSpawnPos = PlayerSpawnStartPositions(initY, players.Length);
             print($"플레이어 수: {players.Length}"); 
 
             var playerNum = PhotonNetwork.LocalPlayer.GetPlayerNumber();
@@ -172,25 +174,29 @@ public class GameState : MonoBehaviourPunCallbacks
     /// <param name="upRight"> 맵 우상단 위치</param>
     /// <param name="playerNum"> 총 플레이어 수</param>
     /// <returns></returns>
-    private Vector2[] PlayerSpawnStartPositions(Vector2 bottomLeft, Vector2 upRight, int playerNum)
+    private Vector2[] PlayerSpawnStartPositions(float initY,int playerNum)
     {
         if (playerNum < 1 || playerNum > maxPlayer) return null;
 
         // 개인 플레이어 너비 = 전체 너비 / 플레이어 수
         // 개인 플레이어 영역은 0.25단위로 움직일 수 있도록 조정
-        var rawWidth = MathF.Abs(upRight.x - bottomLeft.x) / playerNum;
+        var rawWidth = MathF.Abs(maxRight - maxLeft) / playerNum;
         playerWidth = Mathf.Ceil(rawWidth / 0.5f) * 0.5f;
+
+        // 플레이어 영역은 최대 개인 너비를 벗어나지 못하도록 설정
+        if (playerWidth > playerSpaceMaxWidth) playerWidth = playerSpaceMaxWidth;
+
         // 조정된 width에 따라, 좌하단 좌표 수정, 
-        var widthRemain = MathF.Abs(upRight.x - bottomLeft.x) - (playerWidth * playerNum);
+        var widthRemain = MathF.Abs(maxRight - maxLeft) - (playerWidth * playerNum);
         // 가운데 정렬
-        bottomLeft = new Vector2(bottomLeft.x + widthRemain / 2, bottomLeft.y);
+        var bottomLeft = new Vector2(maxLeft + widthRemain / 2, initY);
 
         // 투명 벽 수 = 플레이어 수 + 1
         // 투명 벽 위치 (x값) = bottomLeft.x + 투명 벽 인덱스 * width
         // 투명 벽 위치 (y값) = bottomLeft.y
-        for (int i = 0; i < playerNum; i++)
+        for (int i = 0; i < playerNum + 1; i++)
         {
-            PhotonNetwork.Instantiate(wallPrefabPath, new Vector2(bottomLeft.x + (i * playerWidth), bottomLeft.y), Quaternion.identity);
+            PhotonNetwork.Instantiate(wallPrefabPath, new Vector2(bottomLeft.x + (i * playerWidth), initY), Quaternion.identity);
         }
 
         // 플레이어 스폰 위치 (x값) =
@@ -200,7 +206,7 @@ public class GameState : MonoBehaviourPunCallbacks
         var playerPositions = new Vector2[playerNum];
         for (int i = 0; i < playerPositions.Length; i++)
         {
-            playerPositions[i] = new Vector2((bottomLeft.x + playerWidth * i) + (playerWidth / 2), bottomLeft.y);
+            playerPositions[i] = new Vector2((bottomLeft.x + playerWidth * i) + (playerWidth / 2), initY);
         }
         return playerPositions;
     }
