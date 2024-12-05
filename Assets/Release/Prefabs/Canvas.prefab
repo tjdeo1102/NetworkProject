@@ -424,7 +424,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &998565369882521351
 RectTransform:
   m_ObjectHideFlags: 0
@@ -16754,14 +16754,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 1, b: 0.103330135, a: 1}
+  m_Color: {r: 0.51023495, g: 0.9245283, b: 0.5524767, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 151eef41825813d4f96dd0d4c8ecdc2f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 86f917da3ee3c69479ab74f43290683f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -17169,7 +17169,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &8547708471778463987
 RectTransform:
   m_ObjectHideFlags: 0
@@ -19813,8 +19813,8 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 0
-  m_InputType: 0
+  m_ContentType: 7
+  m_InputType: 2
   m_AsteriskChar: 42
   m_KeyboardType: 0
   m_LineType: 0
@@ -20405,8 +20405,8 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 0
-  m_InputType: 0
+  m_ContentType: 7
+  m_InputType: 2
   m_AsteriskChar: 42
   m_KeyboardType: 0
   m_LineType: 0
@@ -20497,23 +20497,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114203681368998942, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114203681368998942, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 888793251168136112}
+      objectReference: {fileID: 1874062793}
     - target: {fileID: 114203681368998942, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 114203681368998942, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SetActive
+      value: ButtonWrapper
       objectReference: {fileID: 0}
     - target: {fileID: 114203681368998942, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
+      value: ButtonCoroutine, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 114203681368998942, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -20534,18 +20534,18 @@ PrefabInstance:
     - target: {fileID: 114340747883980198, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1575196744}
     - target: {fileID: 114340747883980198, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 114340747883980198, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SignUp
+      value: ButtonWrapper
       objectReference: {fileID: 0}
     - target: {fileID: 114340747883980198, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: SignUpPanel, Assembly-CSharp
+      value: ButtonCoroutine, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 114340747883980198, guid: 958d908895575974d9da23987ab36d94, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -20679,6 +20679,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 237ddfb810bcf1d43aa8dd568bcf0ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1874062793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888843717425684650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c4125bdeabdde4a8ccc839bc2e0e96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 888793251168136112}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  animator: {fileID: 0}
 --- !u!1 &888871442937677302 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1170415335359010, guid: 958d908895575974d9da23987ab36d94, type: 3}
@@ -20696,6 +20724,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 237ddfb810bcf1d43aa8dd568bcf0ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1575196744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888871442937677302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c4125bdeabdde4a8ccc839bc2e0e96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6835836396416558767}
+        m_TargetAssemblyTypeName: SignUpPanel, Assembly-CSharp
+        m_MethodName: SignUp
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  animator: {fileID: 0}
 --- !u!224 &1103189846647201770 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224791788001335358, guid: 958d908895575974d9da23987ab36d94, type: 3}
@@ -21312,23 +21368,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114766721766862886, guid: 820d0ac9c16b3ef4380dfc8c6e7c3bff, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114766721766862886, guid: 820d0ac9c16b3ef4380dfc8c6e7c3bff, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 322666651004779146}
+      objectReference: {fileID: 1651813329}
     - target: {fileID: 114766721766862886, guid: 820d0ac9c16b3ef4380dfc8c6e7c3bff, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 114766721766862886, guid: 820d0ac9c16b3ef4380dfc8c6e7c3bff, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SetActive
+      value: ButtonWrapper
       objectReference: {fileID: 0}
     - target: {fileID: 114766721766862886, guid: 820d0ac9c16b3ef4380dfc8c6e7c3bff, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
+      value: ButtonCoroutine, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 114766721766862886, guid: 820d0ac9c16b3ef4380dfc8c6e7c3bff, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -21449,6 +21505,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 237ddfb810bcf1d43aa8dd568bcf0ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1651813329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5224216408910641517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c4125bdeabdde4a8ccc839bc2e0e96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 322666651004779146}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  animator: {fileID: 0}
 --- !u!224 &5447588891314583703 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224315927802686028, guid: 820d0ac9c16b3ef4380dfc8c6e7c3bff, type: 3}
