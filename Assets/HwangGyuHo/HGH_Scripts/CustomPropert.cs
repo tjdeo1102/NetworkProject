@@ -8,6 +8,7 @@ using PhotonHashtable = ExitGames.Client.Photon.Hashtable;
 public static class CustomPropert
 {
     public const string READY = "Ready";
+    public const string MODE = "Mode";
 
     private static PhotonHashtable customProperty = new PhotonHashtable();
     // 확장메소드
@@ -16,6 +17,13 @@ public static class CustomPropert
         customProperty.Clear();
         customProperty[READY] = ready;
         player.SetCustomProperties(customProperty);
+    }
+
+    public static void SetMode(this Room room, int mode)
+    {
+        customProperty.Clear();
+        customProperty[MODE] = mode;
+        room.SetCustomProperties(customProperty);
     }
 
     // 가져오는 방법
@@ -30,6 +38,21 @@ public static class CustomPropert
         else
         {
             return false;
+        }
+
+    }
+
+    public static int GetMode(this Room room)
+    {
+        PhotonHashtable customProperty = room.CustomProperties;
+
+        if (customProperty.ContainsKey(MODE))
+        {
+            return (int)customProperty[MODE];
+        }
+        else
+        {
+            return 0;
         }
 
     }

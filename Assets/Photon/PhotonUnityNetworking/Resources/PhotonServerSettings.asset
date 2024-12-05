@@ -52,6 +52,11 @@ MonoBehaviour:
   - SelectModeButton2
   - SelectModeButton3
   - ChangeDragRPC
+  - Die
+  - UpdateHealthUI
+  - TakeDamage
+  - SelectModeButton
+  - ModeSelect
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

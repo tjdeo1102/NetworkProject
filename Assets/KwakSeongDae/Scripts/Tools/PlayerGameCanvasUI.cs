@@ -52,7 +52,10 @@ public class PlayerGameCanvasUI : MonoBehaviour
         var obj = Instantiate(resultEntryPrefab,scoreView.transform);
         if (obj.TryGetComponent<ResultScoreEntry>(out var entry))
         {
-            entry.SetEntry(playerID.ToString(), score);
+            foreach (var player in PhotonNetwork.PlayerList) {
+                if (player.ActorNumber == playerID)
+                    entry.SetEntry(player.NickName, score);
+            }
         }
     }
     public void AddResultEntry(int playerID, float score)
@@ -61,7 +64,11 @@ public class PlayerGameCanvasUI : MonoBehaviour
         var obj = Instantiate(resultEntryPrefab, scoreView.transform);
         if (obj.TryGetComponent<ResultScoreEntry>(out var entry))
         {
-            entry.SetEntry(playerID.ToString(), score);
+            foreach (var player in PhotonNetwork.PlayerList)
+            {
+                if (player.ActorNumber == playerID)
+                    entry.SetEntry(player.NickName, score);
+            }
         }
     }
 

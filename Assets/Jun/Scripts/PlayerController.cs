@@ -49,6 +49,8 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
     private void Start()
     {
+        curHp = maxHp;
+
         //네트워크 테스트용
         if (photonView.IsMine)
         {
@@ -63,7 +65,6 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
             transform.position = new Vector2(TowerTest.transform.position.x - 2.5f, 
                 TowerTest.transform.position.y + 5f);
 
-            curHp = maxHp;
             UpdateHealthUI(); // 게임 시작 시 하트 UI 초기화
 
             if (spawnPoint == null || blockPrefabs == null || blockPrefabs.Length == 0)
@@ -156,9 +157,10 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         //이벤트 해제 어디서?
     }
 
+    [PunRPC]
     public void TakeDamage(int damage)
     {
-        if (photonView.IsMine == false) return;
+        //if (photonView.IsMine == false) return;
 
         curHp -= damage;
         Debug.Log($"현재 체력 : {curHp}");
@@ -166,12 +168,14 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
 
         OnChangeHp?.Invoke(curHp);
 
+        //photonView.RPC("UpdateHealthUI", RpcTarget.All);
         UpdateHealthUI();
 
         // 플레이어의 체력이 0 이하가 되면 그 이후의 상황을 처리
         if (curHp <= 0
             && canDie == true)
         {
+            //photonView.RPC("Die", RpcTarget.All);
             Die();
         }
     }
@@ -250,7 +254,7 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         //플레이어 체력처리
         if (invisibleRoutine == null)
         {
-            TakeDamage(1);
+            photonView.RPC("TakeDamage", RpcTarget.All, 1);
             SoundManager.Instance.Play(Enums.ESoundType.SFX, SoundManager.SFX_DAMAGED);
             invisibleRoutine = StartCoroutine(InvisibleRoutine());
         }
@@ -270,13 +274,13 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         {
             stream.SendNext(BlockCount);
             stream.SendNext(IsGoal);
-            stream.SendNext(curHp);
+            //stream.SendNext(curHp);
         }
         else
         {
             BlockCount = (int)stream.ReceiveNext();
             IsGoal = (bool)stream.ReceiveNext();
-            curHp = (int)stream.ReceiveNext();
+            //curHp = (int)stream.ReceiveNext();
         }
     }
 
