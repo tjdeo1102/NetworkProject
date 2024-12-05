@@ -59,14 +59,14 @@ public class LoginPanel : MonoBehaviour
         Debug.Log($"Email verified : {user.IsEmailVerified}");
         Debug.Log($"User ID : {user.UserId}");
 
-        if(user.IsEmailVerified == false)
-        {
-            // 이메일 인증 진행
-            verifyPanel.gameObject.SetActive(true);
+        //if(user.IsEmailVerified == false)
+        //{
+        //    // 이메일 인증 진행
+        //    verifyPanel.gameObject.SetActive(true);
 
 
-        }
-        else if (user.DisplayName == "")
+        //}
+        if (user.DisplayName == "")
         {
             // 닉네임 설정 단계
             nickNamePanel.gameObject.SetActive(true);

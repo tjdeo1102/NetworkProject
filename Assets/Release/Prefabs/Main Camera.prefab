@@ -99,8 +99,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 4538821578143997905}
   zoomSpeed: 2.5
-  maxZoomOut: 15
-  minZoomIn: 10
+  maxZoomOut: 18
+  minZoomIn: 15
   gameState: {fileID: 0}
   cameraSize: 0
   highestPlayerHeight: 0

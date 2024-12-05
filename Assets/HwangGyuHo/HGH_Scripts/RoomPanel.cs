@@ -19,6 +19,7 @@ public class RoomPanel : MonoBehaviour
     [SerializeField] private int gameScene;
     [SerializeField] PhotonView photonView;
     [SerializeField] TMP_Text modeText;
+    [SerializeField] TMP_Text roomTitle;
 
     [Header("Mode Select")]
     [SerializeField] private bool isMode_0;           // 모드1 버튼
@@ -37,6 +38,8 @@ public class RoomPanel : MonoBehaviour
 
         if (PhotonNetwork.IsMasterClient == true)
             SendSelectMode1();
+
+        roomTitle?.SetText(PhotonNetwork.CurrentRoom.Name);
     }
 
     private void OnDisable()
