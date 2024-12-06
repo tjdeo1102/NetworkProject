@@ -169,13 +169,14 @@ public class SurvivalModeState : GameState
             }
         }
 
-        if (DeadPlayers.Count >= playerObjectDic.Count)
+        if (DeadPlayers.Count + 1 >= playerObjectDic.Count)
         {
             List<Tuple<int, int>> result = new List<Tuple<int, int>>();
             foreach (var id in playerObjectDic.Keys)
             {
                 if (playerObjectDic[id].TryGetComponent<PlayerController>(out var controller))
                 {
+                    controller.ReachGoal();
                     result.Add(new Tuple<int, int>(id,controller.BlockCount));
                 }
             }

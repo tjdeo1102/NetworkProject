@@ -204,12 +204,18 @@ public class PlayerController : MonoBehaviourPun, IPunObservable
         Heart.SetActive(false);
     }
 
-    public void ReachGoal()
+    [PunRPC]
+    public void ReachGoalRPC()
     {
         IsGoal = true;
         OnPlayerDone?.Invoke();
         //골인 했을 때 추가적인 구현
         //ex) 원작 게임처럼 큰 나무집이 떨어져 1등이 엔딩을 장식할 수 있도록
+    }
+
+    public void ReachGoal()
+    {
+        photonView.RPC("ReachGoalRPC", RpcTarget.All);
     }
 
     public void BlockEnter(Blocks block)

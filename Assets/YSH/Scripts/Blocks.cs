@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -171,17 +172,24 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         else
         {
             rigid.drag = normalDrag;
+
             rigid.velocity = Vector2.zero;
         }
     }
 
-    public void SetOwner(PlayerController player)
+    [PunRPC]
+    public void SetOwnerRPC(int viewID)
     {
         // owner 참조
-        owner = player;
+        owner = PhotonView.Find(viewID).GetComponent<PlayerController>();
         // 이벤트 구독
         owner.OnPlayerDone += Freeze;
         owner.OnProcessPanalty += ChangeDrag;
+    }
+
+    public void SetOwner(PlayerController player)
+    {
+        photonView.RPC("SetOwnerRPC", RpcTarget.All, player.GetComponent<PhotonView>().ViewID);
     }
 
     // Player의 빠른 하강 조작을 위한 Interface
@@ -418,6 +426,9 @@ public class Blocks : MonoBehaviourPun, IPunObservable
 
     private void OnCollisionEnter2D(Collision2D other)
     {
+        if (owner.IsGoal)
+            return;
+
         if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
         {
             //rigid.rotation = targetAngle;
@@ -482,6 +493,8 @@ public class Blocks : MonoBehaviourPun, IPunObservable
 
         // 이벤트 발생
         OnBlockExited?.Invoke(this);
+
+        print($"CollisionExit: {owner.BlockCount}");
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -491,13 +504,41 @@ public class Blocks : MonoBehaviourPun, IPunObservable
         {
             if (owner != null)
             {
+                if (owner.IsGoal)
+                    return;
+
+                //if (!photonView.IsMine)
+                //    return;
+
+                //// 충돌체 카운트 감소
+                //collisionCount--;
+
+                //// 아직 enter된 상태가 아니면 return
+                //if (!isEntered)
+                //    return;
+
+                //// 충돌중인 물체가 있다면 exit가 아닌것으로 간주
+                //if (collisionCount > 0)
+                //    return;
+
+                // enter flag set
+                if (isEntered)
+                {
+                    isEntered = false;
+                    collisionCount--;
+                    owner.BlockCount--;
+                }
+
+                print($"TriggerEnter: {owner.BlockCount}");
+
                 owner.OnPlayerDone -= Freeze;
                 owner.OnProcessPanalty -= ChangeDrag;
+
+                // 이벤트 발생
+                OnBlockFallen?.Invoke(this);
+                // 바로 삭제
+                Destroy(gameObject);
             }
-            // 이벤트 발생
-            OnBlockFallen?.Invoke(this);
-            // 바로 삭제
-            Destroy(gameObject);
         }
     }
 

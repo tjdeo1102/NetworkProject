@@ -57,6 +57,8 @@ MonoBehaviour:
   - TakeDamage
   - SelectModeButton
   - ModeSelect
+  - ReachGoalRPC
+  - SetOwnerRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
