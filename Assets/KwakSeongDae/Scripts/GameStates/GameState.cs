@@ -72,8 +72,10 @@ public class GameState : MonoBehaviourPunCallbacks
         startDelay = new WaitForSecondsRealtime(startDelayTime);
         finishDelay = new WaitForSeconds(finishDelayTime);
         // 플레이어 오브젝트 딕셔너리는 모든 클라이언트가 가질수 있도록 설정
-        playerObjectDic = new Dictionary<int, GameObject>();
-        towerObjectDic = new Dictionary<int, GameObject>();
+        if (playerObjectDic == null)
+            playerObjectDic = new Dictionary<int, GameObject>();
+        if (towerObjectDic == null)
+            towerObjectDic = new Dictionary<int, GameObject>();
 
         if (playerPrefabPath.IsNullOrEmpty() == false
             && uiPrefab != null)
@@ -116,6 +118,8 @@ public class GameState : MonoBehaviourPunCallbacks
     [PunRPC]
     protected void SetPlayerObjectDic(int viewID)
     {
+        if (playerObjectDic == null)
+            playerObjectDic = new Dictionary<int, GameObject>();
         var obj = PhotonView.Find(viewID);
         playerObjectDic.Add(obj.Owner.ActorNumber, obj.gameObject);
     }
@@ -123,14 +127,16 @@ public class GameState : MonoBehaviourPunCallbacks
     [PunRPC]
     protected void SetTowerObjectDic(int viewID)
     {
+        if (towerObjectDic == null)
+            towerObjectDic = new Dictionary<int, GameObject>();
         var obj = PhotonView.Find(viewID);
         towerObjectDic.Add(obj.Owner.ActorNumber, obj.gameObject);
     }
 
     [PunRPC]
-    protected void StartRoutineWrap()
+    protected void StartRoutineWrap(PhotonMessageInfo info)
     {
-        StartCoroutine(StartRoutine(PhotonNetwork.Time));
+        StartCoroutine(StartRoutine(info.SentServerTime));
     }
 
     /// <summary>
@@ -138,7 +144,7 @@ public class GameState : MonoBehaviourPunCallbacks
     /// </summary>
     protected IEnumerator StartRoutine(double startTime)
     {
-        var delay = PhotonNetwork.Time - startTime;
+        var delay = Math.Abs(PhotonNetwork.Time - startTime);
         //print($"방장이 보낸 RPC를 수신까지 딜레이 {delay}");
         // 지연보상 적용
         playerUI?.SetTimer(startDelayTime - (float)delay);
@@ -217,7 +223,9 @@ public class GameState : MonoBehaviourPunCallbacks
 
         // 방장이 바뀌는 경우 (강제종료 된 경우)
         // 1. 게임 씬의 모든 오브젝트 정리 
-        gameObject.SetActive(false);
+        if (gameObject != null)
+            gameObject.SetActive(false);
+
         // 2. 방 떠나기
         PhotonNetwork.LeaveRoom();
     }
